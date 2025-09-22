@@ -1,4 +1,8 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 /**
  * JHUB AFRICA PROJECT TRACKER
  * Application Initialization File
@@ -23,7 +27,9 @@ if (basename($_SERVER['PHP_SELF']) === 'init.php') {
 ob_start();
 
 // Define application access constant
-define('JHUB_ACCESS', true);
+if (!defined('JHUB_ACCESS')) {
+    define('JHUB_ACCESS', true);
+}
 
 // Get the root directory
 define('ROOT_DIR', dirname(dirname(__FILE__)) . '/');
@@ -50,7 +56,6 @@ function jhubErrorHandler($severity, $message, $file, $line) {
         E_USER_ERROR => 'USER ERROR',
         E_USER_WARNING => 'USER WARNING',
         E_USER_NOTICE => 'USER NOTICE',
-        E_STRICT => 'STRICT NOTICE',
         E_RECOVERABLE_ERROR => 'RECOVERABLE ERROR'
     ];
     
@@ -91,8 +96,8 @@ function jhubExceptionHandler($exception) {
 }
 
 // Set custom error and exception handlers
-set_error_handler('jhubErrorHandler');
-set_exception_handler('jhubExceptionHandler');
+// set_error_handler('jhubErrorHandler');
+// set_exception_handler('jhubExceptionHandler');
 
 // ==============================================
 // LOAD CONFIGURATION FILES
@@ -487,3 +492,8 @@ register_shutdown_function('jhubShutdown');
  * - DEVELOPMENT_MODE: True if in development environment
  * - ROOT_DIR: Path to application root directory
  */
+
+
+
+
+

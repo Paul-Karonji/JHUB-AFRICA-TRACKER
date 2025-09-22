@@ -124,8 +124,11 @@ class Project {
             ];
             
         } catch (Exception $e) {
-            logActivity('ERROR', "Get project team error: " . $e->getMessage(), ['project_id' => $projectId]);
-            return ['success' => false, 'message' => 'Failed to get project team'];
+            $this->db->rollback();
+            logActivity('ERROR', "Project creation error: " . $e->getMessage(), [
+                'project_data' => array_intersect_key($data, array_flip(['name', 'profile_name', 'email']))
+            ]);
+            return ['success' => false, 'message' => $e->getMessage()];
         }
     }
     
@@ -780,14 +783,7 @@ class Project {
             ];
         }
     }
-}
-            $this->db->rollback();
-            logActivity('ERROR', "Project creation error: " . $e->getMessage(), [
-                'project_data' => array_intersect_key($data, array_flip(['name', 'profile_name', 'email']))
-            ]);
-            return ['success' => false, 'message' => $e->getMessage()];
-        }
-    }
+
     
     /**
      * Get project details with current stage and ratings
@@ -1448,3 +1444,11 @@ class Project {
             return ['success' => true, 'team' => $team];
             
         } catch (Exception $e) {
+            logActivity('ERROR', "Get project team error: " . $e->getMessage(), [
+                'project_id' => $projectId
+            ]);
+            return ['success' => false, 'message' => $e->getMessage()];
+        }
+    }
+}
+

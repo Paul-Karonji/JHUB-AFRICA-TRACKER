@@ -21,7 +21,9 @@ if (!defined('JHUB_ACCESS')) {
 // ==============================================
 
 // Application Access Control
-define('JHUB_ACCESS', true);
+if (!defined('JHUB_ACCESS')) {
+    define('JHUB_ACCESS', true);
+}
 define('JHUB_VERSION', '1.0.0');
 define('JHUB_RELEASE_DATE', '2024-01-01');
 
