@@ -38,6 +38,18 @@ class APIRouter {
     
     /** @var Project Project management instance */
     private $project;
+    /** @var Mentor */
+    private $mentor;
+
+    /** @var Comment */
+    private $comment;
+
+    /** @var Rating */
+    private $rating;
+
+    /** @var Notification */
+    private $notification;
+
     
     /** @var array Rate limiting storage */
     private $rateLimits = [];
@@ -48,6 +60,10 @@ class APIRouter {
     public function __construct() {
         $this->auth = new Auth();
         $this->project = new Project();
+        $this->mentor = new Mentor();
+        $this->comment = new Comment();
+        $this->rating = new Rating();
+        $this->notification = new Notification();
     }
     
     /**
@@ -275,28 +291,216 @@ class APIRouter {
     /**
      * Handle comment endpoints
      */
-    private function handleComments($method, $id, $subResource) {
-        // Comments will be handled by the Comment class when implemented
-        $this->sendResponse(['error' => 'Comments API not yet implemented'], 501);
+        private function handleComments($method, $id, $subResource) {
+        switch ($method) {
+            case 'GET':
+                if ($id === null) {
+                    $projectId = $_GET['project_id'] ?? null;
+                    if (!$projectId) {
+                        $this->sendResponse(['error' => 'project_id is required'], 400);
+                        return;
+                    }
+                    $includeReplies = ($_GET['include_replies'] ?? '1') !== '0';
+                    $limit = $_GET['limit'] ?? null;
+                    $result = $this->comment->getProjectComments($projectId, $includeReplies, 'newest_first', $limit);
+                    $this->sendResponse($result);
+                } else {
+                    $comment = $this->comment->getComment($id);
+                    if (!$comment) {
+                        $this->sendResponse(['error' => 'Comment not found'], 404);
+                        return;
+                    }
+                    $this->sendResponse(['success' => true, 'comment' => $comment]);
+                }
+                break;
+            case 'POST':
+                $data = $this->getRequestData();
+                try {
+                    requireKeys($data, ['project_id', 'comment_text']);
+                    $userType = 'public';
+                    $userId = null;
+                    $commenterName = $data['commenter_name'] ?? null;
+                    if ($this->auth->isAuthenticated()) {
+                        $userType = $this->auth->getUserType();
+                        $userId = $this->auth->getUserId();
+                        if ($userType === 'project') {
+                            $commenterName = $_SESSION['project_name'] ?? 'Project Team';
+                        } elseif ($userType === 'mentor') {
+                            $commenterName = $_SESSION['name'] ?? 'Mentor';
+                        } elseif ($userType === 'admin') {
+                            $commenterName = $_SESSION['username'] ?? 'Admin';
+                        }
+                    } else {
+                        $userType = $data['user_type'] ?? 'public';
+                    }
+                    $result = $this->comment->addComment(
+                        $data['project_id'],
+                        $userType,
+                        $userId,
+                        $data['comment_text'],
+                        $data['parent_id'] ?? null,
+                        $commenterName
+                    );
+                    $status = $result['success'] ? 201 : 400;
+                    $this->sendResponse($result, $status);
+                } catch (Exception $e) {
+                    $this->sendResponse(['success' => false, 'error' => $e->getMessage()], 400);
+                }
+                break;
+            case 'PUT':
+                if ($id === null) {
+                    $this->sendResponse(['error' => 'Comment ID required'], 400);
+                    return;
+                }
+                if (!$this->auth->isAuthenticated()) {
+                    $this->sendResponse(['error' => 'Authentication required'], 401);
+                    return;
+                }
+                $data = $this->getRequestData();
+                $userType = $this->auth->getUserType();
+                $userId = $this->auth->getUserId();
+                $result = $this->comment->updateComment($id, $data['comment_text'] ?? '', $userType, $userId);
+                $this->sendResponse($result, $result['success'] ? 200 : 400);
+                break;
+            case 'DELETE':
+                if ($id === null) {
+                    $this->sendResponse(['error' => 'Comment ID required'], 400);
+                    return;
+                }
+                if (!$this->auth->isAuthenticated()) {
+                    $this->sendResponse(['error' => 'Authentication required'], 401);
+                    return;
+                }
+                $userType = $this->auth->getUserType();
+                $userId = $this->auth->getUserId();
+                $result = $this->comment->deleteComment($id, $userType, $userId);
+                $this->sendResponse($result, $result['success'] ? 200 : 400);
+                break;
+            default:
+                $this->sendResponse(['error' => 'Method not allowed'], 405);
+        }
     }
-    
-    /**
+/**
      * Handle rating endpoints
      */
-    private function handleRatings($method, $id, $subResource) {
-        // Ratings will be handled by the Rating class when implemented
-        $this->sendResponse(['error' => 'Ratings API not yet implemented'], 501);
+        private function handleRatings($method, $id, $subResource) {
+        switch ($method) {
+            case 'GET':
+                if ($id !== null) {
+                    if ($subResource === 'timeline') {
+                        $result = $this->rating->getProjectTimeline($id);
+                        $this->sendResponse($result);
+                    } elseif ($subResource === 'latest') {
+                        $result = $this->rating->getLatestRating($id);
+                        $this->sendResponse(['success' => true, 'rating' => $result]);
+                    } elseif ($subResource === 'can-rate') {
+                        $this->requireMentorAccess($this->auth->getUserId());
+                        $mentorId = $this->auth->getUserId();
+                        $result = $this->rating->canMentorRateProject($id, $mentorId);
+                        $this->sendResponse($result);
+                    } else {
+                        $result = $this->rating->getProjectRatings($id);
+                        $this->sendResponse($result);
+                    }
+                } elseif (isset($_GET['mentor_id'])) {
+                    $result = $this->rating->getRatingsByMentor($_GET['mentor_id']);
+                    $this->sendResponse($result);
+                } else {
+                    $result = $this->rating->getSystemRatingStats();
+                    $this->sendResponse(['success' => true, 'stats' => $result]);
+                }
+                break;
+            case 'POST':
+                $this->requireAuthentication();
+                if ($this->auth->getUserType() !== 'mentor') {
+                    $this->sendResponse(['error' => 'Only mentors can update ratings'], 403);
+                    return;
+                }
+                $data = $this->getRequestData();
+                try {
+                    requireKeys($data, ['project_id', 'stage', 'percentage']);
+                    $mentorId = $this->auth->getUserId();
+                    $result = $this->rating->updateProjectRating(
+                        $data['project_id'],
+                        $mentorId,
+                        (int) $data['stage'],
+                        (int) $data['percentage'],
+                        $data['notes'] ?? null
+                    );
+                    $status = $result['success'] ? 200 : 400;
+                    $this->sendResponse($result, $status);
+                } catch (Exception $e) {
+                    $this->sendResponse(['success' => false, 'error' => $e->getMessage()], 400);
+                }
+                break;
+            default:
+                $this->sendResponse(['error' => 'Method not allowed'], 405);
+        }
     }
-    
-    /**
+/**
      * Handle notification endpoints
      */
-    private function handleNotifications($method, $id, $subResource) {
-        // Notifications will be handled by the Notification class when implemented
-        $this->sendResponse(['error' => 'Notifications API not yet implemented'], 501);
+        private function handleNotifications($method, $id, $subResource) {
+        $this->requireAuthentication();
+        $userType = $this->auth->getUserType();
+        $userId = $this->auth->getUserId();
+
+        switch ($method) {
+            case 'GET':
+                if ($subResource === 'unread-count') {
+                    $count = $this->notification->countUnread($userType, $userId);
+                    $this->sendResponse(['success' => true, 'unread' => $count]);
+                    return;
+                }
+                $options = [
+                    'limit' => (int) ($_GET['limit'] ?? 20),
+                    'offset' => (int) ($_GET['offset'] ?? 0),
+                    'unread_only' => ($_GET['unread_only'] ?? '0') === '1'
+                ];
+                $result = $this->notification->getNotifications($userType, $userId, $options);
+                $this->sendResponse($result);
+                break;
+            case 'POST':
+                $data = $this->getRequestData();
+                if ($subResource === 'mark-read' || isset($data['notification_id']) || $id !== null) {
+                    $notificationId = $data['notification_id'] ?? $id;
+                    if (!$notificationId) {
+                        $this->sendResponse(['error' => 'notification_id is required'], 400);
+                        return;
+                    }
+                    $result = $this->notification->markAsRead($notificationId, $userType, $userId);
+                    $this->sendResponse($result);
+                } elseif ($subResource === 'mark-all-read') {
+                    $result = $this->notification->markAllAsRead($userType, $userId);
+                    $this->sendResponse($result);
+                } else {
+                    if ($userType !== 'admin') {
+                        $this->sendResponse(['error' => 'Only administrators can create notifications'], 403);
+                        return;
+                    }
+                    try {
+                        requireKeys($data, ['recipient_type', 'title', 'message']);
+                        $result = $this->notification->create($data);
+                        $status = $result['success'] ? 201 : 400;
+                        $this->sendResponse($result, $status);
+                    } catch (Exception $e) {
+                        $this->sendResponse(['success' => false, 'error' => $e->getMessage()], 400);
+                    }
+                }
+                break;
+            case 'DELETE':
+                if (!$id) {
+                    $this->sendResponse(['error' => 'Notification ID required'], 400);
+                    return;
+                }
+                $result = $this->notification->delete($id, $userType, $userId);
+                $this->sendResponse($result, $result['success'] ? 200 : 400);
+                break;
+            default:
+                $this->sendResponse(['error' => 'Method not allowed'], 405);
+        }
     }
-    
-    /**
+/**
      * Handle statistics endpoints
      */
     private function handleStats($method, $segments) {
@@ -474,16 +678,29 @@ class APIRouter {
     // ================================================
     
     private function handleGetMentors() {
-        // This would be implemented in the Mentor class
-        $this->sendResponse(['error' => 'Mentors API not yet implemented'], 501);
+        $filters = [
+            'page' => (int) ($_GET['page'] ?? 1),
+            'per_page' => (int) ($_GET['per_page'] ?? AppConfig::MENTORS_PER_PAGE),
+            'search' => $_GET['search'] ?? null,
+            'active_only' => ($_GET['active_only'] ?? '0') === '1'
+        ];
+
+        $result = $this->mentor->getMentors($filters);
+        $this->sendResponse($result);
     }
-    
-    private function handleRegisterMentor() {
-        // This would be implemented in the Mentor class
-        $this->sendResponse(['error' => 'Mentor registration API not yet implemented'], 501);
+private function handleRegisterMentor() {
+        $data = $this->getRequestData();
+        $adminId = $this->auth->getUserId();
+
+        try {
+            $result = $this->mentor->registerMentor($data, $adminId);
+            $status = $result['success'] ? 201 : 400;
+            $this->sendResponse($result, $status);
+        } catch (Exception $e) {
+            $this->sendResponse(['success' => false, 'error' => $e->getMessage()], 400);
+        }
     }
-    
-    private function handleGetMentorProjects($mentorId) {
+private function handleGetMentorProjects($mentorId) {
         $activeOnly = $_GET['active_only'] ?? true;
         
         $result = $this->project->getProjectsByMentor($mentorId, $activeOnly);
@@ -674,3 +891,8 @@ try {
         'message' => DEVELOPMENT_MODE ? $e->getMessage() : 'An unexpected error occurred'
     ]);
 }
+
+
+
+
+

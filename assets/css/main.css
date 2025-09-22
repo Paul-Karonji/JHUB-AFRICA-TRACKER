@@ -1,0 +1,209 @@
+:root {
+    --primary: #1565c0;
+    --primary-dark: #0d47a1;
+    --accent: #42a5f5;
+    --success: #2e7d32;
+    --danger: #c62828;
+    --muted: #607d8b;
+    --bg: #f5f7fb;
+    --text: #1f2933;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: "Segoe UI", Tahoma, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+.app-header {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: #fff;
+    padding: 1.2rem 0;
+    box-shadow: 0 4px 14px rgba(21, 101, 192, 0.25);
+}
+
+.app-header .branding {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+}
+
+.app-header .brand {
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.4rem;
+    letter-spacing: 1px;
+    text-decoration: none;
+}
+
+.app-header .tagline {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.main-nav {
+    margin-top: 0.5rem;
+    display: flex;
+    gap: 1.25rem;
+}
+
+.main-nav a {
+    color: #e3f2fd;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.main-nav a:hover {
+    color: #fff;
+}
+
+.app-main {
+    padding: 2rem 0 4rem 0;
+}
+
+.app-footer {
+    border-top: 1px solid rgba(21, 101, 192, 0.1);
+    background: #fff;
+    padding: 1.5rem 0;
+    color: var(--muted);
+}
+
+.app-footer a {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(15, 53, 102, 0.08);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.badge {
+    display: inline-block;
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.badge-success { background: rgba(46, 125, 50, 0.15); color: var(--success); }
+.badge-info { background: rgba(33, 150, 243, 0.15); color: var(--primary); }
+.badge-warning { background: rgba(255, 193, 7, 0.2); color: #b76e00; }
+.badge-danger { background: rgba(198, 40, 40, 0.15); color: var(--danger); }
+.badge-secondary { background: rgba(96, 125, 139, 0.2); color: var(--muted); }
+.badge-dark { background: rgba(33, 33, 33, 0.2); color: #212121; }
+
+.button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.6rem 1.2rem;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.button-secondary { background: var(--muted); }
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th,
+.table td {
+    padding: 0.75rem;
+    border-bottom: 1px solid rgba(15, 53, 102, 0.08);
+    text-align: left;
+}
+
+.table th {
+    font-size: 0.85rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.progress {
+    width: 100%;
+    height: 8px;
+    background: rgba(15, 53, 102, 0.08);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 8px;
+    border-radius: 999px;
+}
+
+.bg-success { background: linear-gradient(90deg, #43a047, #66bb6a); }
+.bg-warning { background: linear-gradient(90deg, #ffa000, #ffca28); }
+.bg-danger { background: linear-gradient(90deg, #e53935, #ef5350); }
+
+.grid {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.grid-3 {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+.metric {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.metric .label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+.metric .value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+}
+
+.alert {
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.alert-info { background: rgba(33, 150, 243, 0.12); color: var(--primary-dark); }
+.alert-warning { background: rgba(255, 193, 7, 0.12); color: #935f00; }
+.alert-success { background: rgba(76, 175, 80, 0.12); color: var(--success); }
+.alert-danger { background: rgba(244, 67, 54, 0.12); color: var(--danger); }
+
+@media (max-width: 768px) {
+    .main-nav {
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    .grid-3 {
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    }
+}

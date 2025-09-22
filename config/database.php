@@ -32,15 +32,6 @@ class DatabaseConfig {
     const DB_CHARSET = 'utf8mb4';
     const DB_COLLATION = 'utf8mb4_unicode_ci';
     
-    // Connection Options
-    const DB_OPTIONS = [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        PDO::ATTR_EMULATE_PREPARES => false,
-        PDO::ATTR_PERSISTENT => false,
-        \PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci"
-    ];
-    
     // Security Settings
     const PASSWORD_HASH_COST = 12;
     const SESSION_LIFETIME = 3600; // 1 hour in seconds
@@ -160,7 +151,13 @@ class DatabaseConfig {
      * @return array PDO connection options
      */
     public static function getOptions() {
-        return self::DB_OPTIONS;
+        return [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES => false,
+            PDO::ATTR_PERSISTENT => false,
+            PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES " . self::DB_CHARSET . " COLLATE " . self::DB_COLLATION
+        ];
     }
     
     /**
@@ -260,4 +257,3 @@ class DatabaseConfig {
 
 // Initialize environment on load
 DatabaseConfig::initializeEnvironment();
-
