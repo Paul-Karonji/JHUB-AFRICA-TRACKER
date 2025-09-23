@@ -27,7 +27,7 @@ class DatabaseConfig {
     const DB_HOST = 'localhost';
     const DB_NAME = 'jhub_africa_tracker';
     const DB_USER = 'root';
-    const DB_PASS = 'Paul';
+    const DB_PASS = '';
     const DB_PORT = 3306;
     const DB_CHARSET = 'utf8mb4';
     const DB_COLLATION = 'utf8mb4_unicode_ci';
