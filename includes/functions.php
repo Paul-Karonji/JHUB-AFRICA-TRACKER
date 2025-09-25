@@ -1,139 +1,239 @@
 <?php
-/**
- * Global utility functions shared across the application.
- */
+// includes/functions.php
+// Common Functions
 
-if (!defined('JHUB_ACCESS')) {
-    die('Direct access not permitted');
+/**
+ * Get stage name
+ */
+function getStageName($stage) {
+    global $STAGE_NAMES;
+    return isset($STAGE_NAMES[$stage]) ? $STAGE_NAMES[$stage] : 'Unknown Stage';
 }
 
 /**
- * Send standardized JSON response and terminate script.
+ * Get stage description
  */
-function jsonResponse($payload, $statusCode = 200) {
-    http_response_code($statusCode);
-    header('Content-Type: application/json');
-    if (is_array($payload)) {
-        $payload = array_merge($payload, [
-            'timestamp' => time(),
-            'api_version' => API_VERSION
-        ]);
-    }
-    echo json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-    exit;
+function getStageDescription($stage) {
+    global $STAGE_DESCRIPTIONS;
+    return isset($STAGE_DESCRIPTIONS[$stage]) ? $STAGE_DESCRIPTIONS[$stage] : '';
 }
 
 /**
- * Safely fetch JSON body from request.
+ * Get stage progress percentage
  */
-function getJsonBody() {
-    $raw = file_get_contents('php://input');
-    if (!$raw) {
-        return [];
-    }
-
-    $data = json_decode($raw, true);
-    return is_array($data) ? $data : [];
-}
-
-/**
- * Merge request payload from JSON and POST arrays.
- */
-function getRequestPayload() {
-    return array_merge(getJsonBody(), $_POST ?? []);
-}
-
-/**
- * Quickly validate required keys exist in associative array.
- */
-function requireKeys(array $source, array $keys) {
-    $missing = [];
-    foreach ($keys as $key) {
-        if (!isset($source[$key]) || $source[$key] === '') {
-            $missing[] = $key;
-        }
-    }
-    if (!empty($missing)) {
-        throw new Exception('Missing required fields: ' . implode(', ', $missing));
-    }
-}
-
-/**
- * Sanitize string for safe output.
- */
-function e($value) {
-    return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
-}
-
-/**
- * Convert associative array keys to snake_case recursively.
- */
-function arrayKeysToSnakeCase(array $data) {
-    $result = [];
-    foreach ($data as $key => $value) {
-        $snake = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $key));
-        $result[$snake] = is_array($value) ? arrayKeysToSnakeCase($value) : $value;
-    }
-    return $result;
-}
-
-/**
- * Simple pagination helper.
- */
-function buildPagination($total, $page, $perPage) {
-    $totalPages = $perPage > 0 ? (int) ceil($total / $perPage) : 1;
-    return [
-        'total' => (int) $total,
-        'page' => max(1, (int) $page),
-        'per_page' => (int) $perPage,
-        'total_pages' => max(1, $totalPages)
+function getStageProgress($stage) {
+    $progressMap = [
+        1 => 16.67, // ~17%
+        2 => 33.33, // ~33%
+        3 => 50.00, // 50%
+        4 => 66.67, // ~67%
+        5 => 83.33, // ~83%
+        6 => 100.00 // 100%
     ];
+    
+    return isset($progressMap[$stage]) ? $progressMap[$stage] : 0;
 }
 
 /**
- * Ensure request method matches expected.
+ * Get all projects for a user
  */
-function requireMethod($method) {
-    if (strtoupper($_SERVER['REQUEST_METHOD']) !== strtoupper($method)) {
-        jsonResponse([
-            'success' => false,
-            'error' => 'Method not allowed',
-            'allowed_method' => strtoupper($method)
-        ], 405);
+function getUserProjects($userType, $userId) {
+    $database = Database::getInstance();
+    
+    switch ($userType) {
+        case 'admin':
+            return $database->getRows("
+                SELECT p.*, 
+                       COUNT(DISTINCT pi.pi_id) as innovator_count,
+                       COUNT(DISTINCT pm.mentor_id) as mentor_count
+                FROM projects p
+                LEFT JOIN project_innovators pi ON p.project_id = pi.project_id AND pi.is_active = 1
+                LEFT JOIN project_mentors pm ON p.project_id = pm.project_id AND pm.is_active = 1
+                GROUP BY p.project_id
+                ORDER BY p.created_at DESC
+            ");
+            
+        case 'mentor':
+            return $database->getRows("
+                SELECT p.*, pm.assigned_at,
+                       COUNT(DISTINCT pi.pi_id) as innovator_count
+                FROM projects p
+                INNER JOIN project_mentors pm ON p.project_id = pm.project_id
+                LEFT JOIN project_innovators pi ON p.project_id = pi.project_id AND pi.is_active = 1
+                WHERE pm.mentor_id = ? AND pm.is_active = 1 AND p.status != 'terminated'
+                GROUP BY p.project_id
+                ORDER BY pm.assigned_at DESC
+            ", [$userId]);
+            
+        case 'project':
+            return $database->getRows("
+                SELECT p.*,
+                       COUNT(DISTINCT pi.pi_id) as innovator_count,
+                       COUNT(DISTINCT pm.mentor_id) as mentor_count
+                FROM projects p
+                LEFT JOIN project_innovators pi ON p.project_id = pi.project_id AND pi.is_active = 1
+                LEFT JOIN project_mentors pm ON p.project_id = pm.project_id AND pm.is_active = 1
+                WHERE p.project_id = ?
+                GROUP BY p.project_id
+            ", [$userId]);
     }
+    
+    return [];
 }
 
 /**
- * Ensure rate limit checks for custom endpoints (simple token bucket in session).
+ * Get project team members
  */
-function rateLimit($key, $maxAttempts = 100, $windowSeconds = 3600) {
-    if (!isset($_SESSION['rate_limits'][$key])) {
-        $_SESSION['rate_limits'][$key] = [];
-    }
-
-    $now = time();
-    $_SESSION['rate_limits'][$key] = array_filter(
-        $_SESSION['rate_limits'][$key],
-        function ($attempt) use ($now, $windowSeconds) {
-            return ($now - $attempt) < $windowSeconds;
-        }
-    );
-
-    if (count($_SESSION['rate_limits'][$key]) >= $maxAttempts) {
-        return false;
-    }
-
-    $_SESSION['rate_limits'][$key][] = $now;
-    return true;
+function getProjectTeam($projectId) {
+    $database = Database::getInstance();
+    return $database->getRows("
+        SELECT * FROM project_innovators 
+        WHERE project_id = ? AND is_active = 1 
+        ORDER BY added_at ASC
+    ", [$projectId]);
 }
 
 /**
- * Build domain absolute URL from relative path.
+ * Get project mentors
  */
-function absoluteUrl($path) {
-    $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
-    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-    $path = ltrim($path, '/');
-    return $scheme . $host . '/' . $path;
+function getProjectMentors($projectId) {
+    $database = Database::getInstance();
+    return $database->getRows("
+        SELECT m.*, pm.assigned_at, pm.notes
+        FROM project_mentors pm
+        INNER JOIN mentors m ON pm.mentor_id = m.mentor_id
+        WHERE pm.project_id = ? AND pm.is_active = 1 AND m.is_active = 1
+        ORDER BY pm.assigned_at ASC
+    ", [$projectId]);
 }
+
+/**
+ * Get project comments
+ */
+function getProjectComments($projectId, $parentId = null, $limit = 50) {
+    $database = Database::getInstance();
+    
+    $sql = "
+        SELECT * FROM comments 
+        WHERE project_id = ? AND parent_comment_id " . ($parentId ? "= ?" : "IS NULL") . " 
+        AND is_deleted = 0
+        ORDER BY created_at ASC
+    ";
+    
+    $params = $parentId ? [$projectId, $parentId] : [$projectId];
+    
+    if ($limit) {
+        $sql .= " LIMIT " . intval($limit);
+    }
+    
+    return $database->getRows($sql, $params);
+}
+
+/**
+ * Check if mentor is assigned to project
+ */
+function isMentorAssignedToProject($mentorId, $projectId) {
+    $database = Database::getInstance();
+    $result = $database->getRow("
+        SELECT pm_id FROM project_mentors 
+        WHERE mentor_id = ? AND project_id = ? AND is_active = 1
+    ", [$mentorId, $projectId]);
+    
+    return !empty($result);
+}
+
+/**
+ * Get available projects for mentor assignment
+ */
+function getAvailableProjectsForMentor($mentorId) {
+    $database = Database::getInstance();
+    return $database->getRows("
+        SELECT p.*, 
+               COUNT(DISTINCT pi.pi_id) as innovator_count,
+               COUNT(DISTINCT pm.mentor_id) as mentor_count
+        FROM projects p
+        LEFT JOIN project_innovators pi ON p.project_id = pi.project_id AND pi.is_active = 1
+        LEFT JOIN project_mentors pm ON p.project_id = pm.project_id AND pm.is_active = 1
+        WHERE p.status = 'active' 
+        AND p.project_id NOT IN (
+            SELECT project_id FROM project_mentors 
+            WHERE mentor_id = ? AND is_active = 1
+        )
+        GROUP BY p.project_id
+        ORDER BY p.created_at DESC
+    ", [$mentorId]);
+}
+
+/**
+ * Get system statistics for admin dashboard
+ */
+function getSystemStatistics() {
+    $database = Database::getInstance();
+    
+    $stats = [];
+    
+    // Total projects
+    $stats['total_projects'] = $database->count('projects');
+    $stats['active_projects'] = $database->count('projects', 'status = ?', ['active']);
+    $stats['completed_projects'] = $database->count('projects', 'status = ?', ['completed']);
+    $stats['terminated_projects'] = $database->count('projects', 'status = ?', ['terminated']);
+    
+    // Applications
+    $stats['pending_applications'] = $database->count('project_applications', 'status = ?', ['pending']);
+    $stats['total_applications'] = $database->count('project_applications');
+    
+    // Users
+    $stats['total_mentors'] = $database->count('mentors', 'is_active = 1');
+    $stats['total_innovators'] = $database->count('project_innovators', 'is_active = 1');
+    
+    // Recent activity
+    $stats['projects_this_month'] = $database->count('projects', 'created_at >= DATE_SUB(NOW(), INTERVAL 1 MONTH)');
+    $stats['applications_this_week'] = $database->count('project_applications', 'applied_at >= DATE_SUB(NOW(), INTERVAL 1 WEEK)');
+    
+    return $stats;
+}
+
+/**
+ * Log activity
+ */
+function logActivity($userType, $userId, $action, $description, $projectId = null, $additionalData = null) {
+    $database = Database::getInstance();
+    
+    $data = [
+        'user_type' => $userType,
+        'user_id' => $userId,
+        'action' => $action,
+        'description' => $description,
+        'ip_address' => $_SERVER['REMOTE_ADDR'] ?? null,
+        'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? null
+    ];
+    
+    if ($projectId) {
+        $data['project_id'] = $projectId;
+    }
+    
+    if ($additionalData) {
+        $data['additional_data'] = json_encode($additionalData);
+    }
+    
+    return $database->insert('activity_logs', $data);
+}
+
+/**
+ * Send email notification (placeholder for later implementation)
+ */
+function sendEmailNotification($to, $subject, $message, $type = 'general') {
+    // This will be implemented when we add the email system
+    // For now, we'll just log the notification
+    
+    $database = Database::getInstance();
+    return $database->insert('email_notifications', [
+        'recipient_email' => $to,
+        'subject' => $subject,
+        'message_body' => $message,
+        'notification_type' => $type,
+        'status' => 'pending'
+    ]);
+}
+
 ?>

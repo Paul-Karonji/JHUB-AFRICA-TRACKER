@@ -1,786 +1,260 @@
 <?php
-/**
- * JHUB AFRICA PROJECT TRACKER
- * Authentication Management Class
- * 
- * This class handles all authentication operations including login, logout,
- * session management, and user verification for all user types.
- * 
- * @author JHUB AFRICA Development Team
- * @version 1.0
- * @since 2024
- */
+// classes/Auth.php
+// Authentication System
 
-// Prevent direct access
-if (!defined('JHUB_ACCESS')) {
-    die('Direct access not permitted');
-}
-
-/**
- * Authentication Class
- * 
- * Manages multi-type user authentication and session handling
- */
 class Auth {
-    
-    /** @var Database Database instance */
     private $db;
+    private static $instance = null;
     
-    /** @var array Login attempt tracking */
-    private $loginAttempts = [];
-    
-    /** @var string Current user type */
-    private $currentUserType = null;
-    
-    /** @var int Current user ID */
-    private $currentUserId = null;
-    
-    /**
-     * Constructor - Initialize authentication system
-     */
-    public function __construct() {
+    private function __construct() {
         $this->db = Database::getInstance();
-        $this->initializeSession();
-        $this->loadCurrentUser();
     }
     
-    /**
-     * Initialize session if not already started
-     */
-    private function initializeSession() {
+    public static function getInstance() {
+        if (self::$instance === null) {
+            self::$instance = new Auth();
+        }
+        return self::$instance;
+    }
+    
+    // Start secure session
+    public function startSession() {
         if (session_status() === PHP_SESSION_NONE) {
-            AppConfig::initializeSession();
-        }
-        
-        // Regenerate session ID periodically for security
-        if (!isset($_SESSION['last_regeneration'])) {
-            $_SESSION['last_regeneration'] = time();
-        } elseif ($_SESSION['last_regeneration'] < (time() - 300)) {
-            session_regenerate_id(true);
-            $_SESSION['last_regeneration'] = time();
-        }
-    }
-    
-    /**
-     * Load current user information from session
-     */
-    private function loadCurrentUser() {
-        if (isset($_SESSION['user_type']) && isset($_SESSION['user_id'])) {
-            $this->currentUserType = $_SESSION['user_type'];
-            $this->currentUserId = $_SESSION['user_id'];
+            session_name(SESSION_NAME);
+            session_start();
+            
+            // Regenerate session ID periodically
+            if (!isset($_SESSION['created'])) {
+                $_SESSION['created'] = time();
+            } else if (time() - $_SESSION['created'] > 1800) {
+                session_regenerate_id(true);
+                $_SESSION['created'] = time();
+            }
         }
     }
     
-    /**
-     * Admin login authentication
-     * 
-     * @param string $username Admin username
-     * @param string $password Admin password
-     * @return array Login result
-     */
+    // Admin login
     public function loginAdmin($username, $password) {
-        try {
-            // Check login attempts
-            if ($this->isLoginBlocked('admin', $username)) {
-                return [
-                    'success' => false,
-                    'message' => 'Too many failed login attempts. Please try again later.',
-                    'blocked_until' => $this->getBlockedUntil('admin', $username)
-                ];
-            }
-            
-            // Validate input
-            if (empty($username) || empty($password)) {
-                $this->recordFailedLogin('admin', $username);
-                return ['success' => false, 'message' => 'Username and password are required'];
-            }
-            
-            // Get admin from database
-            $stmt = $this->db->prepare("SELECT id, username, password FROM admins WHERE username = ?");
-            $this->db->execute($stmt, [$username]);
-            $admin = $stmt->fetch();
-            
-            if (!$admin || !password_verify($password, $admin['password'])) {
-                $this->recordFailedLogin('admin', $username);
-                return ['success' => false, 'message' => 'Invalid admin credentials'];
-            }
-            
-            // Login successful - create session
-            $this->createUserSession('admin', $admin['id'], [
-                'username' => $admin['username']
-            ]);
-            
-            $this->clearFailedLogins('admin', $username);
-            
-            logActivity('INFO', "Admin login successful", ['username' => $username]);
-            
-            return [
-                'success' => true,
-                'user_type' => 'admin',
-                'user_id' => $admin['id'],
-                'username' => $admin['username'],
-                'redirect' => AppConfig::getDashboardUrl('admin')
-            ];
-            
-        } catch (Exception $e) {
-            logActivity('ERROR', "Admin login error: " . $e->getMessage(), ['username' => $username]);
-            return ['success' => false, 'message' => 'Login failed. Please try again.'];
-        }
+        return $this->login('admin', $username, $password, 'admins', 'admin_id', 'username');
     }
     
-    /**
-     * Mentor login authentication
-     * 
-     * @param string $email Mentor email
-     * @param string $password Mentor password
-     * @return array Login result
-     */
+    // Mentor login
     public function loginMentor($email, $password) {
-        try {
-            // Check login attempts
-            if ($this->isLoginBlocked('mentor', $email)) {
-                return [
-                    'success' => false,
-                    'message' => 'Too many failed login attempts. Please try again later.',
-                    'blocked_until' => $this->getBlockedUntil('mentor', $email)
-                ];
-            }
-            
-            // Validate input
-            if (empty($email) || empty($password)) {
-                $this->recordFailedLogin('mentor', $email);
-                return ['success' => false, 'message' => 'Email and password are required'];
-            }
-            
-            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                return ['success' => false, 'message' => 'Invalid email format'];
-            }
-            
-            // Get mentor from database
-            $stmt = $this->db->prepare("
-                SELECT id, name, email, password, bio, expertise 
-                FROM mentors 
-                WHERE email = ?
-            ");
-            $this->db->execute($stmt, [$email]);
-            $mentor = $stmt->fetch();
-            
-            if (!$mentor || !password_verify($password, $mentor['password'])) {
-                $this->recordFailedLogin('mentor', $email);
-                return ['success' => false, 'message' => 'Invalid mentor credentials'];
-            }
-            
-            // Login successful - create session
-            $this->createUserSession('mentor', $mentor['id'], [
-                'name' => $mentor['name'],
-                'email' => $mentor['email'],
-                'expertise' => $mentor['expertise'],
-                'bio' => $mentor['bio']
-            ]);
-            
-            $this->clearFailedLogins('mentor', $email);
-            
-            logActivity('INFO', "Mentor login successful", ['email' => $email, 'name' => $mentor['name']]);
-            
-            return [
-                'success' => true,
-                'user_type' => 'mentor',
-                'user_id' => $mentor['id'],
-                'name' => $mentor['name'],
-                'email' => $mentor['email'],
-                'expertise' => $mentor['expertise'],
-                'redirect' => AppConfig::getDashboardUrl('mentor')
-            ];
-            
-        } catch (Exception $e) {
-            logActivity('ERROR', "Mentor login error: " . $e->getMessage(), ['email' => $email]);
-            return ['success' => false, 'message' => 'Login failed. Please try again.'];
-        }
+        return $this->login('mentor', $email, $password, 'mentors', 'mentor_id', 'email');
     }
     
-    /**
-     * Project login authentication
-     * 
-     * @param string $profileName Project profile name
-     * @param string $password Project password
-     * @return array Login result
-     */
-    public function loginProject($profileName, $password) {
-        try {
-            // Check login attempts
-            if ($this->isLoginBlocked('project', $profileName)) {
-                return [
-                    'success' => false,
-                    'message' => 'Too many failed login attempts. Please try again later.',
-                    'blocked_until' => $this->getBlockedUntil('project', $profileName)
-                ];
-            }
-            
-            // Validate input
-            if (empty($profileName) || empty($password)) {
-                $this->recordFailedLogin('project', $profileName);
-                return ['success' => false, 'message' => 'Profile name and password are required'];
-            }
-            
-            // Get project from database with additional info
-            $stmt = $this->db->prepare("
-                SELECT p.id, p.name, p.profile_name, p.password, p.status, p.description,
-                       p.email, p.website,
-                       COALESCE(latest_rating.stage, p.current_stage, 1) as current_stage,
-                       COALESCE(latest_rating.percentage, p.current_percentage, 10) as current_percentage,
-                       COUNT(pi.id) as innovator_count
-                FROM projects p
-                LEFT JOIN project_innovators pi ON p.id = pi.project_id
-                LEFT JOIN (
-                    SELECT project_id, stage, percentage,
-                           ROW_NUMBER() OVER (PARTITION BY project_id ORDER BY rated_at DESC) as rn
-                    FROM ratings
-                ) latest_rating ON p.id = latest_rating.project_id AND latest_rating.rn = 1
-                WHERE p.profile_name = ? AND p.status != 'terminated'
-                GROUP BY p.id
-            ");
-            $this->db->execute($stmt, [$profileName]);
-            $project = $stmt->fetch();
-            
-            if (!$project || !password_verify($password, $project['password'])) {
-                $this->recordFailedLogin('project', $profileName);
-                return ['success' => false, 'message' => 'Invalid project credentials'];
-            }
-            
-            if ($project['status'] === 'terminated') {
-                return ['success' => false, 'message' => 'This project has been terminated'];
-            }
-            
-            // Login successful - create session
-            $this->createUserSession('project', $project['id'], [
-                'project_name' => $project['name'],
-                'profile_name' => $project['profile_name'],
-                'project_status' => $project['status'],
-                'current_stage' => $project['current_stage'],
-                'current_percentage' => $project['current_percentage'],
-                'innovator_count' => $project['innovator_count'],
-                'description' => $project['description'],
-                'email' => $project['email'],
-                'website' => $project['website']
-            ]);
-            
-            $this->clearFailedLogins('project', $profileName);
-            
-            logActivity('INFO', "Project login successful", [
-                'profile_name' => $profileName, 
-                'project_name' => $project['name']
-            ]);
-            
-            return [
-                'success' => true,
-                'user_type' => 'project',
-                'project_id' => $project['id'],
-                'project_name' => $project['name'],
-                'profile_name' => $project['profile_name'],
-                'current_stage' => $project['current_stage'],
-                'status' => $project['status'],
-                'redirect' => AppConfig::getDashboardUrl('project')
-            ];
-            
-        } catch (Exception $e) {
-            logActivity('ERROR', "Project login error: " . $e->getMessage(), ['profile_name' => $profileName]);
-            return ['success' => false, 'message' => 'Login failed. Please try again.'];
-        }
+    // Project login
+    public function loginProject($profile_name, $password) {
+        return $this->login('project', $profile_name, $password, 'projects', 'project_id', 'profile_name');
     }
     
-    /**
-     * Create user session
-     * 
-     * @param string $userType User type
-     * @param int $userId User ID
-     * @param array $additionalData Additional session data
-     */
-    private function createUserSession($userType, $userId, $additionalData = []) {
-        // Clear existing session data
-        session_unset();
+    // Generic login method
+    private function login($userType, $identifier, $password, $table, $idField, $identifierField) {
+        // Check for brute force attacks
+        if ($this->isAccountLocked($identifier, $userType)) {
+            return ['success' => false, 'message' => 'Account temporarily locked due to too many failed attempts.'];
+        }
         
-        // Set base session data
+        $sql = "SELECT {$idField}, {$identifierField}, password FROM {$table} WHERE {$identifierField} = ? AND is_active = 1";
+        $user = $this->db->getRow($sql, [$identifier]);
+        
+        if ($user && password_verify($password, $user['password'])) {
+            // Successful login
+            $this->createSession($userType, $user[$idField], $user[$identifierField]);
+            $this->updateLastLogin($table, $idField, $user[$idField]);
+            $this->clearLoginAttempts($identifier, $userType);
+            
+            return ['success' => true, 'message' => MSG_SUCCESS_LOGIN];
+        } else {
+            // Failed login
+            $this->recordFailedAttempt($identifier, $userType);
+            return ['success' => false, 'message' => MSG_ERROR_LOGIN];
+        }
+    }
+    
+    // Create user session
+    private function createSession($userType, $userId, $identifier) {
         $_SESSION['user_type'] = $userType;
         $_SESSION['user_id'] = $userId;
+        $_SESSION['user_identifier'] = $identifier;
         $_SESSION['login_time'] = time();
         $_SESSION['last_activity'] = time();
-        $_SESSION['ip_address'] = getClientIP();
-        $_SESSION['user_agent'] = $_SERVER['HTTP_USER_AGENT'] ?? '';
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-        
-        // Add additional data
-        foreach ($additionalData as $key => $value) {
-            $_SESSION[$key] = $value;
-        }
-        
-        // Set current user properties
-        $this->currentUserType = $userType;
-        $this->currentUserId = $userId;
-        
-        // Regenerate session ID for security
-        session_regenerate_id(true);
-        $_SESSION['last_regeneration'] = time();
     }
     
-    /**
-     * Logout user and destroy session
-     * 
-     * @return array Logout result
-     */
-    public function logout() {
-        try {
-            $userType = $this->currentUserType;
-            $userId = $this->currentUserId;
-            
-            // Log the logout
-            if ($userType && $userId) {
-                logActivity('INFO', "User logout", [
-                    'user_type' => $userType,
-                    'user_id' => $userId
-                ]);
-            }
-            
-            // Clear session data
-            session_unset();
-            session_destroy();
-            
-            // Clear instance properties
-            $this->currentUserType = null;
-            $this->currentUserId = null;
-            
-            return [
-                'success' => true,
-                'message' => 'Logged out successfully',
-                'redirect' => AppConfig::getUrl()
-            ];
-            
-        } catch (Exception $e) {
-            logActivity('ERROR', "Logout error: " . $e->getMessage());
-            return ['success' => false, 'message' => 'Logout failed'];
-        }
+    // Check if user is logged in
+    public function isLoggedIn() {
+        return isset($_SESSION['user_type']) && isset($_SESSION['user_id']);
     }
     
-    /**
-     * Check if user is authenticated
-     * 
-     * @return bool True if authenticated
-     */
-    public function isAuthenticated() {
-        if (!isset($_SESSION['user_type']) || !isset($_SESSION['login_time'])) {
+    // Check if session is valid
+    public function isValidSession() {
+        if (!$this->isLoggedIn()) {
             return false;
         }
         
         // Check session timeout
-        if ((time() - $_SESSION['login_time']) > DatabaseConfig::SESSION_LIFETIME) {
-            $this->logout();
-            return false;
+        if (isset($_SESSION['last_activity'])) {
+            if (time() - $_SESSION['last_activity'] > SESSION_TIMEOUT) {
+                $this->logout();
+                return false;
+            }
+            $_SESSION['last_activity'] = time();
         }
-        
-        // Check last activity timeout (30 minutes)
-        if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > 1800) {
-            $this->logout();
-            return false;
-        }
-        
-        // Update last activity
-        $_SESSION['last_activity'] = time();
         
         return true;
     }
     
-    /**
-     * Get current user type
-     * 
-     * @return string|null User type or null if not authenticated
-     */
+    // Get current user type
     public function getUserType() {
-        return $this->isAuthenticated() ? $this->currentUserType : null;
+        return isset($_SESSION['user_type']) ? $_SESSION['user_type'] : null;
     }
     
-    /**
-     * Get current user ID
-     * 
-     * @return int|null User ID or null if not authenticated
-     */
+    // Get current user ID
     public function getUserId() {
-        return $this->isAuthenticated() ? $this->currentUserId : null;
+        return isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
     }
     
-    /**
-     * Get current project ID (for project users)
-     * 
-     * @return int|null Project ID or null if not project user
-     */
-    public function getProjectId() {
-        if ($this->getUserType() === 'project') {
-            return $this->getUserId();
-        }
-        return null;
+    // Get current user identifier
+    public function getUserIdentifier() {
+        return isset($_SESSION['user_identifier']) ? $_SESSION['user_identifier'] : null;
     }
     
-    /**
-     * Get session data
-     * 
-     * @param string $key Session key
-     * @param mixed $default Default value
-     * @return mixed Session value
-     */
-    public function getSessionData($key, $default = null) {
-        return $this->isAuthenticated() ? ($_SESSION[$key] ?? $default) : $default;
-    }
-    
-    /**
-     * Set session data
-     * 
-     * @param string $key Session key
-     * @param mixed $value Session value
-     * @return bool True if set successfully
-     */
-    public function setSessionData($key, $value) {
-        if ($this->isAuthenticated()) {
-            $_SESSION[$key] = $value;
-            return true;
-        }
-        return false;
-    }
-    
-    /**
-     * Check if user has specific permission
-     * 
-     * @param string $permission Permission to check
-     * @return bool True if user has permission
-     */
+    // Check if user has specific permission
     public function hasPermission($permission) {
         $userType = $this->getUserType();
-        if (!$userType) {
-            return false;
-        }
         
-        return DatabaseConfig::userHasPermission($userType, $permission);
-    }
-    
-    /**
-     * Require specific user type (throw exception if not authorized)
-     * 
-     * @param string $requiredType Required user type
-     * @throws Exception If user is not authorized
-     */
-    public function requireUserType($requiredType) {
-        if (!$this->isAuthenticated()) {
-            throw new Exception("Authentication required", 401);
-        }
-        
-        if ($this->getUserType() !== $requiredType) {
-            throw new Exception("Access denied. Required role: $requiredType", 403);
-        }
-    }
-    
-    /**
-     * Require minimum user role level
-     * 
-     * @param string $minimumType Minimum required user type
-     * @throws Exception If user doesn't have sufficient role
-     */
-    public function requireMinimumRole($minimumType) {
-        if (!$this->isAuthenticated()) {
-            throw new Exception("Authentication required", 401);
-        }
-        
-        if (!hasRequiredRole($this->getUserType(), $minimumType)) {
-            throw new Exception("Insufficient permissions", 403);
-        }
-    }
-    
-    /**
-     * Hash password using secure algorithm
-     * 
-     * @param string $password Plain text password
-     * @return string Hashed password
-     */
-    public static function hashPassword($password) {
-        return password_hash($password, PASSWORD_DEFAULT, [
-            'cost' => DatabaseConfig::PASSWORD_HASH_COST
-        ]);
-    }
-    
-    /**
-     * Verify password against hash
-     * 
-     * @param string $password Plain text password
-     * @param string $hash Hashed password
-     * @return bool True if password matches
-     */
-    public static function verifyPassword($password, $hash) {
-        return password_verify($password, $hash);
-    }
-    
-    /**
-     * Record failed login attempt
-     * 
-     * @param string $userType User type
-     * @param string $identifier User identifier (username/email/profile_name)
-     */
-    private function recordFailedLogin($userType, $identifier) {
-        $key = $userType . ':' . $identifier;
-        $ip = getClientIP();
-        
-        if (!isset($this->loginAttempts[$key])) {
-            $this->loginAttempts[$key] = [];
-        }
-        
-        $this->loginAttempts[$key][] = [
-            'time' => time(),
-            'ip' => $ip,
-            'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? ''
+        $permissions = [
+            'admin' => [
+                'view_all_projects', 'create_project_direct', 'terminate_project',
+                'manage_mentors', 'manage_admins', 'remove_innovators',
+                'approve_applications', 'view_reports'
+            ],
+            'mentor' => [
+                'view_all_projects', 'assign_to_project', 'rate_project',
+                'manage_resources', 'create_assessments', 'create_learning_objectives',
+                'remove_innovators_from_assigned_projects'
+            ],
+            'project' => [
+                'view_own_project', 'manage_team', 'add_innovators', 'comment_on_project'
+            ]
         ];
         
-        // Store in session for persistence
-        $_SESSION['login_attempts'] = $this->loginAttempts;
-        
-        logActivity('WARNING', "Failed login attempt", [
-            'user_type' => $userType,
-            'identifier' => $identifier,
-            'ip' => $ip
-        ]);
+        return isset($permissions[$userType]) && in_array($permission, $permissions[$userType]);
     }
     
-    /**
-     * Check if login is blocked due to too many failed attempts
-     * 
-     * @param string $userType User type
-     * @param string $identifier User identifier
-     * @return bool True if blocked
-     */
-    private function isLoginBlocked($userType, $identifier) {
-        $key = $userType . ':' . $identifier;
-        
-        // Load attempts from session
-        if (isset($_SESSION['login_attempts'])) {
-            $this->loginAttempts = $_SESSION['login_attempts'];
+    // Require specific permission
+    public function requirePermission($permission) {
+        if (!$this->isValidSession()) {
+            $this->redirectToLogin();
+            exit;
         }
         
-        if (!isset($this->loginAttempts[$key])) {
-            return false;
-        }
-        
-        $attempts = $this->loginAttempts[$key];
-        $recentAttempts = array_filter($attempts, function($attempt) {
-            return (time() - $attempt['time']) < DatabaseConfig::LOGIN_LOCKOUT_TIME;
-        });
-        
-        return count($recentAttempts) >= DatabaseConfig::MAX_LOGIN_ATTEMPTS;
-    }
-    
-    /**
-     * Get timestamp when login block expires
-     * 
-     * @param string $userType User type
-     * @param string $identifier User identifier
-     * @return int|null Block expiry timestamp
-     */
-    private function getBlockedUntil($userType, $identifier) {
-        $key = $userType . ':' . $identifier;
-        
-        if (!isset($this->loginAttempts[$key])) {
-            return null;
-        }
-        
-        $attempts = $this->loginAttempts[$key];
-        if (empty($attempts)) {
-            return null;
-        }
-        
-        $lastAttempt = max(array_column($attempts, 'time'));
-        return $lastAttempt + DatabaseConfig::LOGIN_LOCKOUT_TIME;
-    }
-    
-    /**
-     * Clear failed login attempts
-     * 
-     * @param string $userType User type
-     * @param string $identifier User identifier
-     */
-    private function clearFailedLogins($userType, $identifier) {
-        $key = $userType . ':' . $identifier;
-        unset($this->loginAttempts[$key]);
-        
-        if (isset($_SESSION['login_attempts'])) {
-            unset($_SESSION['login_attempts'][$key]);
+        if (!$this->hasPermission($permission)) {
+            $this->accessDenied();
+            exit;
         }
     }
     
-    /**
-     * Get user information array
-     * 
-     * @return array|null User information or null if not authenticated
-     */
-    public function getUserInfo() {
-        if (!$this->isAuthenticated()) {
-            return null;
+    // Require specific user type
+    public function requireUserType($userType) {
+        if (!$this->isValidSession()) {
+            $this->redirectToLogin();
+            exit;
         }
         
-        $userType = $this->getUserType();
-        $userId = $this->getUserId();
-        
-        $info = [
-            'user_type' => $userType,
-            'user_id' => $userId,
-            'login_time' => $_SESSION['login_time'],
-            'last_activity' => $_SESSION['last_activity']
-        ];
-        
-        switch ($userType) {
-            case 'admin':
-                $info['username'] = $_SESSION['username'] ?? null;
-                break;
-                
-            case 'mentor':
-                $info['name'] = $_SESSION['name'] ?? null;
-                $info['email'] = $_SESSION['email'] ?? null;
-                $info['expertise'] = $_SESSION['expertise'] ?? null;
-                $info['bio'] = $_SESSION['bio'] ?? null;
-                break;
-                
-            case 'project':
-                $info['project_name'] = $_SESSION['project_name'] ?? null;
-                $info['profile_name'] = $_SESSION['profile_name'] ?? null;
-                $info['project_status'] = $_SESSION['project_status'] ?? null;
-                $info['current_stage'] = $_SESSION['current_stage'] ?? null;
-                $info['current_percentage'] = $_SESSION['current_percentage'] ?? null;
-                $info['innovator_count'] = $_SESSION['innovator_count'] ?? null;
-                break;
-        }
-        
-        return $info;
-    }
-    
-    /**
-     * Update user session data (useful for keeping data fresh)
-     * 
-     * @return bool True if updated successfully
-     */
-    public function refreshUserSession() {
-        if (!$this->isAuthenticated()) {
-            return false;
-        }
-        
-        try {
-            $userType = $this->getUserType();
-            $userId = $this->getUserId();
-            
-            switch ($userType) {
-                case 'admin':
-                    $stmt = $this->db->prepare("SELECT username FROM admins WHERE id = ?");
-                    $this->db->execute($stmt, [$userId]);
-                    $user = $stmt->fetch();
-                    if ($user) {
-                        $_SESSION['username'] = $user['username'];
-                    }
-                    break;
-                    
-                case 'mentor':
-                    $stmt = $this->db->prepare("SELECT name, email, bio, expertise FROM mentors WHERE id = ?");
-                    $this->db->execute($stmt, [$userId]);
-                    $user = $stmt->fetch();
-                    if ($user) {
-                        $_SESSION['name'] = $user['name'];
-                        $_SESSION['email'] = $user['email'];
-                        $_SESSION['bio'] = $user['bio'];
-                        $_SESSION['expertise'] = $user['expertise'];
-                    }
-                    break;
-                    
-                case 'project':
-                    $stmt = $this->db->prepare("
-                        SELECT p.name, p.status, p.description, p.email, p.website,
-                               COALESCE(latest_rating.stage, p.current_stage, 1) as current_stage,
-                               COALESCE(latest_rating.percentage, p.current_percentage, 10) as current_percentage,
-                               COUNT(pi.id) as innovator_count
-                        FROM projects p
-                        LEFT JOIN project_innovators pi ON p.id = pi.project_id
-                        LEFT JOIN (
-                            SELECT project_id, stage, percentage,
-                                   ROW_NUMBER() OVER (PARTITION BY project_id ORDER BY rated_at DESC) as rn
-                            FROM ratings
-                        ) latest_rating ON p.id = latest_rating.project_id AND latest_rating.rn = 1
-                        WHERE p.id = ?
-                        GROUP BY p.id
-                    ");
-                    $this->db->execute($stmt, [$userId]);
-                    $project = $stmt->fetch();
-                    if ($project) {
-                        $_SESSION['project_name'] = $project['name'];
-                        $_SESSION['project_status'] = $project['status'];
-                        $_SESSION['current_stage'] = $project['current_stage'];
-                        $_SESSION['current_percentage'] = $project['current_percentage'];
-                        $_SESSION['innovator_count'] = $project['innovator_count'];
-                        $_SESSION['description'] = $project['description'];
-                        $_SESSION['email'] = $project['email'];
-                        $_SESSION['website'] = $project['website'];
-                    }
-                    break;
-            }
-            
-            return true;
-            
-        } catch (Exception $e) {
-            logActivity('ERROR', "Session refresh error: " . $e->getMessage());
-            return false;
+        if ($this->getUserType() !== $userType) {
+            $this->accessDenied();
+            exit;
         }
     }
     
-    /**
-     * Generate secure CSRF token
-     * 
-     * @return string CSRF token
-     */
+    // Generate CSRF token
     public function generateCSRFToken() {
         if (!isset($_SESSION['csrf_token'])) {
-            $_SESSION['csrf_token'] = bin2hex(random_bytes(CSRF_TOKEN_LENGTH));
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
         }
         return $_SESSION['csrf_token'];
     }
     
-    /**
-     * Verify CSRF token
-     * 
-     * @param string $token Token to verify
-     * @return bool True if token is valid
-     */
-    public function verifyCSRFToken($token) {
-        if (!isset($_SESSION['csrf_token'])) {
-            return false;
-        }
-        
-        return hash_equals($_SESSION['csrf_token'], $token);
+    // Validate CSRF token
+    public function validateCSRFToken($token) {
+        return isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
     }
     
-    /**
-     * Check if current session is valid and secure
-     * 
-     * @return bool True if session is valid
-     */
-    public function validateSession() {
-        if (!$this->isAuthenticated()) {
-            return false;
-        }
+    // Logout user
+    public function logout() {
+        session_destroy();
+        setcookie(session_name(), '', time() - 3600, '/');
+    }
+    
+    // Redirect to appropriate login page
+    public function redirectToLogin() {
+        $loginUrls = [
+            'admin' => '/auth/admin-login.php',
+            'mentor' => '/auth/mentor-login.php',
+            'project' => '/auth/project-login.php'
+        ];
         
-        // Check IP address consistency (optional, can be disabled for mobile users)
-        if (AppConfig::isFeatureEnabled('strict_ip_checking')) {
-            if (isset($_SESSION['ip_address']) && $_SESSION['ip_address'] !== getClientIP()) {
-                logActivity('WARNING', "Session IP mismatch detected");
-                $this->logout();
-                return false;
-            }
-        }
+        $userType = $this->getUserType();
+        $loginUrl = isset($loginUrls[$userType]) ? $loginUrls[$userType] : '/auth/login.php';
         
-        // Check user agent consistency
-        if (isset($_SESSION['user_agent']) && $_SESSION['user_agent'] !== ($_SERVER['HTTP_USER_AGENT'] ?? '')) {
-            logActivity('WARNING', "Session user agent mismatch detected");
-            $this->logout();
-            return false;
-        }
+        header("Location: " . SITE_URL . $loginUrl);
+    }
+    
+    // Access denied
+    public function accessDenied() {
+        http_response_code(403);
+        echo "Access denied. You don't have permission to view this page.";
+    }
+    
+    // Check if account is locked
+    private function isAccountLocked($identifier, $userType) {
+        $sql = "SELECT COUNT(*) as attempts FROM activity_logs 
+                WHERE action = 'failed_login' 
+                AND description LIKE ? 
+                AND created_at > DATE_SUB(NOW(), INTERVAL 15 MINUTE)";
         
-        return true;
+        $result = $this->db->getRow($sql, ["%{$userType}:{$identifier}%"]);
+        
+        return ($result && $result['attempts'] >= MAX_LOGIN_ATTEMPTS);
+    }
+    
+    // Record failed login attempt
+    private function recordFailedAttempt($identifier, $userType) {
+        $this->db->insert('activity_logs', [
+            'user_type' => 'system',
+            'action' => 'failed_login',
+            'description' => "Failed login attempt for {$userType}: {$identifier}",
+            'ip_address' => $_SERVER['REMOTE_ADDR'] ?? null,
+            'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? null
+        ]);
+    }
+    
+    // Clear login attempts
+    private function clearLoginAttempts($identifier, $userType) {
+        // Login attempts are automatically cleared after 15 minutes
+        // No action needed here
+    }
+    
+    // Update last login time
+    private function updateLastLogin($table, $idField, $userId) {
+        $this->db->update($table, 
+            ['last_login' => date('Y-m-d H:i:s')], 
+            "{$idField} = ?", 
+            [$userId]
+        );
+    }
+    
+    // Hash password
+    public static function hashPassword($password) {
+        return password_hash($password, PASSWORD_DEFAULT);
+    }
+    
+    // Verify password
+    public static function verifyPassword($password, $hash) {
+        return password_verify($password, $hash);
     }
 }
+
+?>
