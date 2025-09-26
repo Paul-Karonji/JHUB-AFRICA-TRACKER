@@ -6,3 +6,95 @@ Params: {"last_login":"2025-09-26 00:30:10","0":1}
 SQL: UPDATE admins SET last_login = :last_login WHERE admin_id = ?
 Params: {"last_login":"2025-09-26 09:35:59","0":1}
 ---
+2025-09-26 10:12:21 - Database Error: SQLSTATE[HY093]: Invalid parameter number: mixed named and positional parameters
+SQL: UPDATE project_applications SET status = :status, reviewed_at = :reviewed_at, reviewed_by = :reviewed_by WHERE application_id = ?
+Params: {"status":"approved","reviewed_at":"2025-09-26 10:12:21","reviewed_by":1,"0":1}
+---
+2025-09-26 10:12:44 - Database Error: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'test_project_001' for key 'unique_profile_name'
+SQL: INSERT INTO projects (project_name, date, project_email, project_website, description, profile_name, password, project_lead_name, project_lead_email, current_stage, status, created_from_application, created_by_admin) VALUES (:project_name, :date, :project_email, :project_website, :description, :profile_name, :password, :project_lead_name, :project_lead_email, :current_stage, :status, :created_from_application, :created_by_admin)
+Params: {"project_name":"Test","date":"2025-09-26","project_email":null,"project_website":null,"description":"This is a test","profile_name":"test_project_001","password":"$2y$10$aFwN4dJ\/.3jHaoqvICvWieAJQyp4wQyXWlE.ztd81OCBhPQh4Usrm","project_lead_name":"John","project_lead_email":"john@gmail.com","current_stage":1,"status":"active","created_from_application":1,"created_by_admin":1}
+---
+2025-09-26 10:13:00 - Database Error: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'test_project_001' for key 'unique_profile_name'
+SQL: INSERT INTO projects (project_name, date, project_email, project_website, description, profile_name, password, project_lead_name, project_lead_email, current_stage, status, created_from_application, created_by_admin) VALUES (:project_name, :date, :project_email, :project_website, :description, :profile_name, :password, :project_lead_name, :project_lead_email, :current_stage, :status, :created_from_application, :created_by_admin)
+Params: {"project_name":"Test","date":"2025-09-26","project_email":null,"project_website":null,"description":"This is a test","profile_name":"test_project_001","password":"$2y$10$aFwN4dJ\/.3jHaoqvICvWieAJQyp4wQyXWlE.ztd81OCBhPQh4Usrm","project_lead_name":"John","project_lead_email":"john@gmail.com","current_stage":1,"status":"active","created_from_application":1,"created_by_admin":1}
+---
+2025-09-26 10:14:05 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_active' in 'where clause'
+SQL: SELECT project_id, profile_name, password FROM projects WHERE profile_name = ? AND is_active = 1
+Params: ["test_project_001"]
+---
+2025-09-26 10:14:51 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_active' in 'where clause'
+SQL: SELECT project_id, profile_name, password FROM projects WHERE profile_name = ? AND is_active = 1
+Params: ["test_project_001"]
+---
+2025-09-26 10:15:35 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_active' in 'where clause'
+SQL: SELECT project_id, profile_name, password FROM projects WHERE profile_name = ? AND is_active = 1
+Params: ["test_project_001"]
+---
+2025-09-26 10:16:21 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_active' in 'where clause'
+SQL: SELECT project_id, profile_name, password FROM projects WHERE profile_name = ? AND is_active = 1
+Params: ["test_project_001"]
+---
+2025-09-26 10:17:59 - Database Error: SQLSTATE[HY093]: Invalid parameter number: mixed named and positional parameters
+SQL: UPDATE admins SET last_login = :last_login WHERE admin_id = ?
+Params: {"last_login":"2025-09-26 10:17:59","0":1}
+---
+2025-09-26 10:18:19 - Database Error: SQLSTATE[HY093]: Invalid parameter number: mixed named and positional parameters
+SQL: UPDATE project_applications SET status = :status, reviewed_at = :reviewed_at, reviewed_by = :reviewed_by WHERE application_id = ?
+Params: {"status":"approved","reviewed_at":"2025-09-26 10:18:19","reviewed_by":1,"0":2}
+---
+2025-09-26 10:19:31 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_active' in 'where clause'
+SQL: SELECT project_id, profile_name, password FROM projects WHERE profile_name = ? AND is_active = 1
+Params: ["test smith"]
+---
+2025-09-26 10:27:03 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_active' in 'where clause'
+SQL: SELECT project_id, profile_name, password FROM projects WHERE profile_name = ? AND is_active = 1
+Params: ["test_project_001"]
+---
+2025-09-26 10:34:43 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_active' in 'where clause'
+SQL: SELECT project_id, profile_name, password FROM projects WHERE profile_name = ? AND is_active = 1
+Params: ["test smith"]
+---
+2025-09-26 10:35:25 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_active' in 'where clause'
+SQL: SELECT project_id, profile_name, password FROM projects WHERE profile_name = ? AND is_active = 1
+Params: ["test smith"]
+---
+2025-09-26 10:35:26 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_active' in 'where clause'
+SQL: SELECT project_id, profile_name, password FROM projects WHERE profile_name = ? AND is_active = 1
+Params: ["test smith"]
+---
+2025-09-26 10:35:33 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_active' in 'where clause'
+SQL: SELECT project_id, profile_name, password FROM projects WHERE profile_name = ? AND is_active = 1
+Params: ["test smith"]
+---
+2025-09-26 10:35:33 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_active' in 'where clause'
+SQL: SELECT project_id, profile_name, password FROM projects WHERE profile_name = ? AND is_active = 1
+Params: ["test smith"]
+---
+2025-09-26 10:35:47 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_active' in 'where clause'
+SQL: SELECT project_id, profile_name, password FROM projects WHERE profile_name = ? AND is_active = 1
+Params: ["test_project_001"]
+---
+2025-09-26 10:35:47 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_active' in 'where clause'
+SQL: SELECT project_id, profile_name, password FROM projects WHERE profile_name = ? AND is_active = 1
+Params: ["test smith"]
+---
+2025-09-26 10:36:28 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_active' in 'where clause'
+SQL: SELECT project_id, profile_name, password FROM projects WHERE profile_name = ? AND is_active = 1
+Params: ["test_project_001"]
+---
+Uncaught exception: Call to undefined function getSystemStatistics() in C:\xampp\htdocs\jhub-africa-tracker\dashboards\admin\index.php on line 112025-09-26 10:37:09 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_active' in 'where clause'
+SQL: SELECT project_id, profile_name, password FROM projects WHERE profile_name = ? AND is_active = 1
+Params: ["test smith"]
+---
+2025-09-26 10:40:20 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_active' in 'where clause'
+SQL: SELECT project_id, profile_name, password FROM projects WHERE profile_name = ? AND is_active = 1
+Params: ["test smith"]
+---
+2025-09-26 10:44:17 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_active' in 'where clause'
+SQL: SELECT project_id, profile_name, password FROM projects WHERE profile_name = ? AND is_active = 1
+Params: ["test smith"]
+---
+Uncaught exception: Call to undefined function getStageName() in C:\xampp\htdocs\jhub-africa-tracker\dashboards\project\index.php on line 72Uncaught exception: Call to undefined function getStageName() in C:\xampp\htdocs\jhub-africa-tracker\dashboards\project\index.php on line 72Uncaught exception: Call to undefined function getStageName() in C:\xampp\htdocs\jhub-africa-tracker\dashboards\project\index.php on line 72Uncaught exception: Call to undefined function getStageName() in C:\xampp\htdocs\jhub-africa-tracker\dashboards\project\index.php on line 72Uncaught exception: Call to undefined function getStageName() in C:\xampp\htdocs\jhub-africa-tracker\dashboards\project\index.php on line 72Uncaught exception: Call to undefined function getStageName() in C:\xampp\htdocs\jhub-africa-tracker\dashboards\project\index.php on line 72Uncaught exception: Call to undefined function getStageName() in C:\xampp\htdocs\jhub-africa-tracker\dashboards\project\index.php on line 72Uncaught exception: Call to undefined function getSystemStatistics() in C:\xampp\htdocs\jhub-africa-tracker\index.php on line 22Uncaught exception: Call to undefined function getStageName() in C:\xampp\htdocs\jhub-africa-tracker\public\about.php on line 512025-09-26 11:02:56 - Database Error: SQLSTATE[HY093]: Invalid parameter number: mixed named and positional parameters
+SQL: UPDATE projects SET last_login = :last_login WHERE project_id = ?
+Params: {"last_login":"2025-09-26 11:02:56","0":4}
+---
