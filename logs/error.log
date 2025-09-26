@@ -98,3 +98,43 @@ Uncaught exception: Call to undefined function getStageName() in C:\xampp\htdocs
 SQL: UPDATE projects SET last_login = :last_login WHERE project_id = ?
 Params: {"last_login":"2025-09-26 11:02:56","0":4}
 ---
+2025-09-26 11:08:39 - Database Error: SQLSTATE[HY093]: Invalid parameter number: mixed named and positional parameters
+SQL: UPDATE projects SET last_login = :last_login WHERE project_id = ?
+Params: {"last_login":"2025-09-26 11:08:39","0":4}
+---
+2025-09-26 11:19:56 - Database Error: SQLSTATE[HY093]: Invalid parameter number: mixed named and positional parameters
+SQL: UPDATE projects SET last_login = :last_login WHERE project_id = ?
+Params: {"last_login":"2025-09-26 11:19:56","0":4}
+---
+2025-09-26 12:07:09 - Database Error: SQLSTATE[HY093]: Invalid parameter number: mixed named and positional parameters
+SQL: UPDATE admins SET last_login = :last_login WHERE admin_id = ?
+Params: {"last_login":"2025-09-26 12:07:09","0":1}
+---
+2025-09-26 12:07:40 - Database Error: SQLSTATE[HY093]: Invalid parameter number: mixed named and positional parameters
+SQL: UPDATE admins SET last_login = :last_login WHERE admin_id = ?
+Params: {"last_login":"2025-09-26 12:07:40","0":1}
+---
+2025-09-26 12:08:02 - Database Error: SQLSTATE[HY093]: Invalid parameter number: mixed named and positional parameters
+SQL: UPDATE project_applications SET status = :status, reviewed_at = :reviewed_at, reviewed_by = :reviewed_by WHERE application_id = ?
+Params: {"status":"approved","reviewed_at":"2025-09-26 12:08:02","reviewed_by":1,"0":3}
+---
+2025-09-26 12:08:41 - Database Error: SQLSTATE[HY093]: Invalid parameter number: mixed named and positional parameters
+SQL: UPDATE projects SET last_login = :last_login WHERE project_id = ?
+Params: {"last_login":"2025-09-26 12:08:41","0":5}
+---
+2025-09-26 12:11:50 - Database Error: SQLSTATE[HY093]: Invalid parameter number: mixed named and positional parameters
+SQL: UPDATE admins SET last_login = :last_login WHERE admin_id = ?
+Params: {"last_login":"2025-09-26 12:11:50","0":1}
+---
+2025-09-26 12:12:37 - Database Error: SQLSTATE[HY093]: Invalid parameter number: mixed named and positional parameters
+SQL: UPDATE project_applications SET status = :status, reviewed_at = :reviewed_at, reviewed_by = :reviewed_by, rejection_reason = :rejection_reason WHERE application_id = ?
+Params: {"status":"rejected","reviewed_at":"2025-09-26 12:12:37","reviewed_by":1,"rejection_reason":"too basic","0":3}
+---
+2025-09-26 12:12:45 - Database Error: SQLSTATE[HY093]: Invalid parameter number: mixed named and positional parameters
+SQL: UPDATE project_applications SET status = :status, reviewed_at = :reviewed_at, reviewed_by = :reviewed_by WHERE application_id = ?
+Params: {"status":"approved","reviewed_at":"2025-09-26 12:12:45","reviewed_by":1,"0":4}
+---
+2025-09-26 12:14:48 - Database Error: SQLSTATE[HY093]: Invalid parameter number: mixed named and positional parameters
+SQL: UPDATE admins SET last_login = :last_login WHERE admin_id = ?
+Params: {"last_login":"2025-09-26 12:14:48","0":1}
+---
