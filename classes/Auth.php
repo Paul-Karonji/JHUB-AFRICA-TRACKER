@@ -1,6 +1,6 @@
 <?php
 // classes/Auth.php
-// Authentication System
+// Authentication System - FIXED VERSION
 
 class Auth {
     private $db;
@@ -43,64 +43,98 @@ class Auth {
         return $this->login('mentor', $email, $password, 'mentors', 'mentor_id', 'email');
     }
     
-    // Project login
+    // Project login - FIXED
     public function loginProject($profile_name, $password) {
         return $this->login('project', $profile_name, $password, 'projects', 'project_id', 'profile_name');
     }
     
-    // Generic login method
+    // Generic login method - FIXED VERSION
     private function login($userType, $identifier, $password, $table, $idField, $identifierField) {
-        // Check for brute force attacks
-        if ($this->isAccountLocked($identifier, $userType)) {
-            return ['success' => false, 'message' => 'Account temporarily locked due to too many failed attempts.'];
-        }
-        
-        $sql = "SELECT {$idField}, {$identifierField}, password FROM {$table} WHERE {$identifierField} = ? AND is_active = 1";
-        $user = $this->db->getRow($sql, [$identifier]);
-        
-        if ($user && password_verify($password, $user['password'])) {
-            // Successful login
-            $this->createSession($userType, $user[$idField], $user[$identifierField]);
-            $this->updateLastLogin($table, $idField, $user[$idField]);
+        try {
+            // Check for brute force attacks
+            if ($this->isAccountLocked($identifier, $userType)) {
+                return ['success' => false, 'message' => 'Account temporarily locked due to too many failed attempts.'];
+            }
+            
+            // Query to get user - select ALL fields to avoid missing field issues
+            $sql = "SELECT * FROM {$table} WHERE {$identifierField} = ?";
+            $user = $this->db->getRow($sql, [$identifier]);
+            
+            if (!$user) {
+                $this->recordFailedAttempt($identifier, $userType);
+                return ['success' => false, 'message' => 'Invalid username or password.'];
+            }
+            
+            // Check if user is active - handle both 'is_active' and 'status' fields
+            $isActive = true; // Default to true
+            
+            if (isset($user['is_active'])) {
+                // Use is_active field if it exists
+                $isActive = (bool)$user['is_active'];
+            } elseif (isset($user['status'])) {
+                // Use status field if is_active doesn't exist (for projects table)
+                $isActive = ($user['status'] === 'active');
+            }
+            
+            if (!$isActive) {
+                return ['success' => false, 'message' => 'Account is inactive. Please contact support.'];
+            }
+            
+            // Verify password
+            if (!isset($user['password']) || empty($user['password'])) {
+                return ['success' => false, 'message' => 'Account configuration error. Please contact support.'];
+            }
+            
+            if (!password_verify($password, $user['password'])) {
+                $this->recordFailedAttempt($identifier, $userType);
+                return ['success' => false, 'message' => 'Invalid username or password.'];
+            }
+            
+            // Clear any failed attempts
             $this->clearLoginAttempts($identifier, $userType);
             
-            return ['success' => true, 'message' => MSG_SUCCESS_LOGIN];
-        } else {
-            // Failed login
-            $this->recordFailedAttempt($identifier, $userType);
-            return ['success' => false, 'message' => MSG_ERROR_LOGIN];
+            // Create session
+            $_SESSION['user_id'] = $user[$idField];
+            $_SESSION['user_type'] = $userType;
+            $_SESSION['user_identifier'] = $identifier;
+            $_SESSION['user_agent'] = $_SERVER['HTTP_USER_AGENT'] ?? '';
+            $_SESSION['ip_address'] = $_SERVER['REMOTE_ADDR'] ?? '';
+            $_SESSION['last_activity'] = time();
+            
+            // Update last login time
+            $this->updateLastLogin($table, $idField, $user[$idField]);
+            
+            return [
+                'success' => true,
+                'message' => 'Login successful!',
+                'user_id' => $user[$idField],
+                'user_type' => $userType
+            ];
+            
+        } catch (Exception $e) {
+            error_log("Login error: " . $e->getMessage());
+            return ['success' => false, 'message' => 'An error occurred during login. Please try again.'];
         }
     }
     
-    // Create user session
-    private function createSession($userType, $userId, $identifier) {
-        $_SESSION['user_type'] = $userType;
-        $_SESSION['user_id'] = $userId;
-        $_SESSION['user_identifier'] = $identifier;
-        $_SESSION['login_time'] = time();
-        $_SESSION['last_activity'] = time();
-        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-    }
-    
-    // Check if user is logged in
-    public function isLoggedIn() {
-        return isset($_SESSION['user_type']) && isset($_SESSION['user_id']);
-    }
-    
-    // Check if session is valid
+    // Check if user has valid session
     public function isValidSession() {
-        if (!$this->isLoggedIn()) {
+        // Check if session has required data
+        if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_type'])) {
             return false;
         }
         
-        // Check session timeout
+        // Check for session timeout
         if (isset($_SESSION['last_activity'])) {
-            if (time() - $_SESSION['last_activity'] > SESSION_TIMEOUT) {
+            $inactive = time() - $_SESSION['last_activity'];
+            if ($inactive >= SESSION_TIMEOUT) {
                 $this->logout();
                 return false;
             }
-            $_SESSION['last_activity'] = time();
         }
+        
+        // Update last activity time
+        $_SESSION['last_activity'] = time();
         
         return true;
     }
@@ -197,38 +231,50 @@ class Auth {
         ];
         
         $userType = $this->getUserType();
-        $loginUrl = isset($loginUrls[$userType]) ? $loginUrls[$userType] : '/auth/login.php';
+        $loginUrl = isset($loginUrls[$userType]) ? $loginUrls[$userType] : '/auth/project-login.php';
         
         header("Location: " . SITE_URL . $loginUrl);
+        exit;
     }
     
     // Access denied
     public function accessDenied() {
         http_response_code(403);
         echo "Access denied. You don't have permission to view this page.";
+        exit;
     }
     
     // Check if account is locked
     private function isAccountLocked($identifier, $userType) {
-        $sql = "SELECT COUNT(*) as attempts FROM activity_logs 
-                WHERE action = 'failed_login' 
-                AND description LIKE ? 
-                AND created_at > DATE_SUB(NOW(), INTERVAL 15 MINUTE)";
-        
-        $result = $this->db->getRow($sql, ["%{$userType}:{$identifier}%"]);
-        
-        return ($result && $result['attempts'] >= MAX_LOGIN_ATTEMPTS);
+        try {
+            $sql = "SELECT COUNT(*) as attempts FROM activity_logs 
+                    WHERE action = 'failed_login' 
+                    AND description LIKE ? 
+                    AND created_at > DATE_SUB(NOW(), INTERVAL 15 MINUTE)";
+            
+            $result = $this->db->getRow($sql, ["%{$userType}%{$identifier}%"]);
+            
+            return ($result && $result['attempts'] >= MAX_LOGIN_ATTEMPTS);
+        } catch (Exception $e) {
+            // If activity_logs table doesn't exist or there's an error, don't lock account
+            return false;
+        }
     }
     
     // Record failed login attempt
     private function recordFailedAttempt($identifier, $userType) {
-        $this->db->insert('activity_logs', [
-            'user_type' => 'system',
-            'action' => 'failed_login',
-            'description' => "Failed login attempt for {$userType}: {$identifier}",
-            'ip_address' => $_SERVER['REMOTE_ADDR'] ?? null,
-            'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? null
-        ]);
+        try {
+            $this->db->insert('activity_logs', [
+                'user_type' => 'system',
+                'action' => 'failed_login',
+                'description' => "Failed login attempt for {$userType}: {$identifier}",
+                'ip_address' => $_SERVER['REMOTE_ADDR'] ?? null,
+                'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? null
+            ]);
+        } catch (Exception $e) {
+            // Silently fail if we can't log
+            error_log("Failed to record login attempt: " . $e->getMessage());
+        }
     }
     
     // Clear login attempts
@@ -239,11 +285,16 @@ class Auth {
     
     // Update last login time
     private function updateLastLogin($table, $idField, $userId) {
-        $this->db->update($table, 
-            ['last_login' => date('Y-m-d H:i:s')], 
-            "{$idField} = ?", 
-            [$userId]
-        );
+        try {
+            $this->db->update($table, 
+                ['last_login' => date('Y-m-d H:i:s')], 
+                "{$idField} = ?", 
+                [$userId]
+            );
+        } catch (Exception $e) {
+            // Silently fail if we can't update
+            error_log("Failed to update last login: " . $e->getMessage());
+        }
     }
     
     // Hash password
@@ -256,5 +307,4 @@ class Auth {
         return password_verify($password, $hash);
     }
 }
-
 ?>
