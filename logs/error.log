@@ -1,0 +1,4 @@
+Error [2]: require_once(../../includes/init.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\jhub-africa-tracker\index.php on line 232Uncaught exception: Failed opening required '../../includes/init.php' (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\jhub-africa-tracker\index.php on line 2322025-09-26 00:30:10 - Database Error: SQLSTATE[HY093]: Invalid parameter number: mixed named and positional parameters
+SQL: UPDATE admins SET last_login = :last_login WHERE admin_id = ?
+Params: {"last_login":"2025-09-26 00:30:10","0":1}
+---
