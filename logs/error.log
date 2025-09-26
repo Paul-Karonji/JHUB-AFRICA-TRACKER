@@ -2,3 +2,7 @@ Error [2]: require_once(../../includes/init.php): Failed to open stream: No such
 SQL: UPDATE admins SET last_login = :last_login WHERE admin_id = ?
 Params: {"last_login":"2025-09-26 00:30:10","0":1}
 ---
+2025-09-26 09:35:59 - Database Error: SQLSTATE[HY093]: Invalid parameter number: mixed named and positional parameters
+SQL: UPDATE admins SET last_login = :last_login WHERE admin_id = ?
+Params: {"last_login":"2025-09-26 09:35:59","0":1}
+---
