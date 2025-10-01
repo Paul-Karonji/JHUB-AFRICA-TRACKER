@@ -162,3 +162,19 @@ Params: {"last_login":"2025-09-30 16:45:21","0":2}
 SQL: UPDATE mentors SET last_login = :last_login WHERE mentor_id = ?
 Params: {"last_login":"2025-10-01 16:01:30","0":2}
 ---
+Uncaught exception: Call to undefined method Auth::isLoggedIn() in C:\xampp\htdocs\jhub-africa-tracker\api\index.php on line 382025-10-01 16:22:14 - Database Error: SQLSTATE[HY093]: Invalid parameter number: mixed named and positional parameters
+SQL: UPDATE admins SET last_login = :last_login WHERE admin_id = ?
+Params: {"last_login":"2025-10-01 16:22:14","0":1}
+---
+Uncaught exception: Call to undefined method Auth::isLoggedIn() in C:\xampp\htdocs\jhub-africa-tracker\api\mentors\reset-password.php on line 7Uncaught exception: Call to undefined method Auth::isLoggedIn() in C:\xampp\htdocs\jhub-africa-tracker\api\mentors\toggle-status.php on line 7Uncaught exception: Call to undefined method Auth::isLoggedIn() in C:\xampp\htdocs\jhub-africa-tracker\api\applications\review.php on line 7Uncaught exception: Call to undefined method Auth::isLoggedIn() in C:\xampp\htdocs\jhub-africa-tracker\api\applications\review.php on line 72025-10-01 16:24:19 - Database Error: SQLSTATE[HY093]: Invalid parameter number: mixed named and positional parameters
+SQL: UPDATE project_applications SET status = :status, reviewed_at = :reviewed_at, reviewed_by = :reviewed_by WHERE application_id = ?
+Params: {"status":"approved","reviewed_at":"2025-10-01 16:24:19","reviewed_by":1,"0":6}
+---
+2025-10-01 16:27:35 - Database Error: SQLSTATE[HY093]: Invalid parameter number: mixed named and positional parameters
+SQL: UPDATE mentors SET last_login = :last_login WHERE mentor_id = ?
+Params: {"last_login":"2025-10-01 16:27:35","0":3}
+---
+2025-10-01 16:37:49 - Database Error: SQLSTATE[HY093]: Invalid parameter number: mixed named and positional parameters
+SQL: UPDATE admins SET last_login = :last_login WHERE admin_id = ?
+Params: {"last_login":"2025-10-01 16:37:49","0":1}
+---
