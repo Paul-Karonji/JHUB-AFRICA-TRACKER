@@ -150,3 +150,15 @@ Params: {"last_login":"2025-09-30 16:11:03","0":1}
 SQL: UPDATE projects SET current_stage = :current_stage WHERE project_id = ?
 Params: {"current_stage":2,"0":7}
 ---
+2025-09-30 16:39:28 - Database Error: SQLSTATE[HY093]: Invalid parameter number: mixed named and positional parameters
+SQL: UPDATE admins SET last_login = :last_login WHERE admin_id = ?
+Params: {"last_login":"2025-09-30 16:39:28","0":1}
+---
+2025-09-30 16:45:21 - Database Error: SQLSTATE[HY093]: Invalid parameter number: mixed named and positional parameters
+SQL: UPDATE mentors SET last_login = :last_login WHERE mentor_id = ?
+Params: {"last_login":"2025-09-30 16:45:21","0":2}
+---
+2025-10-01 16:01:30 - Database Error: SQLSTATE[HY093]: Invalid parameter number: mixed named and positional parameters
+SQL: UPDATE mentors SET last_login = :last_login WHERE mentor_id = ?
+Params: {"last_login":"2025-10-01 16:01:30","0":2}
+---
