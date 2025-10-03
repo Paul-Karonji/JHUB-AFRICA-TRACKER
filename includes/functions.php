@@ -3,35 +3,48 @@
 // Common Functions
 
 /**
+ * Calculate stage progress percentage
+ */
+function getStageProgress($stage) {
+    $progressMap = [
+        1 => 0,    // Just started
+        2 => 17,   // Mentorship begun
+        3 => 33,   // Assessment phase
+        4 => 50,   // Learning & development
+        5 => 67,   // Progress tracking
+        6 => 100   // Showcase & integration
+    ];
+    return $progressMap[$stage] ?? 0;
+}
+
+/**
  * Get stage name
  */
 function getStageName($stage) {
-    global $STAGE_NAMES;
-    return isset($STAGE_NAMES[$stage]) ? $STAGE_NAMES[$stage] : 'Unknown Stage';
+    $stageNames = [
+        1 => 'Project Creation',
+        2 => 'Mentorship',
+        3 => 'Assessment',
+        4 => 'Learning & Development',
+        5 => 'Progress Tracking',
+        6 => 'Showcase & Integration'
+    ];
+    return $stageNames[$stage] ?? 'Unknown Stage';
 }
 
 /**
  * Get stage description
  */
 function getStageDescription($stage) {
-    global $STAGE_DESCRIPTIONS;
-    return isset($STAGE_DESCRIPTIONS[$stage]) ? $STAGE_DESCRIPTIONS[$stage] : '';
-}
-
-/**
- * Get stage progress percentage
- */
-function getStageProgress($stage) {
-    $progressMap = [
-        1 => 16.67, // ~17%
-        2 => 33.33, // ~33%
-        3 => 50.00, // 50%
-        4 => 66.67, // ~67%
-        5 => 83.33, // ~83%
-        6 => 100.00 // 100%
+    $descriptions = [
+        1 => 'Initial project setup and team building',
+        2 => 'Working with mentors for guidance and support',
+        3 => 'Project assessment and evaluation in progress',
+        4 => 'Focused on skills development and learning',
+        5 => 'Progress monitoring and feedback collection',
+        6 => 'Final showcase and ecosystem integration'
     ];
-    
-    return isset($progressMap[$stage]) ? $progressMap[$stage] : 0;
+    return $descriptions[$stage] ?? '';
 }
 
 /**
