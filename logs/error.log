@@ -178,3 +178,822 @@ Params: {"last_login":"2025-10-01 16:27:35","0":3}
 SQL: UPDATE admins SET last_login = :last_login WHERE admin_id = ?
 Params: {"last_login":"2025-10-01 16:37:49","0":1}
 ---
+2025-10-03 08:52:47 - Database Error: SQLSTATE[HY093]: Invalid parameter number: mixed named and positional parameters
+SQL: UPDATE mentors SET last_login = :last_login WHERE mentor_id = ?
+Params: {"last_login":"2025-10-03 08:52:47","0":2}
+---
+Uncaught exception: Call to undefined method Database::getAll() in C:\xampp\htdocs\jhub-africa-tracker\dashboards\mentor\index.php on line 13Uncaught exception: Call to undefined method Database::getAll() in C:\xampp\htdocs\jhub-africa-tracker\dashboards\mentor\index.php on line 13Uncaught exception: Call to undefined method Database::getAll() in C:\xampp\htdocs\jhub-africa-tracker\dashboards\mentor\index.php on line 13Uncaught exception: Call to undefined method Database::getAll() in C:\xampp\htdocs\jhub-africa-tracker\dashboards\mentor\index.php on line 13Uncaught exception: Call to undefined method Database::getAll() in C:\xampp\htdocs\jhub-africa-tracker\dashboards\mentor\available-projects.php on line 10Uncaught exception: Call to undefined method Database::getAll() in C:\xampp\htdocs\jhub-africa-tracker\dashboards\mentor\available-projects.php on line 10Uncaught exception: Call to undefined method Database::getAll() in C:\xampp\htdocs\jhub-africa-tracker\dashboards\mentor\available-projects.php on line 102025-10-03 09:15:56 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM mentor_resources WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+2025-10-03 09:15:56 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM project_assessments WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+2025-10-03 09:15:56 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM learning_objectives WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+2025-10-03 09:16:05 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM mentor_resources WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+2025-10-03 09:16:05 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM project_assessments WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+2025-10-03 09:16:05 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM learning_objectives WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+Uncaught exception: Call to undefined method Database::getAll() in C:\xampp\htdocs\jhub-africa-tracker\dashboards\mentor\index.php on line 13Uncaught exception: Call to undefined method Database::getAll() in C:\xampp\htdocs\jhub-africa-tracker\dashboards\mentor\index.php on line 13Uncaught exception: Call to undefined method Database::getAll() in C:\xampp\htdocs\jhub-africa-tracker\dashboards\mentor\index.php on line 262025-10-03 09:18:14 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'mr.is_deleted' in 'where clause'
+SQL: 
+    SELECT mr.*, p.project_name
+    FROM mentor_resources mr
+    INNER JOIN projects p ON mr.project_id = p.project_id
+    WHERE mr.mentor_id = ? AND mr.is_deleted = 0
+    ORDER BY mr.created_at DESC
+    LIMIT 5
+
+Params: [2]
+---
+2025-10-03 09:18:14 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM mentor_resources WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+2025-10-03 09:18:14 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM project_assessments WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+2025-10-03 09:18:14 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM learning_objectives WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+Uncaught exception: Call to undefined method Database::getAll() in C:\xampp\htdocs\jhub-africa-tracker\dashboards\mentor\my-projects.php on line 1002025-10-03 10:19:26 - Database Error: SQLSTATE[HY093]: Invalid parameter number: mixed named and positional parameters
+SQL: UPDATE mentors SET last_login = :last_login WHERE mentor_id = ?
+Params: {"last_login":"2025-10-03 10:19:26","0":2}
+---
+2025-10-03 10:19:26 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'mr.is_deleted' in 'where clause'
+SQL: 
+    SELECT mr.*, p.project_name
+    FROM mentor_resources mr
+    INNER JOIN projects p ON mr.project_id = p.project_id
+    WHERE mr.mentor_id = ? AND mr.is_deleted = 0
+    ORDER BY mr.created_at DESC
+    LIMIT 5
+
+Params: [2]
+---
+2025-10-03 10:19:26 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM mentor_resources WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+2025-10-03 10:19:26 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM project_assessments WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+2025-10-03 10:19:26 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM learning_objectives WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+2025-10-03 10:19:26 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'mr.is_deleted' in 'where clause'
+SQL: 
+    SELECT mr.*, p.project_name
+    FROM mentor_resources mr
+    INNER JOIN projects p ON mr.project_id = p.project_id
+    WHERE mr.mentor_id = ? AND mr.is_deleted = 0
+    ORDER BY mr.created_at DESC
+    LIMIT 5
+
+Params: [2]
+---
+2025-10-03 10:19:26 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM mentor_resources WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+2025-10-03 10:19:26 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM project_assessments WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+2025-10-03 10:19:26 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM learning_objectives WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+Uncaught exception: Call to undefined method Database::getAll() in C:\xampp\htdocs\jhub-africa-tracker\dashboards\mentor\my-projects.php on line 1002025-10-03 10:22:17 - Database Error: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'as team_count,
+               (SELECT COUNT(*) FROM project_mentors WHERE pr...' at line 1
+SQL: 
+    
+               (SELECT COUNT(*) FROM project_innovators WHERE project_id = p.project_id AND is_active = 1) as team_count,
+               (SELECT COUNT(*) FROM project_mentors WHERE project_id = p.project_id AND is_active = 1) as mentor_count
+        FROM projects p
+        INNER JOIN project_mentors pm ON p.project_id = pm.project_id
+        WHERE pm.mentor_id = ? AND pm.is_active = 1
+        ORDER BY p.updated_at DESC
+    
+Params: [2]
+---
+2025-10-03 10:23:52 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'mr.is_deleted' in 'where clause'
+SQL: 
+    SELECT mr.*, p.project_name
+    FROM mentor_resources mr
+    INNER JOIN projects p ON mr.project_id = p.project_id
+    WHERE mr.mentor_id = ? AND mr.is_deleted = 0
+    ORDER BY mr.created_at DESC
+    LIMIT 5
+
+Params: [2]
+---
+2025-10-03 10:23:52 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM mentor_resources WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+2025-10-03 10:23:52 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM project_assessments WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+2025-10-03 10:23:52 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM learning_objectives WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+2025-10-03 10:26:13 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'mr.is_deleted' in 'where clause'
+SQL: 
+    SELECT mr.*, p.project_name
+    FROM mentor_resources mr
+    INNER JOIN projects p ON mr.project_id = p.project_id
+    WHERE mr.mentor_id = ? AND mr.is_deleted = 0
+    ORDER BY mr.created_at DESC
+    LIMIT 5
+
+Params: [2]
+---
+2025-10-03 10:26:13 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM mentor_resources WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+2025-10-03 10:26:13 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM project_assessments WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+2025-10-03 10:26:13 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM learning_objectives WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+Uncaught exception: Call to undefined method Database::getAll() in C:\xampp\htdocs\jhub-africa-tracker\dashboards\mentor\resources.php on line 14Uncaught exception: Call to undefined method Database::getAll() in C:\xampp\htdocs\jhub-africa-tracker\dashboards\mentor\resources.php on line 1162025-10-03 10:27:47 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'mr.is_deleted' in 'where clause'
+SQL: 
+    SELECT mr.*, p.project_name
+    FROM mentor_resources mr
+    INNER JOIN projects p ON mr.project_id = p.project_id
+    WHERE mr.mentor_id = ? AND mr.is_deleted = 0
+    ORDER BY mr.created_at DESC
+
+Params: [2]
+---
+2025-10-03 10:28:16 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'mr.is_deleted' in 'where clause'
+SQL: 
+    SELECT mr.*, p.project_name
+    FROM mentor_resources mr
+    INNER JOIN projects p ON mr.project_id = p.project_id
+    WHERE mr.mentor_id = ? AND mr.is_deleted = 0
+    ORDER BY mr.created_at DESC
+    LIMIT 5
+
+Params: [2]
+---
+2025-10-03 10:28:16 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM mentor_resources WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+2025-10-03 10:28:16 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM project_assessments WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+2025-10-03 10:28:16 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM learning_objectives WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+2025-10-03 10:29:21 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'mr.is_deleted' in 'where clause'
+SQL: 
+    SELECT mr.*, p.project_name
+    FROM mentor_resources mr
+    INNER JOIN projects p ON mr.project_id = p.project_id
+    WHERE mr.mentor_id = ? AND mr.is_deleted = 0
+    ORDER BY mr.created_at DESC
+    LIMIT 5
+
+Params: [2]
+---
+2025-10-03 10:29:21 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM mentor_resources WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+2025-10-03 10:29:21 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM project_assessments WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+2025-10-03 10:29:21 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM learning_objectives WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+Uncaught exception: Call to undefined method Database::getAll() in C:\xampp\htdocs\jhub-africa-tracker\dashboards\mentor\assessments.php on line 14Uncaught exception: Call to undefined method Database::getAll() in C:\xampp\htdocs\jhub-africa-tracker\dashboards\mentor\assessments.php on line 1052025-10-03 10:30:41 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'pa.is_deleted' in 'where clause'
+SQL: 
+    SELECT pa.*, p.project_name
+    FROM project_assessments pa
+    INNER JOIN projects p ON pa.project_id = p.project_id
+    WHERE pa.mentor_id = ? AND pa.is_deleted = 0
+    ORDER BY pa.created_at DESC
+
+Params: [2]
+---
+2025-10-03 10:30:59 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'mr.is_deleted' in 'where clause'
+SQL: 
+    SELECT mr.*, p.project_name
+    FROM mentor_resources mr
+    INNER JOIN projects p ON mr.project_id = p.project_id
+    WHERE mr.mentor_id = ? AND mr.is_deleted = 0
+    ORDER BY mr.created_at DESC
+    LIMIT 5
+
+Params: [2]
+---
+2025-10-03 10:30:59 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM mentor_resources WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+2025-10-03 10:30:59 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM project_assessments WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+2025-10-03 10:30:59 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM learning_objectives WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+2025-10-03 10:34:05 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'mr.is_deleted' in 'where clause'
+SQL: 
+    SELECT mr.*, p.project_name
+    FROM mentor_resources mr
+    INNER JOIN projects p ON mr.project_id = p.project_id
+    WHERE mr.mentor_id = ? AND mr.is_deleted = 0
+    ORDER BY mr.created_at DESC
+    LIMIT 5
+
+Params: [2]
+---
+2025-10-03 10:34:05 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM mentor_resources WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+2025-10-03 10:34:05 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM project_assessments WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+2025-10-03 10:34:05 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM learning_objectives WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+Uncaught exception: Call to undefined method Database::getAll() in C:\xampp\htdocs\jhub-africa-tracker\dashboards\mentor\learning.php on line 14Uncaught exception: Call to undefined method Database::getAll() in C:\xampp\htdocs\jhub-africa-tracker\dashboards\mentor\learning.php on line 1152025-10-03 10:41:26 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'lo.is_deleted' in 'where clause'
+SQL: 
+    SELECT lo.*, p.project_name
+    FROM learning_objectives lo
+    INNER JOIN projects p ON lo.project_id = p.project_id
+    WHERE lo.mentor_id = ? AND lo.is_deleted = 0
+    ORDER BY lo.created_at DESC
+
+Params: [2]
+---
+Uncaught exception: Call to undefined method Database::getAll() in C:\xampp\htdocs\jhub-africa-tracker\dashboards\mentor\learning.php on line 14Uncaught exception: Call to undefined method Database::getRowsl() in C:\xampp\htdocs\jhub-africa-tracker\dashboards\mentor\learning.php on line 14Uncaught exception: Call to undefined method Database::getAll() in C:\xampp\htdocs\jhub-africa-tracker\dashboards\mentor\learning.php on line 1152025-10-03 10:51:24 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'lo.is_deleted' in 'where clause'
+SQL: 
+    SELECT lo.*, p.project_name
+    FROM learning_objectives lo
+    INNER JOIN projects p ON lo.project_id = p.project_id
+    WHERE lo.mentor_id = ? AND lo.is_deleted = 0
+    ORDER BY lo.created_at DESC
+
+Params: [2]
+---
+2025-10-03 10:51:38 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'mr.is_deleted' in 'where clause'
+SQL: 
+    SELECT mr.*, p.project_name
+    FROM mentor_resources mr
+    INNER JOIN projects p ON mr.project_id = p.project_id
+    WHERE mr.mentor_id = ? AND mr.is_deleted = 0
+    ORDER BY mr.created_at DESC
+    LIMIT 5
+
+Params: [2]
+---
+2025-10-03 10:51:38 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM mentor_resources WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+2025-10-03 10:51:38 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM project_assessments WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+2025-10-03 10:51:38 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM learning_objectives WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+2025-10-03 10:55:16 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'mr.is_deleted' in 'where clause'
+SQL: 
+    SELECT mr.*, p.project_name
+    FROM mentor_resources mr
+    INNER JOIN projects p ON mr.project_id = p.project_id
+    WHERE mr.mentor_id = ? AND mr.is_deleted = 0
+    ORDER BY mr.created_at DESC
+    LIMIT 5
+
+Params: [2]
+---
+2025-10-03 10:55:16 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM mentor_resources WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+2025-10-03 10:55:16 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM project_assessments WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+2025-10-03 10:55:16 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM learning_objectives WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+Uncaught exception: Call to undefined method Auth::isLoggedIn() in C:\xampp\htdocs\jhub-africa-tracker\api\mentors\assign-to-project.php on line 7Uncaught exception: Call to undefined method Auth::isLoggedIn() in C:\xampp\htdocs\jhub-africa-tracker\api\mentors\assign-to-project.php on line 7Uncaught exception: Call to undefined method Auth::isLoggedIn() in C:\xampp\htdocs\jhub-africa-tracker\api\mentors\assign-to-project.php on line 72025-10-03 10:55:49 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'mr.is_deleted' in 'where clause'
+SQL: 
+    SELECT mr.*, p.project_name
+    FROM mentor_resources mr
+    INNER JOIN projects p ON mr.project_id = p.project_id
+    WHERE mr.mentor_id = ? AND mr.is_deleted = 0
+    ORDER BY mr.created_at DESC
+    LIMIT 5
+
+Params: [2]
+---
+2025-10-03 10:55:49 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM mentor_resources WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+2025-10-03 10:55:49 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM project_assessments WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+2025-10-03 10:55:49 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM learning_objectives WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+2025-10-03 10:55:53 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'lo.is_deleted' in 'where clause'
+SQL: 
+    SELECT lo.*, p.project_name
+    FROM learning_objectives lo
+    INNER JOIN projects p ON lo.project_id = p.project_id
+    WHERE lo.mentor_id = ? AND lo.is_deleted = 0
+    ORDER BY lo.created_at DESC
+
+Params: [2]
+---
+2025-10-03 10:58:04 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'mr.is_deleted' in 'where clause'
+SQL: 
+    SELECT mr.*, p.project_name
+    FROM mentor_resources mr
+    INNER JOIN projects p ON mr.project_id = p.project_id
+    WHERE mr.mentor_id = ? AND mr.is_deleted = 0
+    ORDER BY mr.created_at DESC
+    LIMIT 5
+
+Params: [2]
+---
+2025-10-03 10:58:04 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM mentor_resources WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+2025-10-03 10:58:04 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM project_assessments WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+2025-10-03 10:58:04 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM learning_objectives WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+Uncaught exception: Call to undefined method Auth::isLoggedIn() in C:\xampp\htdocs\jhub-africa-tracker\api\mentors\assign-to-project.php on line 72025-10-03 10:58:47 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'mr.is_deleted' in 'where clause'
+SQL: 
+    SELECT mr.*, p.project_name
+    FROM mentor_resources mr
+    INNER JOIN projects p ON mr.project_id = p.project_id
+    WHERE mr.mentor_id = ? AND mr.is_deleted = 0
+    ORDER BY mr.created_at DESC
+
+Params: [2]
+---
+2025-10-03 10:59:03 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM mentor_resources WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+2025-10-03 10:59:03 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM project_assessments WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+2025-10-03 10:59:03 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM learning_objectives WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+2025-10-03 10:59:49 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'mr.is_deleted' in 'where clause'
+SQL: 
+    SELECT mr.*, p.project_name
+    FROM mentor_resources mr
+    INNER JOIN projects p ON mr.project_id = p.project_id
+    WHERE mr.mentor_id = ? AND mr.is_deleted = 0
+    ORDER BY mr.created_at DESC
+
+Params: [2]
+---
+2025-10-03 10:59:52 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'mr.is_deleted' in 'where clause'
+SQL: 
+    SELECT mr.*, p.project_name
+    FROM mentor_resources mr
+    INNER JOIN projects p ON mr.project_id = p.project_id
+    WHERE mr.mentor_id = ? AND mr.is_deleted = 0
+    ORDER BY mr.created_at DESC
+
+Params: [2]
+---
+2025-10-03 10:59:55 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'lo.is_deleted' in 'where clause'
+SQL: 
+    SELECT lo.*, p.project_name
+    FROM learning_objectives lo
+    INNER JOIN projects p ON lo.project_id = p.project_id
+    WHERE lo.mentor_id = ? AND lo.is_deleted = 0
+    ORDER BY lo.created_at DESC
+
+Params: [2]
+---
+2025-10-03 10:59:57 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'lo.is_deleted' in 'where clause'
+SQL: 
+    SELECT lo.*, p.project_name
+    FROM learning_objectives lo
+    INNER JOIN projects p ON lo.project_id = p.project_id
+    WHERE lo.mentor_id = ? AND lo.is_deleted = 0
+    ORDER BY lo.created_at DESC
+
+Params: [2]
+---
+2025-10-03 11:00:00 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'pa.is_deleted' in 'where clause'
+SQL: 
+    SELECT pa.*, p.project_name
+    FROM project_assessments pa
+    INNER JOIN projects p ON pa.project_id = p.project_id
+    WHERE pa.mentor_id = ? AND pa.is_deleted = 0
+    ORDER BY pa.created_at DESC
+
+Params: [2]
+---
+2025-10-03 11:00:01 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'pa.is_deleted' in 'where clause'
+SQL: 
+    SELECT pa.*, p.project_name
+    FROM project_assessments pa
+    INNER JOIN projects p ON pa.project_id = p.project_id
+    WHERE pa.mentor_id = ? AND pa.is_deleted = 0
+    ORDER BY pa.created_at DESC
+
+Params: [2]
+---
+2025-10-03 11:00:02 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'mr.is_deleted' in 'where clause'
+SQL: 
+    SELECT mr.*, p.project_name
+    FROM mentor_resources mr
+    INNER JOIN projects p ON mr.project_id = p.project_id
+    WHERE mr.mentor_id = ? AND mr.is_deleted = 0
+    ORDER BY mr.created_at DESC
+
+Params: [2]
+---
+2025-10-03 11:00:05 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'mr.is_deleted' in 'where clause'
+SQL: 
+    SELECT mr.*, p.project_name
+    FROM mentor_resources mr
+    INNER JOIN projects p ON mr.project_id = p.project_id
+    WHERE mr.mentor_id = ? AND mr.is_deleted = 0
+    ORDER BY mr.created_at DESC
+    LIMIT 5
+
+Params: [2]
+---
+2025-10-03 11:00:05 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM mentor_resources WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+2025-10-03 11:00:05 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM project_assessments WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+2025-10-03 11:00:05 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM learning_objectives WHERE mentor_id = ? AND is_deleted = 0
+Params: [2]
+---
+Uncaught exception: Call to undefined method Auth::isLoggedIn() in C:\xampp\htdocs\jhub-africa-tracker\api\mentors\assign-to-project.php on line 7Uncaught exception: Call to undefined method Auth::isLoggedIn() in C:\xampp\htdocs\jhub-africa-tracker\api\mentors\assign-to-project.php on line 7Uncaught exception: Call to undefined method Auth::isLoggedIn() in C:\xampp\htdocs\jhub-africa-tracker\api\mentors\assign-to-project.php on line 72025-10-03 11:01:02 - Database Error: SQLSTATE[HY093]: Invalid parameter number: mixed named and positional parameters
+SQL: UPDATE admins SET last_login = :last_login WHERE admin_id = ?
+Params: {"last_login":"2025-10-03 11:01:02","0":1}
+---
+2025-10-03 11:01:51 - Database Error: SQLSTATE[HY093]: Invalid parameter number: mixed named and positional parameters
+SQL: UPDATE mentors SET last_login = :last_login WHERE mentor_id = ?
+Params: {"last_login":"2025-10-03 11:01:51","0":1}
+---
+2025-10-03 11:01:51 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'mr.is_deleted' in 'where clause'
+SQL: 
+    SELECT mr.*, p.project_name
+    FROM mentor_resources mr
+    INNER JOIN projects p ON mr.project_id = p.project_id
+    WHERE mr.mentor_id = ? AND mr.is_deleted = 0
+    ORDER BY mr.created_at DESC
+    LIMIT 5
+
+Params: [1]
+---
+2025-10-03 11:01:51 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM mentor_resources WHERE mentor_id = ? AND is_deleted = 0
+Params: [1]
+---
+2025-10-03 11:01:51 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM project_assessments WHERE mentor_id = ? AND is_deleted = 0
+Params: [1]
+---
+2025-10-03 11:01:51 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM learning_objectives WHERE mentor_id = ? AND is_deleted = 0
+Params: [1]
+---
+2025-10-03 11:01:51 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'mr.is_deleted' in 'where clause'
+SQL: 
+    SELECT mr.*, p.project_name
+    FROM mentor_resources mr
+    INNER JOIN projects p ON mr.project_id = p.project_id
+    WHERE mr.mentor_id = ? AND mr.is_deleted = 0
+    ORDER BY mr.created_at DESC
+    LIMIT 5
+
+Params: [1]
+---
+2025-10-03 11:01:51 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM mentor_resources WHERE mentor_id = ? AND is_deleted = 0
+Params: [1]
+---
+2025-10-03 11:01:51 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM project_assessments WHERE mentor_id = ? AND is_deleted = 0
+Params: [1]
+---
+2025-10-03 11:01:51 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM learning_objectives WHERE mentor_id = ? AND is_deleted = 0
+Params: [1]
+---
+2025-10-03 11:01:59 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'mr.is_deleted' in 'where clause'
+SQL: 
+    SELECT mr.*, p.project_name
+    FROM mentor_resources mr
+    INNER JOIN projects p ON mr.project_id = p.project_id
+    WHERE mr.mentor_id = ? AND mr.is_deleted = 0
+    ORDER BY mr.created_at DESC
+
+Params: [1]
+---
+2025-10-03 11:02:01 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'mr.is_deleted' in 'where clause'
+SQL: 
+    SELECT mr.*, p.project_name
+    FROM mentor_resources mr
+    INNER JOIN projects p ON mr.project_id = p.project_id
+    WHERE mr.mentor_id = ? AND mr.is_deleted = 0
+    ORDER BY mr.created_at DESC
+
+Params: [1]
+---
+2025-10-03 11:02:18 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'mr.is_deleted' in 'where clause'
+SQL: 
+    SELECT mr.*, p.project_name
+    FROM mentor_resources mr
+    INNER JOIN projects p ON mr.project_id = p.project_id
+    WHERE mr.mentor_id = ? AND mr.is_deleted = 0
+    ORDER BY mr.created_at DESC
+
+Params: [1]
+---
+2025-10-03 11:02:25 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'mr.is_deleted' in 'where clause'
+SQL: 
+    SELECT mr.*, p.project_name
+    FROM mentor_resources mr
+    INNER JOIN projects p ON mr.project_id = p.project_id
+    WHERE mr.mentor_id = ? AND mr.is_deleted = 0
+    ORDER BY mr.created_at DESC
+
+Params: [1]
+---
+2025-10-03 11:02:27 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'mr.is_deleted' in 'where clause'
+SQL: 
+    SELECT mr.*, p.project_name
+    FROM mentor_resources mr
+    INNER JOIN projects p ON mr.project_id = p.project_id
+    WHERE mr.mentor_id = ? AND mr.is_deleted = 0
+    ORDER BY mr.created_at DESC
+    LIMIT 5
+
+Params: [1]
+---
+2025-10-03 11:02:27 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM mentor_resources WHERE mentor_id = ? AND is_deleted = 0
+Params: [1]
+---
+2025-10-03 11:02:27 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM project_assessments WHERE mentor_id = ? AND is_deleted = 0
+Params: [1]
+---
+2025-10-03 11:02:27 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM learning_objectives WHERE mentor_id = ? AND is_deleted = 0
+Params: [1]
+---
+2025-10-03 11:02:36 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'mr.is_deleted' in 'where clause'
+SQL: 
+    SELECT mr.*, p.project_name
+    FROM mentor_resources mr
+    INNER JOIN projects p ON mr.project_id = p.project_id
+    WHERE mr.mentor_id = ? AND mr.is_deleted = 0
+    ORDER BY mr.created_at DESC
+
+Params: [1]
+---
+2025-10-03 11:02:54 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'mr.is_deleted' in 'where clause'
+SQL: 
+    SELECT mr.*, p.project_name
+    FROM mentor_resources mr
+    INNER JOIN projects p ON mr.project_id = p.project_id
+    WHERE mr.mentor_id = ? AND mr.is_deleted = 0
+    ORDER BY mr.created_at DESC
+
+Params: [1]
+---
+2025-10-03 11:02:59 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'mr.is_deleted' in 'where clause'
+SQL: 
+    SELECT mr.*, p.project_name
+    FROM mentor_resources mr
+    INNER JOIN projects p ON mr.project_id = p.project_id
+    WHERE mr.mentor_id = ? AND mr.is_deleted = 0
+    ORDER BY mr.created_at DESC
+    LIMIT 5
+
+Params: [1]
+---
+2025-10-03 11:02:59 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM mentor_resources WHERE mentor_id = ? AND is_deleted = 0
+Params: [1]
+---
+2025-10-03 11:02:59 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM project_assessments WHERE mentor_id = ? AND is_deleted = 0
+Params: [1]
+---
+2025-10-03 11:02:59 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM learning_objectives WHERE mentor_id = ? AND is_deleted = 0
+Params: [1]
+---
+2025-10-03 11:03:02 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'mr.is_deleted' in 'where clause'
+SQL: 
+    SELECT mr.*, p.project_name
+    FROM mentor_resources mr
+    INNER JOIN projects p ON mr.project_id = p.project_id
+    WHERE mr.mentor_id = ? AND mr.is_deleted = 0
+    ORDER BY mr.created_at DESC
+    LIMIT 5
+
+Params: [1]
+---
+2025-10-03 11:03:02 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM mentor_resources WHERE mentor_id = ? AND is_deleted = 0
+Params: [1]
+---
+2025-10-03 11:03:02 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM project_assessments WHERE mentor_id = ? AND is_deleted = 0
+Params: [1]
+---
+2025-10-03 11:03:02 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM learning_objectives WHERE mentor_id = ? AND is_deleted = 0
+Params: [1]
+---
+2025-10-03 11:03:04 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'pa.is_deleted' in 'where clause'
+SQL: 
+    SELECT pa.*, p.project_name
+    FROM project_assessments pa
+    INNER JOIN projects p ON pa.project_id = p.project_id
+    WHERE pa.mentor_id = ? AND pa.is_deleted = 0
+    ORDER BY pa.created_at DESC
+
+Params: [1]
+---
+2025-10-03 11:03:05 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'mr.is_deleted' in 'where clause'
+SQL: 
+    SELECT mr.*, p.project_name
+    FROM mentor_resources mr
+    INNER JOIN projects p ON mr.project_id = p.project_id
+    WHERE mr.mentor_id = ? AND mr.is_deleted = 0
+    ORDER BY mr.created_at DESC
+    LIMIT 5
+
+Params: [1]
+---
+2025-10-03 11:03:05 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM mentor_resources WHERE mentor_id = ? AND is_deleted = 0
+Params: [1]
+---
+2025-10-03 11:03:05 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM project_assessments WHERE mentor_id = ? AND is_deleted = 0
+Params: [1]
+---
+2025-10-03 11:03:05 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM learning_objectives WHERE mentor_id = ? AND is_deleted = 0
+Params: [1]
+---
+2025-10-03 11:03:07 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'pa.is_deleted' in 'where clause'
+SQL: 
+    SELECT pa.*, p.project_name
+    FROM project_assessments pa
+    INNER JOIN projects p ON pa.project_id = p.project_id
+    WHERE pa.mentor_id = ? AND pa.is_deleted = 0
+    ORDER BY pa.created_at DESC
+
+Params: [1]
+---
+2025-10-03 11:03:09 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'pa.is_deleted' in 'where clause'
+SQL: 
+    SELECT pa.*, p.project_name
+    FROM project_assessments pa
+    INNER JOIN projects p ON pa.project_id = p.project_id
+    WHERE pa.mentor_id = ? AND pa.is_deleted = 0
+    ORDER BY pa.created_at DESC
+
+Params: [1]
+---
+2025-10-03 11:03:26 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'criteria' in 'field list'
+SQL: INSERT INTO project_assessments (project_id, mentor_id, title, description, criteria, is_completed) VALUES (:project_id, :mentor_id, :title, :description, :criteria, :is_completed)
+Params: {"project_id":7,"mentor_id":1,"title":"test","description":"test","criteria":"test test","is_completed":0}
+---
+2025-10-03 11:03:26 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'pa.is_deleted' in 'where clause'
+SQL: 
+    SELECT pa.*, p.project_name
+    FROM project_assessments pa
+    INNER JOIN projects p ON pa.project_id = p.project_id
+    WHERE pa.mentor_id = ? AND pa.is_deleted = 0
+    ORDER BY pa.created_at DESC
+
+Params: [1]
+---
+2025-10-03 11:03:33 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'lo.is_deleted' in 'where clause'
+SQL: 
+    SELECT lo.*, p.project_name
+    FROM learning_objectives lo
+    INNER JOIN projects p ON lo.project_id = p.project_id
+    WHERE lo.mentor_id = ? AND lo.is_deleted = 0
+    ORDER BY lo.created_at DESC
+
+Params: [1]
+---
+2025-10-03 11:03:34 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'lo.is_deleted' in 'where clause'
+SQL: 
+    SELECT lo.*, p.project_name
+    FROM learning_objectives lo
+    INNER JOIN projects p ON lo.project_id = p.project_id
+    WHERE lo.mentor_id = ? AND lo.is_deleted = 0
+    ORDER BY lo.created_at DESC
+
+Params: [1]
+---
+2025-10-03 11:03:45 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'objective_type' in 'field list'
+SQL: INSERT INTO learning_objectives (project_id, mentor_id, title, description, objective_type, target_completion_date, is_completed) VALUES (:project_id, :mentor_id, :title, :description, :objective_type, :target_completion_date, :is_completed)
+Params: {"project_id":7,"mentor_id":1,"title":"test","description":"test","objective_type":"business","target_completion_date":null,"is_completed":0}
+---
+2025-10-03 11:03:45 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'lo.is_deleted' in 'where clause'
+SQL: 
+    SELECT lo.*, p.project_name
+    FROM learning_objectives lo
+    INNER JOIN projects p ON lo.project_id = p.project_id
+    WHERE lo.mentor_id = ? AND lo.is_deleted = 0
+    ORDER BY lo.created_at DESC
+
+Params: [1]
+---
+2025-10-03 11:04:06 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'objective_type' in 'field list'
+SQL: INSERT INTO learning_objectives (project_id, mentor_id, title, description, objective_type, target_completion_date, is_completed) VALUES (:project_id, :mentor_id, :title, :description, :objective_type, :target_completion_date, :is_completed)
+Params: {"project_id":7,"mentor_id":1,"title":"team","description":"team","objective_type":"technical","target_completion_date":"2025-10-03","is_completed":0}
+---
+2025-10-03 11:04:06 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'lo.is_deleted' in 'where clause'
+SQL: 
+    SELECT lo.*, p.project_name
+    FROM learning_objectives lo
+    INNER JOIN projects p ON lo.project_id = p.project_id
+    WHERE lo.mentor_id = ? AND lo.is_deleted = 0
+    ORDER BY lo.created_at DESC
+
+Params: [1]
+---
+2025-10-03 11:04:08 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM mentor_resources WHERE mentor_id = ? AND is_deleted = 0
+Params: [1]
+---
+2025-10-03 11:04:08 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM project_assessments WHERE mentor_id = ? AND is_deleted = 0
+Params: [1]
+---
+2025-10-03 11:04:08 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_deleted' in 'where clause'
+SQL: SELECT COUNT(*) FROM learning_objectives WHERE mentor_id = ? AND is_deleted = 0
+Params: [1]
+---

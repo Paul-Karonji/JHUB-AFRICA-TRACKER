@@ -1,58 +1,57 @@
 <?php
 // dashboards/mentor/available-projects.php
-// Available Projects for Mentor Assignment
 require_once '../../includes/init.php';
 
 $auth->requireUserType(USER_TYPE_MENTOR);
 
 $mentorId = $auth->getUserId();
 
-// Get available projects (not assigned to this mentor)
-$availableProjects = getAvailableProjectsForMentor($mentorId);
+// Get all active projects (not assigned to this mentor)
+$availableProjects = $database->getRows("
+    SELECT p.*, 
+           (SELECT COUNT(*) FROM project_innovators WHERE project_id = p.project_id AND is_active = 1) as innovator_count,
+           (SELECT COUNT(*) FROM project_mentors WHERE project_id = p.project_id AND is_active = 1) as mentor_count
+    FROM projects p
+    WHERE p.status = 'active'
+    AND p.project_id NOT IN (
+        SELECT project_id FROM project_mentors 
+        WHERE mentor_id = ? AND is_active = 1
+    )
+    ORDER BY p.created_at DESC
+", [$mentorId]);
 
 $pageTitle = "Available Projects";
 include '../../templates/header.php';
 ?>
 
-<div class="mentor-available-projects">
-    <!-- Page Header -->
+<div class="mentor-dashboard">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h1 class="h3 mb-0">Available Projects</h1>
-            <p class="text-muted">Browse and join innovation projects that need mentorship</p>
+            <p class="text-muted">Projects looking for mentorship</p>
         </div>
         <a href="my-projects.php" class="btn btn-outline-primary">
-            <i class="fas fa-arrow-left me-1"></i>Back to My Projects
+            <i class="fas fa-arrow-left me-2"></i>Back to My Projects
         </a>
     </div>
 
-    <!-- Info Alert -->
-    <div class="alert alert-info mb-4">
-        <h5 class="alert-heading"><i class="fas fa-info-circle me-2"></i>How It Works</h5>
-        <ul class="mb-0">
-            <li>Browse active projects looking for mentorship</li>
-            <li>Click "View Details" to learn more about a project</li>
-            <li>Click "Join Project" to become a mentor for that innovation</li>
-            <li>Once joined, the project will move to Stage 2: Mentorship</li>
-            <li>You can mentor multiple projects simultaneously</li>
-        </ul>
-    </div>
-
-    <!-- Projects Grid -->
     <?php if (empty($availableProjects)): ?>
         <div class="card shadow">
             <div class="card-body text-center py-5">
-                <i class="fas fa-project-diagram fa-4x text-muted mb-3"></i>
-                <h4>No Available Projects</h4>
-                <p class="text-muted">
-                    All active projects currently have mentors assigned, or you're already mentoring all available projects.
-                </p>
+                <i class="fas fa-check-circle text-success fa-3x mb-3"></i>
+                <h4>Great! You're mentoring all available projects!</h4>
+                <p class="text-muted">Check back later for new projects that need mentorship.</p>
                 <a href="my-projects.php" class="btn btn-primary mt-3">
                     <i class="fas fa-arrow-left me-2"></i>View My Projects
                 </a>
             </div>
         </div>
     <?php else: ?>
+        <div class="alert alert-info mb-4">
+            <i class="fas fa-info-circle me-2"></i>
+            <strong><?php echo count($availableProjects); ?> projects</strong> are looking for mentors. Click "Join Project" to start mentoring.
+        </div>
+
         <div class="row">
             <?php foreach ($availableProjects as $project): ?>
             <div class="col-md-6 col-lg-4 mb-4">
@@ -87,87 +86,87 @@ include '../../templates/header.php';
                             <p class="mb-0 small"><?php echo e($project['target_market']); ?></p>
                         </div>
                         <?php endif; ?>
-                    </div>
-                    <div class="card-footer bg-transparent">
-                        <div class="d-grid gap-2">
-                            <a href="../../public/project-details.php?id=<?php echo $project['project_id']; ?>" 
-                               class="btn btn-outline-primary btn-sm" target="_blank">
-                                <i class="fas fa-eye me-1"></i> View Details
-                            </a>
-                            <button class="btn btn-success btn-sm btn-join-project" 
+
+                        <div class="d-grid gap-2 mt-3">
+                            <button class="btn btn-primary btn-join-project" 
                                     data-project-id="<?php echo $project['project_id']; ?>"
                                     data-project-name="<?php echo e($project['project_name']); ?>">
                                 <i class="fas fa-plus me-1"></i> Join as Mentor
                             </button>
+                            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse" 
+                                    data-bs-target="#details-<?php echo $project['project_id']; ?>">
+                                <i class="fas fa-info-circle me-1"></i> More Details
+                            </button>
+                        </div>
+
+                        <div class="collapse mt-3" id="details-<?php echo $project['project_id']; ?>">
+                            <hr>
+                            <small>
+                                <strong>Full Description:</strong><br>
+                                <?php echo nl2br(e($project['description'])); ?>
+                            </small>
+                            <?php if ($project['project_website']): ?>
+                                <div class="mt-2">
+                                    <a href="<?php echo e($project['project_website']); ?>" target="_blank" class="small">
+                                        Visit Website <i class="fas fa-external-link-alt ms-1"></i>
+                                    </a>
+                                </div>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
             </div>
             <?php endforeach; ?>
         </div>
-
-        <div class="text-center mt-4">
-            <p class="text-muted">
-                Showing <?php echo count($availableProjects); ?> available project<?php echo count($availableProjects) != 1 ? 's' : ''; ?>
-            </p>
-        </div>
     <?php endif; ?>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Join project buttons
+    // Handle join project buttons
     document.querySelectorAll('.btn-join-project').forEach(button => {
         button.addEventListener('click', function() {
             const projectId = this.dataset.projectId;
             const projectName = this.dataset.projectName;
             
-            if (confirm(`Are you sure you want to join "${projectName}" as a mentor?\n\nYou will be able to share resources, create assessments, and guide the team through their innovation journey.`)) {
-                joinProject(projectId, this);
+            if (!confirm(`Are you sure you want to join "${projectName}" as a mentor?`)) {
+                return;
             }
+            
+            // Disable button
+            this.disabled = true;
+            this.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Joining...';
+            
+            // Make API call
+            fetch('../../api/mentors/assign-to-project.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    project_id: projectId,
+                    csrf_token: '<?php echo $auth->generateCSRFToken(); ?>'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    window.location.href = 'my-projects.php?id=' + projectId;
+                } else {
+                    alert('Error: ' + data.message);
+                    this.disabled = false;
+                    this.innerHTML = '<i class="fas fa-plus me-1"></i> Join as Mentor';
+                }
+            })
+            .catch(error => {
+                alert('Network error. Please try again.');
+                this.disabled = false;
+                this.innerHTML = '<i class="fas fa-plus me-1"></i> Join as Mentor';
+            });
         });
     });
 });
-
-function joinProject(projectId, button) {
-    // Disable button
-    const originalHtml = button.innerHTML;
-    button.disabled = true;
-    button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Joining...';
-    
-    fetch('../../api/projects/mentors.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            action: 'join',
-            project_id: projectId,
-            csrf_token: window.JHUB.csrfToken
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            window.JHUB.Utils.showAlert(data.message, 'success');
-            
-            // Redirect to my projects after brief delay
-            setTimeout(() => {
-                window.location.href = 'my-projects.php';
-            }, 2000);
-        } else {
-            window.JHUB.Utils.showAlert(data.message, 'danger');
-            button.disabled = false;
-            button.innerHTML = originalHtml;
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        window.JHUB.Utils.showAlert('An error occurred while joining the project', 'danger');
-        button.disabled = false;
-        button.innerHTML = originalHtml;
-    });
-}
 </script>
 
 <?php include '../../templates/footer.php'; ?>
