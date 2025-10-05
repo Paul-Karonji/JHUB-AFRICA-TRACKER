@@ -1848,4 +1848,15 @@ Params: [3]
 SQL: UPDATE projects SET current_stage = :current_stage WHERE project_id = ?
 Params: {"current_stage":2,"0":8}
 ---
-Uncaught exception: Undefined constant "UPLOAD_URL" in C:\xampp\htdocs\jhub-africa-tracker\dashboards\admin\applications.php on line 282Uncaught exception: Undefined constant "UPLOAD_URL" in C:\xampp\htdocs\jhub-africa-tracker\dashboards\admin\applications.php on line 282Uncaught exception: Undefined constant "UPLOAD_URL" in C:\xampp\htdocs\jhub-africa-tracker\dashboards\admin\applications.php on line 282Uncaught exception: Undefined constant "UPLOAD_URL" in C:\xampp\htdocs\jhub-africa-tracker\dashboards\admin\applications.php on line 282Uncaught exception: Undefined constant "UPLOAD_URL" in C:\xampp\htdocs\jhub-africa-tracker\dashboards\admin\applications.php on line 282
+Uncaught exception: Undefined constant "UPLOAD_URL" in C:\xampp\htdocs\jhub-africa-tracker\dashboards\admin\applications.php on line 282Uncaught exception: Undefined constant "UPLOAD_URL" in C:\xampp\htdocs\jhub-africa-tracker\dashboards\admin\applications.php on line 282Uncaught exception: Undefined constant "UPLOAD_URL" in C:\xampp\htdocs\jhub-africa-tracker\dashboards\admin\applications.php on line 282Uncaught exception: Undefined constant "UPLOAD_URL" in C:\xampp\htdocs\jhub-africa-tracker\dashboards\admin\applications.php on line 282Uncaught exception: Undefined constant "UPLOAD_URL" in C:\xampp\htdocs\jhub-africa-tracker\dashboards\admin\applications.php on line 2822025-10-06 00:08:53 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'last_login' in 'field list'
+SQL: UPDATE projects SET last_login = ? WHERE project_id = ?
+Params: ["2025-10-06 00:08:53",7]
+---
+2025-10-06 00:23:58 - Database Error: SQLSTATE[HY093]: Invalid parameter number: mixed named and positional parameters
+SQL: UPDATE project_applications SET status = :status, reviewed_at = :reviewed_at, reviewed_by = :reviewed_by, admin_message = :admin_message WHERE application_id = ?
+Params: {"status":"approved","reviewed_at":"2025-10-06 00:23:58","reviewed_by":1,"admin_message":"","0":8}
+---
+2025-10-06 00:24:06 - Database Error: SQLSTATE[HY093]: Invalid parameter number: mixed named and positional parameters
+SQL: UPDATE project_applications SET status = :status, reviewed_at = :reviewed_at, reviewed_by = :reviewed_by, admin_message = :admin_message WHERE application_id = ?
+Params: {"status":"approved","reviewed_at":"2025-10-06 00:24:06","reviewed_by":1,"admin_message":"","0":8}
+---

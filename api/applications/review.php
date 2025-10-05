@@ -1,14 +1,12 @@
 <?php
-// api/applications/review.php
-// Admin Application Review API - FIXED VERSION
+// api/applications/review-enhanced.php
+// Enhanced Admin Application Review API with Messaging and File Auto-Deletion
 
 header('Content-Type: application/json');
 require_once '../../includes/init.php';
 
-// Require admin authentication
 $auth->requireUserType(USER_TYPE_ADMIN);
 
-// Only accept POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     echo json_encode(['success' => false, 'message' => 'Method not allowed']);
@@ -16,28 +14,25 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 try {
-    // Get JSON input
     $input = json_decode(file_get_contents('php://input'), true);
     
     if (!$input) {
         throw new Exception('Invalid request data');
     }
 
-    // Validate CSRF token
     if (!isset($input['csrf_token']) || !$auth->validateCSRFToken($input['csrf_token'])) {
         throw new Exception('Invalid security token');
     }
 
-    // Validate required fields
     if (empty($input['action']) || empty($input['application_id'])) {
         throw new Exception('Missing required fields');
     }
 
-    $action = $input['action']; // 'approve' or 'reject'
+    $action = $input['action'];
     $applicationId = intval($input['application_id']);
+    $adminMessage = isset($input['admin_message']) ? trim($input['admin_message']) : '';
     $rejectionReason = isset($input['rejection_reason']) ? trim($input['rejection_reason']) : '';
 
-    // Get application
     $application = $database->getRow(
         "SELECT * FROM project_applications WHERE application_id = ?",
         [$applicationId]
@@ -47,23 +42,22 @@ try {
         throw new Exception('Application not found');
     }
 
-    // Check if already processed
     if ($application['status'] !== 'pending') {
         throw new Exception('This application has already been processed');
     }
 
-    // Start transaction
     $database->beginTransaction();
 
     try {
         if ($action === 'approve') {
-            // STEP 1: Update application status to approved
+            // Update application status
             $updateResult = $database->update(
                 'project_applications',
                 [
                     'status' => 'approved',
                     'reviewed_at' => date('Y-m-d H:i:s'),
-                    'reviewed_by' => $auth->getUserId()
+                    'reviewed_by' => $auth->getUserId(),
+                    'admin_message' => $adminMessage
                 ],
                 'application_id = ?',
                 [$applicationId]
@@ -73,7 +67,7 @@ try {
                 throw new Exception('Failed to update application status');
             }
 
-            // STEP 2: Create project from application
+            // Create project from application
             $projectData = [
                 'project_name' => $application['project_name'],
                 'date' => $application['date'],
@@ -81,10 +75,10 @@ try {
                 'project_website' => $application['project_website'],
                 'description' => $application['description'],
                 'profile_name' => $application['profile_name'],
-                'password' => $application['password'], // Already hashed
+                'password' => $application['password'],
                 'project_lead_name' => $application['project_lead_name'],
                 'project_lead_email' => $application['project_lead_email'],
-                'current_stage' => 1, // Stage 1: Project Creation
+                'current_stage' => 1,
                 'status' => 'active',
                 'created_from_application' => $applicationId,
                 'created_by_admin' => $auth->getUserId()
@@ -96,7 +90,18 @@ try {
                 throw new Exception('Failed to create project');
             }
 
-            // STEP 3: Log activity
+            // Schedule presentation file for deletion (30 seconds after approval)
+            if ($application['presentation_file']) {
+                $database->insert('file_deletion_queue', [
+                    'file_path' => 'presentations/' . $application['presentation_file'],
+                    'deletion_time' => date('Y-m-d H:i:s', strtotime('+30 seconds')),
+                    'related_type' => 'application',
+                    'related_id' => $applicationId,
+                    'reason' => 'Auto-deletion after approval'
+                ]);
+            }
+
+            // Log activity
             logActivity(
                 USER_TYPE_ADMIN,
                 $auth->getUserId(),
@@ -106,59 +111,60 @@ try {
                 ['application_id' => $applicationId, 'project_name' => $application['project_name']]
             );
 
-            // STEP 4: Send approval email
+            // Send approval email with admin message
             $loginUrl = SITE_URL . '/auth/project-login.php';
             
             $emailContent = "<p>Dear {$application['project_lead_name']},</p>";
             $emailContent .= "<p><strong>Congratulations!</strong> 🎉</p>";
             $emailContent .= "<p>Your project application for <strong>{$application['project_name']}</strong> has been approved!</p>";
+            
+            if ($adminMessage) {
+                $emailContent .= "<div style='background: #e7f3ff; padding: 15px; border-left: 4px solid #2196F3; margin: 20px 0;'>";
+                $emailContent .= "<p><strong>Message from Admin:</strong></p>";
+                $emailContent .= "<p>" . nl2br(htmlspecialchars($adminMessage)) . "</p>";
+                $emailContent .= "</div>";
+            }
+            
             $emailContent .= "<div style='background: #f8f9fa; padding: 15px; border-left: 4px solid #667eea; margin: 20px 0;'>";
             $emailContent .= "<p><strong>Your Login Credentials:</strong></p>";
             $emailContent .= "<p><strong>Username:</strong> {$application['profile_name']}<br>";
             $emailContent .= "<strong>Login URL:</strong> <a href='{$loginUrl}'>{$loginUrl}</a></p>";
             $emailContent .= "</div>";
-            $emailContent .= "<p>Your project is now active at <strong>Stage 1: Project Creation</strong>. You can now:</p>";
-            $emailContent .= "<ul>";
-            $emailContent .= "<li>Access your project dashboard</li>";
-            $emailContent .= "<li>Build your team by adding innovators</li>";
-            $emailContent .= "<li>Connect with expert mentors</li>";
-            $emailContent .= "<li>Access resources and learning materials</li>";
-            $emailContent .= "</ul>";
-            $emailContent .= "<p>Welcome to the JHUB AFRICA innovation ecosystem!</p>";
+            $emailContent .= "<p><strong>Important:</strong> Your uploaded presentation file will be automatically deleted from our servers for security purposes. Please save a copy if needed.</p>";
+            $emailContent .= "<p>Your project is now active at <strong>Stage 1: Project Creation</strong>.</p>";
             $emailContent .= "<p>Best regards,<br><strong>The JHUB AFRICA Team</strong></p>";
 
             sendEmailNotification(
                 $application['project_lead_email'],
-                'Your JHUB AFRICA Application Has Been Approved!',
+                'Application Approved - Welcome to JHUB AFRICA!',
                 $emailContent,
-                NOTIFY_APPLICATION_APPROVED,
-                array_merge($application, ['project_id' => $projectId])
+                'application_approved',
+                array_merge($application, ['project_id' => $projectId, 'admin_message' => $adminMessage])
             );
 
-            // Commit transaction
             $database->commit();
 
             echo json_encode([
                 'success' => true,
-                'message' => 'Application approved successfully! Project has been created and the applicant has been notified.',
+                'message' => 'Application approved successfully! Project created and notification sent. Presentation file will be deleted in 30 seconds.',
                 'project_id' => $projectId
             ]);
 
         } elseif ($action === 'reject') {
-            // Reject application
             
             if (empty($rejectionReason)) {
                 throw new Exception('Rejection reason is required');
             }
 
-            // Update application status
+            // Update application status with rejection reason and admin message
             $updateResult = $database->update(
                 'project_applications',
                 [
                     'status' => 'rejected',
                     'reviewed_at' => date('Y-m-d H:i:s'),
                     'reviewed_by' => $auth->getUserId(),
-                    'rejection_reason' => $rejectionReason
+                    'rejection_reason' => $rejectionReason,
+                    'admin_message' => $adminMessage
                 ],
                 'application_id = ?',
                 [$applicationId]
@@ -166,6 +172,17 @@ try {
 
             if (!$updateResult) {
                 throw new Exception('Failed to update application status');
+            }
+
+            // Schedule presentation file for immediate deletion
+            if ($application['presentation_file']) {
+                $database->insert('file_deletion_queue', [
+                    'file_path' => 'presentations/' . $application['presentation_file'],
+                    'deletion_time' => date('Y-m-d H:i:s', strtotime('+10 seconds')),
+                    'related_type' => 'application',
+                    'related_id' => $applicationId,
+                    'reason' => 'Application rejected'
+                ]);
             }
 
             // Log activity
@@ -178,20 +195,30 @@ try {
                 ['reason' => $rejectionReason]
             );
 
-            // Send rejection email
+            // Send rejection email with admin message
             $emailContent = "<p>Dear {$application['project_lead_name']},</p>";
             $emailContent .= "<p>Thank you for your interest in the JHUB AFRICA program and for submitting your project application for <strong>{$application['project_name']}</strong>.</p>";
             $emailContent .= "<p>After careful review, we regret to inform you that your application has not been approved at this time.</p>";
+            
             $emailContent .= "<div style='background: #fff3cd; padding: 15px; border-left: 4px solid #ffc107; margin: 20px 0;'>";
-            $emailContent .= "<p><strong>Feedback:</strong></p>";
+            $emailContent .= "<p><strong>Reason for Rejection:</strong></p>";
             $emailContent .= "<p>" . nl2br(htmlspecialchars($rejectionReason)) . "</p>";
             $emailContent .= "</div>";
+            
+            if ($adminMessage) {
+                $emailContent .= "<div style='background: #e7f3ff; padding: 15px; border-left: 4px solid #2196F3; margin: 20px 0;'>";
+                $emailContent .= "<p><strong>Additional Message from Admin:</strong></p>";
+                $emailContent .= "<p>" . nl2br(htmlspecialchars($adminMessage)) . "</p>";
+                $emailContent .= "</div>";
+            }
+            
             $emailContent .= "<p>We encourage you to:</p>";
             $emailContent .= "<ul>";
             $emailContent .= "<li>Review and refine your project based on this feedback</li>";
             $emailContent .= "<li>Strengthen your business model and market validation</li>";
             $emailContent .= "<li>Consider reapplying in the future with an improved proposal</li>";
             $emailContent .= "</ul>";
+            $emailContent .= "<p><strong>Note:</strong> Your uploaded presentation file will be deleted from our servers shortly.</p>";
             $emailContent .= "<p>If you have questions about this decision, please contact us at applications@jhubafrica.com</p>";
             $emailContent .= "<p>Best regards,<br><strong>The JHUB AFRICA Team</strong></p>";
 
@@ -199,15 +226,15 @@ try {
                 $application['project_lead_email'],
                 'Update on Your JHUB AFRICA Application',
                 $emailContent,
-                NOTIFY_APPLICATION_REJECTED,
-                array_merge($application, ['rejection_reason' => $rejectionReason])
+                'application_rejected',
+                array_merge($application, ['rejection_reason' => $rejectionReason, 'admin_message' => $adminMessage])
             );
 
             $database->commit();
 
             echo json_encode([
                 'success' => true,
-                'message' => 'Application rejected. Notification email has been sent to the applicant.'
+                'message' => 'Application rejected. Notification email sent. Presentation file will be deleted in 10 seconds.'
             ]);
 
         } else {
