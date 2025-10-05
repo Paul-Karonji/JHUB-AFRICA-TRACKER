@@ -73,7 +73,7 @@ $pageTitle = "Innovation Showcase";
     <link rel="stylesheet" href="../assets/css/main.css">
     <style>
         .hero-section {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #3b54c7 0%, #0e015b 100%);
             color: white;
             padding: 80px 0 60px;
             margin-bottom: 40px;
@@ -92,7 +92,7 @@ $pageTitle = "Innovation Showcase";
         .stat-number {
             font-size: 2.5rem;
             font-weight: bold;
-            color: #667eea;
+            color: #2c409a;
         }
         .project-card {
             border: none;
@@ -107,7 +107,7 @@ $pageTitle = "Innovation Showcase";
             transform: translateY(-5px);
         }
         .project-card .card-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #3b54c7 0%, #0e015b 100%);
             color: white;
             padding: 20px;
             border: none;
@@ -121,13 +121,13 @@ $pageTitle = "Innovation Showcase";
             border-radius: 20px;
             font-size: 0.85rem;
             font-weight: 600;
-            color: #667eea;
+            color: #2c409a;
         }
         .project-meta {
             display: flex;
             gap: 15px;
             font-size: 0.9rem;
-            color: #6c757d;
+            color: #253683;
         }
         .filter-chip {
             display: inline-block;
@@ -140,8 +140,8 @@ $pageTitle = "Innovation Showcase";
             margin: 5px;
         }
         .filter-chip:hover, .filter-chip.active {
-            background: #667eea;
-            border-color: #667eea;
+            background: #2c409a;
+            border-color: #2c409a;
             color: white;
         }
         .search-box {

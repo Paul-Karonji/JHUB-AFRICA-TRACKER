@@ -63,9 +63,11 @@ $pageTitle = isset($pageTitle) ? $pageTitle . ' - ' . SITE_NAME : SITE_NAME;
     <style>
         /* Global Styles */
         :root {
-            --admin-color: #dc3545;
-            --mentor-color: #17a2b8;
-            --project-color: #28a745;
+            --admin-color: #2c409a;
+            --mentor-color: #3fa845;
+            --project-color: #0e015b;
+            --bs-primary: #2c409a;
+            --bs-primary-rgb: 44, 64, 154;
         }
         
         body {
@@ -84,7 +86,7 @@ $pageTitle = isset($pageTitle) ? $pageTitle . ' - ' . SITE_NAME : SITE_NAME;
         /* Sidebar Styles */
         .sidebar {
             width: 250px;
-            background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+            background: linear-gradient(180deg, #2c409a 0%, #0e015b 100%);
             color: white;
             position: fixed;
             height: 100vh;
@@ -187,17 +189,17 @@ $pageTitle = isset($pageTitle) ? $pageTitle . ' - ' . SITE_NAME : SITE_NAME;
         }
         
         .admin-theme .user-badge {
-            background: rgba(220, 53, 69, 0.1);
+            background: rgba(44, 64, 154, 0.1);
             color: var(--admin-color);
         }
         
         .mentor-theme .user-badge {
-            background: rgba(23, 162, 184, 0.1);
+            background: rgba(63, 168, 69, 0.1);
             color: var(--mentor-color);
         }
         
         .project-theme .user-badge {
-            background: rgba(40, 167, 69, 0.1);
+            background: rgba(14, 1, 91, 0.1);
             color: var(--project-color);
         }
         
@@ -209,15 +211,15 @@ $pageTitle = isset($pageTitle) ? $pageTitle . ' - ' . SITE_NAME : SITE_NAME;
         }
         
         .border-left-primary {
-            border-left: 4px solid #4e73df !important;
+            border-left: 4px solid #2c409a !important;
         }
         
         .border-left-success {
-            border-left: 4px solid #1cc88a !important;
+            border-left: 4px solid #3fa845 !important;
         }
         
         .border-left-info {
-            border-left: 4px solid #36b9cc !important;
+            border-left: 4px solid #253683 !important;
         }
         
         .border-left-warning {

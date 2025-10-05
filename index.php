@@ -31,13 +31,13 @@ $pageTitle = "Home";
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JHUB AFRICA - Nurturing African Innovations</title>
     <meta name="description" content="JHUB AFRICA is Africa's premier innovation acceleration platform. Join our ecosystem and transform your innovative ideas into market-ready solutions through expert mentorship and structured development.">
-    <meta name="keywords" content="African innovation, startup incubator, mentorship, technology, innovation hub, Kenya, Africa">
+    <meta name="keywords" content="African innovation, startup incubator, mentorship, technology, JHUB AFRICA, Kenya, Africa">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="assets/css/main.css">
     <style>
         .hero-section {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #3b54c7 0%, #0e015b 100%);
             color: white;
             padding: 120px 0 80px;
             position: relative;
@@ -61,7 +61,7 @@ $pageTitle = "Home";
             width: 80px;
             height: 80px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #3b54c7 0%, #0e015b 100%);
             color: white;
             display: flex;
             align-items: center;
@@ -96,7 +96,7 @@ $pageTitle = "Home";
         .stat-number {
             font-size: 3.5rem;
             font-weight: bold;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #3b54c7 0%, #0e015b 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -114,7 +114,7 @@ $pageTitle = "Home";
             box-shadow: 0 8px 20px rgba(0,0,0,0.15);
         }
         .project-card .card-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #3b54c7 0%, #0e015b 100%);
             color: white;
             padding: 20px;
         }
@@ -135,7 +135,7 @@ $pageTitle = "Home";
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #3b54c7 0%, #0e015b 100%);
             color: white;
             display: flex;
             align-items: center;
@@ -143,7 +143,7 @@ $pageTitle = "Home";
             font-weight: bold;
         }
         .cta-section {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #3b54c7 0%, #0e015b 100%);
             color: white;
             padding: 80px 0;
         }
@@ -546,7 +546,7 @@ $pageTitle = "Home";
                 </a>
             </div>
             <p class="mt-4 mb-0 opacity-75">
-                <small>No application fees • Fast approval • Lifetime access</small>
+                <small>No application fees - Fast approval - Lifetime access</small>
             </p>
         </div>
     </section>

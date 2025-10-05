@@ -390,7 +390,7 @@ include '../../templates/header.php';
     height: 40px;
     border-radius: 50%;
     background-color: #e9ecef;
-    color: #6c757d;
+    color: #253683;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -399,18 +399,18 @@ include '../../templates/header.php';
     border: 2px solid #dee2e6;
 }
 .stage-indicator.active .stage-circle {
-    background-color: #17a2b8;
+    background-color: #253683;
     color: white;
-    border-color: #17a2b8;
+    border-color: #253683;
 }
 .border-left-primary {
-    border-left: 4px solid #4e73df;
+    border-left: 4px solid #2c409a;
 }
 .border-left-success {
-    border-left: 4px solid #1cc88a;
+    border-left: 4px solid #3fa845;
 }
 .border-left-info {
-    border-left: 4px solid #36b9cc;
+    border-left: 4px solid #0e015b;
 }
 </style>
 

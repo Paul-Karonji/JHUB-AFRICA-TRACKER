@@ -115,17 +115,17 @@ try {
             $loginUrl = SITE_URL . '/auth/project-login.php';
             
             $emailContent = "<p>Dear {$application['project_lead_name']},</p>";
-            $emailContent .= "<p><strong>Congratulations!</strong> 🎉</p>";
+            $emailContent .= "<p><strong>Congratulations!</strong> &#127881;</p>";
             $emailContent .= "<p>Your project application for <strong>{$application['project_name']}</strong> has been approved!</p>";
             
             if ($adminMessage) {
-                $emailContent .= "<div style='background: #e7f3ff; padding: 15px; border-left: 4px solid #2196F3; margin: 20px 0;'>";
+                $emailContent .= "<div style='background: #d5d9eb; padding: 15px; border-left: 4px solid #2c409a; margin: 20px 0;'>";
                 $emailContent .= "<p><strong>Message from Admin:</strong></p>";
                 $emailContent .= "<p>" . nl2br(htmlspecialchars($adminMessage)) . "</p>";
                 $emailContent .= "</div>";
             }
             
-            $emailContent .= "<div style='background: #f8f9fa; padding: 15px; border-left: 4px solid #667eea; margin: 20px 0;'>";
+            $emailContent .= "<div style='background: #f8f9fa; padding: 15px; border-left: 4px solid #2c409a; margin: 20px 0;'>";
             $emailContent .= "<p><strong>Your Login Credentials:</strong></p>";
             $emailContent .= "<p><strong>Username:</strong> {$application['profile_name']}<br>";
             $emailContent .= "<strong>Login URL:</strong> <a href='{$loginUrl}'>{$loginUrl}</a></p>";
@@ -206,7 +206,7 @@ try {
             $emailContent .= "</div>";
             
             if ($adminMessage) {
-                $emailContent .= "<div style='background: #e7f3ff; padding: 15px; border-left: 4px solid #2196F3; margin: 20px 0;'>";
+                $emailContent .= "<div style='background: #d5d9eb; padding: 15px; border-left: 4px solid #2c409a; margin: 20px 0;'>";
                 $emailContent .= "<p><strong>Additional Message from Admin:</strong></p>";
                 $emailContent .= "<p>" . nl2br(htmlspecialchars($adminMessage)) . "</p>";
                 $emailContent .= "</div>";
@@ -256,3 +256,4 @@ try {
     error_log('Application review error: ' . $e->getMessage());
 }
 ?>
+

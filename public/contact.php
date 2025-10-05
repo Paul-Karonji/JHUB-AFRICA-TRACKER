@@ -68,7 +68,7 @@ $pageTitle = "Contact Us";
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .hero-contact {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #3b54c7 0%, #0e015b 100%);
             color: white;
             padding: 80px 0;
         }
@@ -88,7 +88,7 @@ $pageTitle = "Contact Us";
             width: 60px;
             height: 60px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #3b54c7 0%, #0e015b 100%);
             color: white;
             display: flex;
             align-items: center;
@@ -97,8 +97,8 @@ $pageTitle = "Contact Us";
             margin-bottom: 20px;
         }
         .form-control:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            border-color: #2c409a;
+            box-shadow: 0 0 0 0.2rem rgba(44, 64, 154, 0.25);
         }
     </style>
 </head>

@@ -34,7 +34,7 @@ $pageTitle = "Application Submitted";
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .confirmation-hero {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            background: linear-gradient(135deg, #3fa845 0%, #56c05c 100%);
             color: white;
             padding: 80px 0;
         }
@@ -73,14 +73,14 @@ $pageTitle = "Application Submitted";
             height: 14px;
             border-radius: 50%;
             background: white;
-            border: 3px solid #667eea;
+            border: 3px solid #2c409a;
         }
         .timeline-item.completed::before {
-            background: #28a745;
-            border-color: #28a745;
+            background: #3fa845;
+            border-color: #3fa845;
         }
         .info-card {
-            border-left: 4px solid #667eea;
+            border-left: 4px solid #2c409a;
         }
     </style>
 </head>
@@ -144,7 +144,7 @@ $pageTitle = "Application Submitted";
                     <div class="card-body">
                         <div class="timeline">
                             <div class="timeline-item completed">
-                                <h6 class="mb-1">Application Submitted ✓</h6>
+                                <h6 class="mb-1">Application Submitted âœ“</h6>
                                 <p class="text-muted small mb-0">Your application has been received and is in our system.</p>
                             </div>
                             <div class="timeline-item">

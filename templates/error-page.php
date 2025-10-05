@@ -25,7 +25,7 @@ $baseUrl = SITE_URL ?? 'http://localhost/jhub-africa-tracker';
     
     <style>
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #3b54c7 0%, #0e015b 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -77,7 +77,7 @@ $baseUrl = SITE_URL ?? 'http://localhost/jhub-africa-tracker';
         .error-icon {
             font-size: 80px;
             margin-bottom: 20px;
-            color: #667eea;
+            color: #2c409a;
         }
         
         .btn-custom {

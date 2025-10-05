@@ -102,7 +102,7 @@ $pageTitle = $project['project_name'];
     <link rel="stylesheet" href="../assets/css/main.css">
     <style>
         .project-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #3b54c7 0%, #0e015b 100%);
             color: white;
             padding: 60px 0;
         }
@@ -124,11 +124,11 @@ $pageTitle = $project['project_name'];
             margin: 0 auto 10px;
         }
         .stage-dot.completed {
-            background: #28a745;
+            background: #3fa845;
             color: white;
         }
         .stage-dot.current {
-            background: #667eea;
+            background: #3b54c7;
             color: white;
             animation: pulse 2s infinite;
         }
@@ -151,7 +151,7 @@ $pageTitle = $project['project_name'];
             width: 80px;
             height: 80px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #3b54c7 0%, #0e015b 100%);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -161,7 +161,7 @@ $pageTitle = $project['project_name'];
             margin: 0 auto 15px;
         }
         .comment-card {
-            border-left: 3px solid #667eea;
+            border-left: 3px solid #3b54c7;
             background: #f8f9fa;
         }
     </style>
@@ -279,7 +279,7 @@ $pageTitle = $project['project_name'];
                             <?php for ($i = 1; $i <= 6; $i++): ?>
                             <div class="col-4 col-md-2">
                                 <div class="stage-dot <?php echo $i < $project['current_stage'] ? 'completed' : ($i == $project['current_stage'] ? 'current' : ''); ?>">
-                                    <?php echo $i < $project['current_stage'] ? '✓' : $i; ?>
+                                    <?php echo $i < $project['current_stage'] ? '&#10003;' : $i; ?>
                                 </div>
                                 <small class="d-block"><?php echo getStageName($i); ?></small>
                             </div>

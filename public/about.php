@@ -16,7 +16,7 @@ $pageTitle = "About Us";
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .hero-about {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #3b54c7 0%, #0e015b 100%);
             color: white;
             padding: 100px 0;
         }
@@ -36,7 +36,7 @@ $pageTitle = "About Us";
             width: 80px;
             height: 80px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #3b54c7 0%, #0e015b 100%);
             color: white;
             display: flex;
             align-items: center;
@@ -55,7 +55,7 @@ $pageTitle = "About Us";
             top: 0;
             bottom: 0;
             width: 3px;
-            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(180deg, #3b54c7 0%, #0e015b 100%);
         }
         .stage-item {
             position: relative;
@@ -70,12 +70,12 @@ $pageTitle = "About Us";
             height: 40px;
             border-radius: 50%;
             background: white;
-            border: 3px solid #667eea;
+            border: 3px solid #2c409a;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            color: #667eea;
+            color: #2c409a;
         }
         .stat-box {
             text-align: center;
@@ -84,7 +84,7 @@ $pageTitle = "About Us";
         .stat-number {
             font-size: 3rem;
             font-weight: bold;
-            color: #667eea;
+            color: #2c409a;
         }
     </style>
 </head>
@@ -284,7 +284,7 @@ $pageTitle = "About Us";
                 </div>
                 <div class="col-md-3">
                     <div class="stat-box">
-                        <div class="stat-number text-white">∞</div>
+                        <div class="stat-number text-white">âˆž</div>
                         <div>Expert Mentor Network</div>
                     </div>
                 </div>

@@ -17,7 +17,7 @@ $hideNav = true; // Don't show logged-in navigation
     <link rel="stylesheet" href="../assets/css/main.css">
     <style>
         .application-hero {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #3b54c7 0%, #0e015b 100%);
             color: white;
             padding: 60px 0;
             margin-bottom: 40px;
@@ -41,13 +41,13 @@ $hideNav = true; // Don't show logged-in navigation
             position: relative;
         }
         .step.active {
-            border-bottom-color: #667eea;
-            color: #667eea;
+            border-bottom-color: #2c409a;
+            color: #2c409a;
             font-weight: 600;
         }
         .step.completed {
-            border-bottom-color: #28a745;
-            color: #28a745;
+            border-bottom-color: #3fa845;
+            color: #3fa845;
         }
         .step::before {
             content: attr(data-step);
@@ -61,13 +61,13 @@ $hideNav = true; // Don't show logged-in navigation
             color: #666;
         }
         .step.active::before {
-            background: #667eea;
+            background: #2c409a;
             color: white;
         }
         .step.completed::before {
-            background: #28a745;
+            background: #3fa845;
             color: white;
-            content: "✓";
+            content: "\2713";
         }
         .file-upload-area {
             border: 2px dashed #ccc;
@@ -78,11 +78,11 @@ $hideNav = true; // Don't show logged-in navigation
             transition: all 0.3s;
         }
         .file-upload-area:hover {
-            border-color: #667eea;
+            border-color: #2c409a;
             background: #f8f9ff;
         }
         .file-upload-area.dragover {
-            border-color: #667eea;
+            border-color: #2c409a;
             background: #f0f4ff;
         }
         .required-field::after {

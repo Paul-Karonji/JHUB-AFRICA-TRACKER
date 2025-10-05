@@ -259,7 +259,7 @@ include '../../templates/header.php';
     height: 40px;
     border-radius: 50%;
     background: #e9ecef;
-    color: #6c757d;
+    color: #253683;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -268,14 +268,14 @@ include '../../templates/header.php';
     box-shadow: 0 0 0 3px #dee2e6;
 }
 .timeline-item.completed .timeline-marker {
-    background: #28a745;
+    background: #3fa845;
     color: white;
-    box-shadow: 0 0 0 3px #28a745;
+    box-shadow: 0 0 0 3px #3fa845;
 }
 .timeline-item.active .timeline-marker {
-    background: #007bff;
+    background: #2c409a;
     color: white;
-    box-shadow: 0 0 0 3px #007bff;
+    box-shadow: 0 0 0 3px #2c409a;
     animation: pulse 2s infinite;
 }
 @keyframes pulse {

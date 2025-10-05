@@ -365,13 +365,13 @@ include '../../templates/header.php';
 
 <style>
 .border-left-primary {
-    border-left: 4px solid #4e73df;
+    border-left: 4px solid #2c409a;
 }
 .border-left-success {
-    border-left: 4px solid #1cc88a;
+    border-left: 4px solid #3fa845;
 }
 .border-left-info {
-    border-left: 4px solid #36b9cc;
+    border-left: 4px solid #253683;
 }
 .border-left-warning {
     border-left: 4px solid #f6c23e;
