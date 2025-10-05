@@ -23,14 +23,14 @@ if (isset($_GET['id'])) {
         $viewProject = $database->getRow("SELECT * FROM projects WHERE project_id = ?", [$projectId]);
         
         // Get project team
-        $teamMembers = $database->getAll("
+        $teamMembers = $database->getRows("
             SELECT * FROM project_innovators 
             WHERE project_id = ? AND is_active = 1
             ORDER BY added_at ASC
         ", [$projectId]);
         
         // Get other mentors
-        $otherMentors = $database->getAll("
+        $otherMentors = $database->getRows("
             SELECT m.*, pm.assigned_at
             FROM mentors m
             INNER JOIN project_mentors pm ON m.mentor_id = pm.mentor_id
@@ -39,7 +39,7 @@ if (isset($_GET['id'])) {
         ", [$projectId]);
         
         // Get resources for this project
-        $projectResources = $database->getAll("
+        $projectResources = $database->getRows("
             SELECT mr.*, m.name as mentor_name
             FROM mentor_resources mr
             INNER JOIN mentors m ON mr.mentor_id = m.mentor_id
@@ -48,14 +48,14 @@ if (isset($_GET['id'])) {
         ", [$projectId]);
         
         // Get assessments
-        $assessments = $database->getAll("
+        $assessments = $database->getRows("
             SELECT * FROM project_assessments
             WHERE project_id = ? AND mentor_id = ? AND is_deleted = 0
             ORDER BY created_at DESC
         ", [$projectId, $mentorId]);
         
         // Get learning objectives
-        $learningObjectives = $database->getAll("
+        $learningObjectives = $database->getRows("
             SELECT * FROM learning_objectives
             WHERE project_id = ? AND mentor_id = ? AND is_deleted = 0
             ORDER BY created_at DESC

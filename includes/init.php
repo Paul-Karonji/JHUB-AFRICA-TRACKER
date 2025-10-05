@@ -18,6 +18,7 @@ require_once __DIR__ . '/../classes/Validator.php';
 // Include helper functions
 require_once __DIR__ . '/helpers.php';
 require_once __DIR__ . '/functions.php';
+require_once __DIR__ . '/email-functions.php';
 
 // Initialize authentication
 $auth = Auth::getInstance();
