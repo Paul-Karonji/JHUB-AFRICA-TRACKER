@@ -1956,3 +1956,7 @@ Params: {"file_path":"presentations\/presentation_68e3a4d52df755.64081022.docx",
 SQL: INSERT INTO activity_logs (user_type, user_id, action, description, ip_address, user_agent, project_id, additional_data) VALUES (:user_type, :user_id, :action, :description, :ip_address, :user_agent, :project_id, :additional_data)
 Params: {"user_type":"admin","user_id":1,"action":"application_approved","description":"Approved application #10 and created project #13","ip_address":"::1","user_agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/140.0.0.0 Safari\/537.36","project_id":"13","additional_data":"{\"application_id\":10,\"project_name\":\"Agri care\"}"}
 ---
+2025-10-06 15:33:43 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'project_id' in 'field list'
+SQL: UPDATE projects SET current_stage = ? WHERE project_id = ?
+Params: [2,13]
+---
