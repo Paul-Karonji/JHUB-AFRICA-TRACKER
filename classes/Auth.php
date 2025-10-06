@@ -134,6 +134,28 @@ class Auth {
         return $this->db->query($sql, [date('Y-m-d H:i:s'), $userId]);
     }
     
+    // ⬇️ Add this inside class Auth (anywhere with the other methods)
+public static function hashPassword(string $password): string
+{
+    if ($password === '') {
+        throw new InvalidArgumentException('Password cannot be empty.');
+    }
+    return password_hash($password, PASSWORD_DEFAULT);
+}
+
+/**
+ * Optional: helper for verifying and auto-rehashing if algo/cost changes
+ */
+public static function verifyPassword(string $password, string $hash): bool
+{
+    if (!password_verify($password, $hash)) {
+        return false;
+    }
+    // If you later want to persist rehashes, do it where you have the user id.
+    // if (password_needs_rehash($hash, PASSWORD_DEFAULT)) { ... update in DB ... }
+    return true;
+}
+
     /**
      * Check if user has valid session
      */
@@ -220,6 +242,7 @@ class Auth {
             exit;
         }
     }
+
     
     /**
      * Generate CSRF token

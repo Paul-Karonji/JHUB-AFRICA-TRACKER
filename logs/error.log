@@ -1868,3 +1868,47 @@ Params: ["2025-10-06 00:49:01",7]
 SQL: UPDATE project_applications SET status = :status, reviewed_at = :reviewed_at, reviewed_by = :reviewed_by, admin_message = :admin_message WHERE application_id = ?
 Params: {"status":"approved","reviewed_at":"2025-10-06 01:09:46","reviewed_by":1,"admin_message":"","0":8}
 ---
+2025-10-06 10:51:43 - Database Error: SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'user_id' cannot be null
+SQL: INSERT INTO activity_logs (user_type, user_id, action, description, ip_address, user_agent) VALUES (:user_type, :user_id, :action, :description, :ip_address, :user_agent)
+Params: {"user_type":"system","user_id":null,"action":"failed_login","description":"Failed mentor login attempt for email: kimotho@gmail.com","ip_address":"::1","user_agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/140.0.0.0 Safari\/537.36"}
+---
+2025-10-06 10:51:48 - Database Error: SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'user_id' cannot be null
+SQL: INSERT INTO activity_logs (user_type, user_id, action, description, ip_address, user_agent) VALUES (:user_type, :user_id, :action, :description, :ip_address, :user_agent)
+Params: {"user_type":"system","user_id":null,"action":"failed_login","description":"Failed mentor login attempt for email: kimotho@gmail.com","ip_address":"::1","user_agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/140.0.0.0 Safari\/537.36"}
+---
+2025-10-06 10:52:18 - Database Error: SQLSTATE[HY093]: Invalid parameter number: mixed named and positional parameters
+SQL: UPDATE projects SET current_stage = :current_stage WHERE project_id = ?
+Params: {"current_stage":2,"0":1}
+---
+2025-10-06 10:52:18 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'additional_data' in 'field list'
+SQL: INSERT INTO activity_logs (user_type, user_id, action, description, ip_address, user_agent, additional_data) VALUES (:user_type, :user_id, :action, :description, :ip_address, :user_agent, :additional_data)
+Params: {"user_type":"mentor","user_id":2,"action":"project_joined","description":"Joined project: Test","ip_address":"::1","user_agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/140.0.0.0 Safari\/537.36","additional_data":"{\"project_id\":1}"}
+---
+2025-10-06 10:52:44 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'additional_data' in 'field list'
+SQL: INSERT INTO activity_logs (user_type, user_id, action, description, ip_address, user_agent, additional_data) VALUES (:user_type, :user_id, :action, :description, :ip_address, :user_agent, :additional_data)
+Params: {"user_type":"mentor","user_id":2,"action":"resource_created","description":"Created resource: test upload","ip_address":"::1","user_agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/140.0.0.0 Safari\/537.36","additional_data":"{\"resource_id\":\"5\",\"project_id\":1}"}
+---
+Uncaught exception: Call to undefined method Auth::hashPassword() in C:\xampp\htdocs\jhub-africa-tracker\api\applications\submit.php on line 89Uncaught exception: Call to undefined method Auth::hashPassword() in C:\xampp\htdocs\jhub-africa-tracker\api\applications\submit.php on line 89Uncaught exception: Call to undefined method Auth::hashPassword() in C:\xampp\htdocs\jhub-africa-tracker\api\applications\submit.php on line 89Uncaught exception: Call to undefined method Auth::hashPassword() in C:\xampp\htdocs\jhub-africa-tracker\api\applications\submit.php on line 89Uncaught exception: Call to undefined method Auth::hashPassword() in C:\xampp\htdocs\jhub-africa-tracker\api\applications\submit.php on line 89Uncaught exception: Call to undefined method Auth::hashPassword() in C:\xampp\htdocs\jhub-africa-tracker\api\applications\submit.php on line 89Uncaught exception: Call to undefined method Auth::hashPassword() in C:\xampp\htdocs\jhub-africa-tracker\api\applications\submit.php on line 892025-10-06 11:33:05 - Database Error: SQLSTATE[HY093]: Invalid parameter number: mixed named and positional parameters
+SQL: UPDATE project_applications SET status = :status, reviewed_at = :reviewed_at, reviewed_by = :reviewed_by, admin_message = :admin_message WHERE application_id = ?
+Params: {"status":"approved","reviewed_at":"2025-10-06 11:33:05","reviewed_by":1,"admin_message":"","0":9}
+---
+2025-10-06 11:33:12 - Database Error: SQLSTATE[HY093]: Invalid parameter number: mixed named and positional parameters
+SQL: UPDATE project_applications SET status = :status, reviewed_at = :reviewed_at, reviewed_by = :reviewed_by, admin_message = :admin_message WHERE application_id = ?
+Params: {"status":"approved","reviewed_at":"2025-10-06 11:33:12","reviewed_by":1,"admin_message":"","0":9}
+---
+2025-10-06 11:33:17 - Database Error: SQLSTATE[HY093]: Invalid parameter number: mixed named and positional parameters
+SQL: UPDATE project_applications SET status = :status, reviewed_at = :reviewed_at, reviewed_by = :reviewed_by, admin_message = :admin_message WHERE application_id = ?
+Params: {"status":"approved","reviewed_at":"2025-10-06 11:33:17","reviewed_by":1,"admin_message":"","0":9}
+---
+2025-10-06 11:34:07 - Database Error: SQLSTATE[HY093]: Invalid parameter number: mixed named and positional parameters
+SQL: UPDATE project_applications SET status = :status, reviewed_at = :reviewed_at, reviewed_by = :reviewed_by, rejection_reason = :rejection_reason, admin_message = :admin_message WHERE application_id = ?
+Params: {"status":"rejected","reviewed_at":"2025-10-06 11:34:07","reviewed_by":1,"rejection_reason":"test","admin_message":"","0":8}
+---
+Error [2]: include(././templates/header.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\jhub-africa-tracker\dashboards\admin\applications.php on line 47Error [2]: include(): Failed opening '././templates/header.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\jhub-africa-tracker\dashboards\admin\applications.php on line 47Error [2]: include(././templates/footer.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\jhub-africa-tracker\dashboards\admin\applications.php on line 367Error [2]: include(): Failed opening '././templates/footer.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\jhub-africa-tracker\dashboards\admin\applications.php on line 367Error [2]: include(././templates/header.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\jhub-africa-tracker\dashboards\admin\applications.php on line 47Error [2]: include(): Failed opening '././templates/header.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\jhub-africa-tracker\dashboards\admin\applications.php on line 47Error [2]: include(././templates/footer.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\jhub-africa-tracker\dashboards\admin\applications.php on line 367Error [2]: include(): Failed opening '././templates/footer.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\jhub-africa-tracker\dashboards\admin\applications.php on line 3672025-10-06 11:59:29 - Database Error: SQLSTATE[HY093]: Invalid parameter number: mixed named and positional parameters
+SQL: UPDATE project_applications SET status = :status, reviewed_at = :reviewed_at, reviewed_by = :reviewed_by, admin_message = :admin_message WHERE application_id = ?
+Params: {"status":"approved","reviewed_at":"2025-10-06 11:59:29","reviewed_by":1,"admin_message":"","0":8}
+---
+2025-10-06 12:00:37 - Database Error: SQLSTATE[HY093]: Invalid parameter number: mixed named and positional parameters
+SQL: UPDATE project_applications SET status = :status, reviewed_at = :reviewed_at, reviewed_by = :reviewed_by, admin_message = :admin_message WHERE application_id = ?
+Params: {"status":"approved","reviewed_at":"2025-10-06 12:00:37","reviewed_by":1,"admin_message":"","0":8}
+---

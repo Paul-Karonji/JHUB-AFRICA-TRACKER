@@ -271,7 +271,8 @@ $hideNav = true; // Don't show logged-in navigation
                                     <label for="profile_name" class="form-label required-field">Profile Name (Username)</label>
                                     <input type="text" class="form-control form-control-lg" 
                                            id="profile_name" name="profile_name" required
-                                           pattern="[a-zA-Z0-9_-]+" minlength="4" maxlength="50"
+                                           pattern="^[a-zA-Z0-9_-]+$" minlength="4" maxlength="50"
+                                           autocomplete="username"
                                            placeholder="Choose a unique username">
                                     <div class="form-text">
                                         Only letters, numbers, hyphens, and underscores. 4-50 characters.
@@ -286,6 +287,7 @@ $hideNav = true; // Don't show logged-in navigation
                                     <div class="input-group">
                                         <input type="password" class="form-control form-control-lg" 
                                                id="password" name="password" required minlength="8"
+                                               autocomplete="new-password"
                                                placeholder="Create a strong password">
                                         <button class="btn btn-outline-secondary" type="button" id="togglePassword">
                                             <i class="fas fa-eye"></i>
@@ -299,6 +301,7 @@ $hideNav = true; // Don't show logged-in navigation
                                     <label for="password_confirm" class="form-label required-field">Confirm Password</label>
                                     <input type="password" class="form-control form-control-lg" 
                                            id="password_confirm" name="password_confirm" required
+                                           autocomplete="new-password"
                                            placeholder="Re-enter your password">
                                     <div class="invalid-feedback">Passwords do not match.</div>
                                 </div>
@@ -466,6 +469,8 @@ $hideNav = true; // Don't show logged-in navigation
                 if (password.value !== passwordConfirm.value) {
                     passwordConfirm.classList.add('is-invalid');
                     valid = false;
+                } else {
+                    passwordConfirm.classList.remove('is-invalid');
                 }
             }
 
@@ -484,7 +489,7 @@ $hideNav = true; // Don't show logged-in navigation
             showStep(currentStep);
         });
 
-        // Form submission
+        // Form submission with enhanced debugging
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
 
@@ -497,23 +502,43 @@ $hideNav = true; // Don't show logged-in navigation
 
             const formData = new FormData(form);
 
+            console.log('=== FORM SUBMISSION DEBUG ===');
+            console.log('Submitting to:', '../api/applications/submit.php');
+
             try {
                 const response = await fetch('../api/applications/submit.php', {
                     method: 'POST',
                     body: formData
                 });
 
-                const data = await response.json();
+                console.log('Response Status:', response.status);
+                console.log('Response OK:', response.ok);
+
+                const text = await response.text();
+                console.log('Raw Response:', text);
+
+                let data;
+                try {
+                    data = JSON.parse(text);
+                    console.log('Parsed Data:', data);
+                } catch (parseError) {
+                    console.error('JSON Parse Error:', parseError);
+                    throw new Error('Invalid server response. Please contact support.');
+                }
 
                 if (data.success) {
-                    window.location.href = 'confirmation.php?id=' + data.application_id;
+                    showAlert('success', data.message);
+                    setTimeout(() => {
+                        window.location.href = 'confirmation.php?id=' + data.application_id;
+                    }, 1000);
                 } else {
                     showAlert('danger', data.message);
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i> Submit Application';
                 }
             } catch (error) {
-                showAlert('danger', 'Network error. Please check your connection and try again.');
+                console.error('Submission Error:', error);
+                showAlert('danger', 'Error: ' + error.message + ' Check the console for details.');
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i> Submit Application';
             }
