@@ -262,59 +262,60 @@ $hideNav = true; // Don't show logged-in navigation
                                 </div>
                             </div>
 
-                            <!-- Step 4: Account Setup -->
-                            <div class="form-step" data-step="4">
-                                <h3 class="mb-4">Create Your Account</h3>
-                                <p class="text-muted mb-4">Set up your login credentials to access the project dashboard once approved.</p>
+                            <!-- Step 4: Account Setup - FIXED VERSION -->
+<div class="form-step" data-step="4">
+    <h3 class="mb-4">Create Your Account</h3>
+    <p class="text-muted mb-4">Set up your login credentials to access the project dashboard once approved.</p>
 
-                                <div class="mb-4">
-                                    <label for="profile_name" class="form-label required-field">Profile Name (Username)</label>
-                                    <input type="text" class="form-control form-control-lg" 
-                                           id="profile_name" name="profile_name" required
-                                           pattern="^[a-zA-Z0-9_-]+$" minlength="4" maxlength="50"
-                                           autocomplete="username"
-                                           placeholder="Choose a unique username">
-                                    <div class="form-text">
-                                        Only letters, numbers, hyphens, and underscores. 4-50 characters.
-                                    </div>
-                                    <div class="invalid-feedback">
-                                        Profile name must be 4-50 characters and contain only letters, numbers, hyphens, or underscores.
-                                    </div>
-                                </div>
+    <div class="mb-4">
+        <label for="profile_name" class="form-label required-field">Profile Name (Username)</label>
+        <!-- ✅ FIXED: Removed the 'v' flag from pattern regex -->
+        <input type="text" class="form-control form-control-lg" 
+               id="profile_name" name="profile_name" required
+               pattern="[a-zA-Z0-9_-]+" minlength="4" maxlength="50"
+               autocomplete="username"
+               placeholder="Choose a unique username">
+        <div class="form-text">
+            Only letters, numbers, hyphens, and underscores. 4-50 characters.
+        </div>
+        <div class="invalid-feedback">
+            Profile name must be 4-50 characters and contain only letters, numbers, hyphens, or underscores.
+        </div>
+    </div>
 
-                                <div class="mb-4">
-                                    <label for="password" class="form-label required-field">Password</label>
-                                    <div class="input-group">
-                                        <input type="password" class="form-control form-control-lg" 
-                                               id="password" name="password" required minlength="8"
-                                               autocomplete="new-password"
-                                               placeholder="Create a strong password">
-                                        <button class="btn btn-outline-secondary" type="button" id="togglePassword">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                    </div>
-                                    <div class="form-text">Minimum 8 characters</div>
-                                    <div class="invalid-feedback">Password must be at least 8 characters long.</div>
-                                </div>
+    <div class="mb-4">
+        <label for="password" class="form-label required-field">Password</label>
+        <div class="input-group">
+            <input type="password" class="form-control form-control-lg" 
+                   id="password" name="password" required minlength="8"
+                   autocomplete="new-password"
+                   placeholder="Create a strong password">
+            <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                <i class="fas fa-eye"></i>
+            </button>
+        </div>
+        <div class="form-text">Minimum 8 characters</div>
+        <div class="invalid-feedback">Password must be at least 8 characters long.</div>
+    </div>
 
-                                <div class="mb-4">
-                                    <label for="password_confirm" class="form-label required-field">Confirm Password</label>
-                                    <input type="password" class="form-control form-control-lg" 
-                                           id="password_confirm" name="password_confirm" required
-                                           autocomplete="new-password"
-                                           placeholder="Re-enter your password">
-                                    <div class="invalid-feedback">Passwords do not match.</div>
-                                </div>
+    <div class="mb-4">
+        <label for="password_confirm" class="form-label required-field">Confirm Password</label>
+        <input type="password" class="form-control form-control-lg" 
+               id="password_confirm" name="password_confirm" required
+               autocomplete="new-password"
+               placeholder="Re-enter your password">
+        <div class="invalid-feedback">Passwords do not match.</div>
+    </div>
 
-                                <div class="form-check mb-4">
-                                    <input class="form-check-input" type="checkbox" id="terms" required>
-                                    <label class="form-check-label" for="terms">
-                                        I agree to the <a href="#" target="_blank">Terms and Conditions</a> and 
-                                        <a href="#" target="_blank">Privacy Policy</a>
-                                    </label>
-                                    <div class="invalid-feedback">You must agree to the terms and conditions.</div>
-                                </div>
-                            </div>
+    <div class="form-check mb-4">
+        <input class="form-check-input" type="checkbox" id="terms" required>
+        <label class="form-check-label" for="terms">
+            I agree to the <a href="#" target="_blank">Terms and Conditions</a> and 
+            <a href="#" target="_blank">Privacy Policy</a>
+        </label>
+        <div class="invalid-feedback">You must agree to the terms and conditions.</div>
+    </div>
+</div>
 
                             <!-- Navigation Buttons -->
                             <div class="d-flex justify-content-between mt-4">
