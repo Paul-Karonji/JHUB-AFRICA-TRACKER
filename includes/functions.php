@@ -235,18 +235,39 @@ function logActivity($userType, $userId, $action, $description, $projectId = nul
 /**
  * Send email notification (placeholder for later implementation)
  */
-function sendEmailNotification($to, $subject, $message, $type = 'general') {
-    // This will be implemented when we add the email system
-    // For now, we'll just log the notification
-    
-    $database = Database::getInstance();
-    return $database->insert('email_notifications', [
-        'recipient_email' => $to,
-        'subject' => $subject,
-        'message_body' => $message,
-        'notification_type' => $type,
-        'status' => 'pending'
-    ]);
+/**
+ * Send email notification using EmailService
+ */
+function sendEmailNotification($to, $subject, $message, $type = 'general', $attachments = []) {
+    try {
+        $emailService = new EmailService();
+        return $emailService->sendEmail($to, $subject, $message, $type, $attachments);
+    } catch (Exception $e) {
+        error_log("Failed to send email: " . $e->getMessage());
+        
+        // Fallback: just queue it
+        $database = Database::getInstance();
+        return $database->insert('email_notifications', [
+            'recipient_email' => $to,
+            'subject' => $subject,
+            'message_body' => $message,
+            'notification_type' => $type,
+            'status' => 'pending'
+        ]);
+    }
+}
+
+/**
+ * Send templated email notification
+ */
+function sendTemplateEmail($to, $type, $data = []) {
+    try {
+        $emailService = new EmailService();
+        return $emailService->sendTemplateEmail($to, $type, $data);
+    } catch (Exception $e) {
+        error_log("Failed to send template email: " . $e->getMessage());
+        return false;
+    }
 }
 
 ?>

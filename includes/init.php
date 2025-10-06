@@ -15,10 +15,28 @@ require_once __DIR__ . '/../classes/Database.php';
 require_once __DIR__ . '/../classes/Auth.php';
 require_once __DIR__ . '/../classes/Validator.php';
 
+
+
+
+// --- Email Configuration (Final Production Setup) ---
+if (!defined('SMTP_HOST')) define('SMTP_HOST', 'smtp.gmail.com');
+if (!defined('SMTP_PORT')) define('SMTP_PORT', 587);
+if (!defined('SMTP_USERNAME')) define('SMTP_USERNAME', 'paultutorw@gmail.com');
+if (!defined('SMTP_PASSWORD')) define('SMTP_PASSWORD', 'vjoh khga djxh vpjm'); // Gmail App Password
+if (!defined('SMTP_ENCRYPTION')) define('SMTP_ENCRYPTION', 'tls');
+if (!defined('SMTP_FROM_EMAIL')) define('SMTP_FROM_EMAIL', 'paultutorw@gmail.com');
+if (!defined('SMTP_FROM_NAME')) define('SMTP_FROM_NAME', 'JHUB AFRICA');
+if (!defined('EMAIL_ENABLED')) define('EMAIL_ENABLED', true);
+
+// Load EmailService class
+require_once __DIR__ . '/../classes/EmailService.php';
+
+
 // Include helper functions
 require_once __DIR__ . '/helpers.php';
 require_once __DIR__ . '/functions.php';
 require_once __DIR__ . '/email-functions.php';
+
 
 // Initialize authentication
 $auth = Auth::getInstance();
@@ -48,6 +66,11 @@ function customErrorHandler($severity, $message, $file, $line) {
     // Log error
     error_log($errorMessage, 3, __DIR__ . '/../logs/error.log');
 }
+
+
+// Optional: Debug output control for PHPMailer
+if (!defined('EMAIL_DEBUG')) define('EMAIL_DEBUG', 0); 
+// 0 = no debug, 1 = client msgs, 2 = client+server msgs
 
 // Custom exception handler
 function customExceptionHandler($exception) {
