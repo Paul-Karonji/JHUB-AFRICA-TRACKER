@@ -1,6 +1,6 @@
 <?php
 // classes/Database.php
-// Database Connection Manager
+// Database Connection Manager - FIXED VERSION
 
 class Database {
     private static $instance = null;
@@ -56,16 +56,26 @@ class Database {
         return false;
     }
     
-    // Update records
+    /**
+     * Update records - FIXED VERSION
+     * Now uses only positional parameters (?) to avoid mixing with named parameters
+     */
     public function update($table, $data, $condition, $conditionParams = []) {
+        // Build SET clause with positional placeholders
         $setClause = [];
+        $values = [];
+        
         foreach ($data as $key => $value) {
-            $setClause[] = "{$key} = :{$key}";
+            $setClause[] = "{$key} = ?";
+            $values[] = $value;
         }
+        
         $setClause = implode(', ', $setClause);
         $sql = "UPDATE {$table} SET {$setClause} WHERE {$condition}";
         
-        $params = array_merge($data, $conditionParams);
+        // Merge data values with condition parameters
+        $params = array_merge($values, $conditionParams);
+        
         return $this->query($sql, $params);
     }
     
@@ -91,6 +101,14 @@ class Database {
             return $stmt->fetchAll();
         }
         return [];
+    }
+    
+    /**
+     * Get all records - NEW METHOD
+     * Added because some files were calling Database::getAll()
+     */
+    public function getAll($sql, $params = []) {
+        return $this->getRows($sql, $params);
     }
     
     // Count records

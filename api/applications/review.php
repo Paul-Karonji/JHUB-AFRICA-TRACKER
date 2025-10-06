@@ -1,6 +1,6 @@
 <?php
-// api/applications/review-enhanced.php
-// Enhanced Admin Application Review API with Messaging and File Auto-Deletion
+// api/applications/review.php
+// Admin Application Review API - FIXED VERSION (Presentations are NEVER deleted)
 
 header('Content-Type: application/json');
 require_once '../../includes/init.php';
@@ -90,16 +90,7 @@ try {
                 throw new Exception('Failed to create project');
             }
 
-            // Schedule presentation file for deletion (30 seconds after approval)
-            if ($application['presentation_file']) {
-                $database->insert('file_deletion_queue', [
-                    'file_path' => 'presentations/' . $application['presentation_file'],
-                    'deletion_time' => date('Y-m-d H:i:s', strtotime('+30 seconds')),
-                    'related_type' => 'application',
-                    'related_id' => $applicationId,
-                    'reason' => 'Auto-deletion after approval'
-                ]);
-            }
+            // REMOVED: File deletion scheduling - presentations are now kept permanently
 
             // Log activity
             logActivity(
@@ -130,8 +121,8 @@ try {
             $emailContent .= "<p><strong>Username:</strong> {$application['profile_name']}<br>";
             $emailContent .= "<strong>Login URL:</strong> <a href='{$loginUrl}'>{$loginUrl}</a></p>";
             $emailContent .= "</div>";
-            $emailContent .= "<p><strong>Important:</strong> Your uploaded presentation file will be automatically deleted from our servers for security purposes. Please save a copy if needed.</p>";
             $emailContent .= "<p>Your project is now active at <strong>Stage 1: Project Creation</strong>.</p>";
+            $emailContent .= "<p>Your presentation file will remain securely stored in our system for future reference.</p>";
             $emailContent .= "<p>Best regards,<br><strong>The JHUB AFRICA Team</strong></p>";
 
             sendEmailNotification(
@@ -146,7 +137,7 @@ try {
 
             echo json_encode([
                 'success' => true,
-                'message' => 'Application approved successfully! Project created and notification sent. Presentation file will be deleted in 30 seconds.',
+                'message' => 'Application approved successfully! Project created and notification sent.',
                 'project_id' => $projectId
             ]);
 
@@ -174,16 +165,7 @@ try {
                 throw new Exception('Failed to update application status');
             }
 
-            // Schedule presentation file for immediate deletion
-            if ($application['presentation_file']) {
-                $database->insert('file_deletion_queue', [
-                    'file_path' => 'presentations/' . $application['presentation_file'],
-                    'deletion_time' => date('Y-m-d H:i:s', strtotime('+10 seconds')),
-                    'related_type' => 'application',
-                    'related_id' => $applicationId,
-                    'reason' => 'Application rejected'
-                ]);
-            }
+            // REMOVED: File deletion scheduling - presentations are now kept permanently
 
             // Log activity
             logActivity(
@@ -218,7 +200,7 @@ try {
             $emailContent .= "<li>Strengthen your business model and market validation</li>";
             $emailContent .= "<li>Consider reapplying in the future with an improved proposal</li>";
             $emailContent .= "</ul>";
-            $emailContent .= "<p><strong>Note:</strong> Your uploaded presentation file will be deleted from our servers shortly.</p>";
+            $emailContent .= "<p>Your presentation file will remain in our system for your future reference.</p>";
             $emailContent .= "<p>If you have questions about this decision, please contact us at applications@jhubafrica.com</p>";
             $emailContent .= "<p>Best regards,<br><strong>The JHUB AFRICA Team</strong></p>";
 
@@ -234,7 +216,7 @@ try {
 
             echo json_encode([
                 'success' => true,
-                'message' => 'Application rejected. Notification email sent. Presentation file will be deleted in 10 seconds.'
+                'message' => 'Application rejected. Notification email sent.'
             ]);
 
         } else {
@@ -256,4 +238,3 @@ try {
     error_log('Application review error: ' . $e->getMessage());
 }
 ?>
-

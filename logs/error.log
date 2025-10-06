@@ -1912,3 +1912,47 @@ Params: {"status":"approved","reviewed_at":"2025-10-06 11:59:29","reviewed_by":1
 SQL: UPDATE project_applications SET status = :status, reviewed_at = :reviewed_at, reviewed_by = :reviewed_by, admin_message = :admin_message WHERE application_id = ?
 Params: {"status":"approved","reviewed_at":"2025-10-06 12:00:37","reviewed_by":1,"admin_message":"","0":8}
 ---
+2025-10-06 14:16:54 - Database Error: SQLSTATE[HY093]: Invalid parameter number: mixed named and positional parameters
+SQL: UPDATE project_applications SET status = :status, reviewed_at = :reviewed_at, reviewed_by = :reviewed_by, admin_message = :admin_message WHERE application_id = ?
+Params: {"status":"approved","reviewed_at":"2025-10-06 14:16:54","reviewed_by":1,"admin_message":"","0":10}
+---
+2025-10-06 14:17:04 - Database Error: SQLSTATE[HY093]: Invalid parameter number: mixed named and positional parameters
+SQL: UPDATE project_applications SET status = :status, reviewed_at = :reviewed_at, reviewed_by = :reviewed_by, admin_message = :admin_message WHERE application_id = ?
+Params: {"status":"approved","reviewed_at":"2025-10-06 14:17:04","reviewed_by":1,"admin_message":"","0":10}
+---
+2025-10-06 14:24:50 - Database Error: SQLSTATE[HY093]: Invalid parameter number: mixed named and positional parameters
+SQL: UPDATE projects SET current_stage = :current_stage WHERE project_id = ?
+Params: {"current_stage":2,"0":4}
+---
+2025-10-06 14:25:03 - Database Error: SQLSTATE[HY093]: Invalid parameter number: mixed named and positional parameters
+SQL: UPDATE projects SET current_stage = :current_stage WHERE project_id = ?
+Params: {"current_stage":2,"0":4}
+---
+2025-10-06 15:01:16 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'admin_message' in 'field list'
+SQL: UPDATE project_applications SET status = ?, reviewed_at = ?, reviewed_by = ?, admin_message = ? WHERE application_id = ?
+Params: ["approved","2025-10-06 15:01:16",1,"Test approval message",1]
+---
+2025-10-06 15:12:41 - Database Error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'tracker.file_deletion_queue' doesn't exist
+SQL: INSERT INTO file_deletion_queue (file_path, deletion_time, related_type, related_id, reason) VALUES (:file_path, :deletion_time, :related_type, :related_id, :reason)
+Params: {"file_path":"presentations\/presentation_68dfdf9864acf1.47813252.pdf","deletion_time":"2025-10-06 15:13:11","related_type":"application","related_id":8,"reason":"Auto-deletion after approval"}
+---
+2025-10-06 15:12:41 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'project_id' in 'field list'
+SQL: INSERT INTO activity_logs (user_type, user_id, action, description, ip_address, user_agent, project_id, additional_data) VALUES (:user_type, :user_id, :action, :description, :ip_address, :user_agent, :project_id, :additional_data)
+Params: {"user_type":"admin","user_id":1,"action":"application_approved","description":"Approved application #8 and created project #11","ip_address":"::1","user_agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/140.0.0.0 Safari\/537.36","project_id":"11","additional_data":"{\"application_id\":8,\"project_name\":\"jeff\"}"}
+---
+2025-10-06 15:12:49 - Database Error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'tracker.file_deletion_queue' doesn't exist
+SQL: INSERT INTO file_deletion_queue (file_path, deletion_time, related_type, related_id, reason) VALUES (:file_path, :deletion_time, :related_type, :related_id, :reason)
+Params: {"file_path":"presentations\/presentation_68e37e858aa208.82460067.docx","deletion_time":"2025-10-06 15:13:19","related_type":"application","related_id":9,"reason":"Auto-deletion after approval"}
+---
+2025-10-06 15:12:49 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'project_id' in 'field list'
+SQL: INSERT INTO activity_logs (user_type, user_id, action, description, ip_address, user_agent, project_id, additional_data) VALUES (:user_type, :user_id, :action, :description, :ip_address, :user_agent, :project_id, :additional_data)
+Params: {"user_type":"admin","user_id":1,"action":"application_approved","description":"Approved application #9 and created project #12","ip_address":"::1","user_agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/140.0.0.0 Safari\/537.36","project_id":"12","additional_data":"{\"application_id\":9,\"project_name\":\"Prime test\"}"}
+---
+2025-10-06 15:12:56 - Database Error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'tracker.file_deletion_queue' doesn't exist
+SQL: INSERT INTO file_deletion_queue (file_path, deletion_time, related_type, related_id, reason) VALUES (:file_path, :deletion_time, :related_type, :related_id, :reason)
+Params: {"file_path":"presentations\/presentation_68e3a4d52df755.64081022.docx","deletion_time":"2025-10-06 15:13:26","related_type":"application","related_id":10,"reason":"Auto-deletion after approval"}
+---
+2025-10-06 15:12:56 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'project_id' in 'field list'
+SQL: INSERT INTO activity_logs (user_type, user_id, action, description, ip_address, user_agent, project_id, additional_data) VALUES (:user_type, :user_id, :action, :description, :ip_address, :user_agent, :project_id, :additional_data)
+Params: {"user_type":"admin","user_id":1,"action":"application_approved","description":"Approved application #10 and created project #13","ip_address":"::1","user_agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/140.0.0.0 Safari\/537.36","project_id":"13","additional_data":"{\"application_id\":10,\"project_name\":\"Agri care\"}"}
+---
