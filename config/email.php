@@ -1,39 +1,37 @@
 <?php
-/**
- * Email Configuration for JHUB AFRICA Project Tracker
- * Location: config/email.php
- */
+// config/email.php
+// Email Configuration
 
-// SMTP Configuration
-define('SMTP_ENABLED', false); // Set to false for testing, true when SMTP is configured
-define('SMTP_HOST', 'localhost');
-define('SMTP_PORT', 587);
-define('SMTP_SECURITY', 'tls'); // tls, ssl, or none
-define('SMTP_USERNAME', '');
-define('SMTP_PASSWORD', '');
-define('SMTP_TIMEOUT', 30);
-
-// Email Addresses
-define('FROM_EMAIL', 'noreply@jhubafrica.com');
-define('FROM_NAME', 'JHUB AFRICA');
-define('REPLY_TO_EMAIL', 'support@jhubafrica.com');
-define('ADMIN_EMAIL', 'admin@jhubafrica.com');
+// SMTP Configuration (for production)
+define('SMTP_HOST', 'smtp.gmail.com'); // Change to your SMTP server
+define('SMTP_PORT', 587); // 587 for TLS, 465 for SSL
+define('SMTP_USERNAME', 'your-email@gmail.com'); // Your email
+define('SMTP_PASSWORD', 'your-app-password'); // Your email password or app password
+define('SMTP_ENCRYPTION', 'tls'); // 'tls' or 'ssl'
+define('SMTP_FROM_EMAIL', 'noreply@jhubafrica.com');
+define('SMTP_FROM_NAME', 'JHUB AFRICA');
 
 // Email Settings
-define('EMAIL_QUEUE_ENABLED', true);
-define('EMAIL_DEBUG', DEBUG_MODE);
-define('EMAIL_CHARSET', 'UTF-8');
-define('MAX_EMAIL_ATTEMPTS', 3);
+define('EMAIL_ENABLED', true); // Set to false to disable emails (for testing)
+define('EMAIL_DEBUG', false); // Set to true to see SMTP debug output
 
 // Email Templates Directory
-define('EMAIL_TEMPLATES_DIR', __DIR__ . '/../templates/email/');
+define('EMAIL_TEMPLATES_DIR', __DIR__ . '/../templates/emails/');
 
-// Email Notification Types
-define('NOTIFY_APPLICATION_RECEIVED', 'application_received');
+// Admin Notification Emails
+define('ADMIN_NOTIFICATION_EMAIL', 'admin@jhubafrica.com');
+
+// Email Queue (for later implementation)
+define('USE_EMAIL_QUEUE', false); // Set to true to queue emails instead of sending immediately
+
+// Notification Types
+define('NOTIFY_APPLICATION_SUBMITTED', 'application_submitted');
 define('NOTIFY_APPLICATION_APPROVED', 'application_approved');
 define('NOTIFY_APPLICATION_REJECTED', 'application_rejected');
-define('NOTIFY_PROJECT_CREATED', 'project_created');
 define('NOTIFY_MENTOR_ASSIGNED', 'mentor_assigned');
-define('NOTIFY_STAGE_COMPLETED', 'stage_completed');
+define('NOTIFY_RESOURCE_SHARED', 'resource_shared');
+define('NOTIFY_ASSESSMENT_CREATED', 'assessment_created');
+define('NOTIFY_STAGE_UPDATED', 'stage_updated');
+define('NOTIFY_COMMENT_POSTED', 'comment_posted');
 
 ?>

@@ -13,7 +13,7 @@ define('SESSION_NAME', 'jhub_session');
 define('SESSION_TIMEOUT', 3600); // 1 hour
 define('CSRF_TOKEN_NAME', 'csrf_token');
 define('MAX_LOGIN_ATTEMPTS', 5);
-define('LOCKOUT_DURATION', 900); // 15 minutes
+define('LOCKOUT_TIME', 900); // 15 minutes
 
 // File Upload Settings
 define('UPLOAD_PATH', dirname(__DIR__) . '/assets/uploads/');

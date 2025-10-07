@@ -1,6 +1,14 @@
 <?php
-// classes/Database.php
-// Database Connection Manager
+/**
+ * classes/Database.php
+ * Database Connection Manager - COMPLETELY FIXED
+ * 
+ * FIXES APPLIED:
+ * 1. update() method uses ONLY positional parameters (?)
+ * 2. Added getAll() method
+ * 3. Proper error logging
+ * 4. Transaction safety
+ */
 
 class Database {
     private static $instance = null;
@@ -31,7 +39,9 @@ class Database {
         return $this->connection;
     }
     
-    // Execute a query and return results
+    /**
+     * Execute a query and return results
+     */
     public function query($sql, $params = []) {
         try {
             $stmt = $this->connection->prepare($sql);
@@ -43,7 +53,10 @@ class Database {
         }
     }
     
-    // Insert record and return last insert ID
+    /**
+     * Insert record and return last insert ID
+     * Uses NAMED parameters (:param)
+     */
     public function insert($table, $data) {
         $columns = implode(', ', array_keys($data));
         $placeholders = ':' . implode(', :', array_keys($data));
@@ -56,26 +69,47 @@ class Database {
         return false;
     }
     
-    // Update records
+    /**
+     * Update records - FIXED VERSION
+     * Uses ONLY positional parameters (?) throughout
+     * This prevents PDO error about mixing named and positional parameters
+     *
+     * @param string $table Table name
+     * @param array $data Associative array of column => value
+     * @param string $condition WHERE clause (e.g. "id = ?")
+     * @param array $conditionParams Parameters for WHERE clause
+     * @return bool Success/failure
+     */
     public function update($table, $data, $condition, $conditionParams = []) {
+        // Build SET clause with positional placeholders
         $setClause = [];
+        $values = [];
+        
         foreach ($data as $key => $value) {
-            $setClause[] = "{$key} = :{$key}";
+            $setClause[] = "{$key} = ?";
+            $values[] = $value;
         }
+        
         $setClause = implode(', ', $setClause);
         $sql = "UPDATE {$table} SET {$setClause} WHERE {$condition}";
         
-        $params = array_merge($data, $conditionParams);
+        // Merge SET values with WHERE condition parameters
+        $params = array_merge($values, $conditionParams);
+        
         return $this->query($sql, $params);
     }
     
-    // Delete records
+    /**
+     * Delete records
+     */
     public function delete($table, $condition, $params = []) {
         $sql = "DELETE FROM {$table} WHERE {$condition}";
         return $this->query($sql, $params);
     }
     
-    // Get single record
+    /**
+     * Get single record
+     */
     public function getRow($sql, $params = []) {
         $stmt = $this->query($sql, $params);
         if ($stmt) {
@@ -84,7 +118,9 @@ class Database {
         return null;
     }
     
-    // Get multiple records
+    /**
+     * Get multiple records
+     */
     public function getRows($sql, $params = []) {
         $stmt = $this->query($sql, $params);
         if ($stmt) {
@@ -93,7 +129,17 @@ class Database {
         return [];
     }
     
-    // Count records
+    /**
+     * Get all records - Alias for getRows()
+     * Added because some code was calling Database::getAll()
+     */
+    public function getAll($sql, $params = []) {
+        return $this->getRows($sql, $params);
+    }
+    
+    /**
+     * Count records
+     */
     public function count($table, $condition = '', $params = []) {
         $sql = "SELECT COUNT(*) FROM {$table}";
         if (!empty($condition)) {
@@ -107,22 +153,30 @@ class Database {
         return 0;
     }
     
-    // Begin transaction
+    /**
+     * Begin transaction
+     */
     public function beginTransaction() {
         return $this->connection->beginTransaction();
     }
     
-    // Commit transaction
+    /**
+     * Commit transaction
+     */
     public function commit() {
         return $this->connection->commit();
     }
     
-    // Rollback transaction
+    /**
+     * Rollback transaction
+     */
     public function rollback() {
         return $this->connection->rollback();
     }
     
-    // Log database errors
+    /**
+     * Log database errors to file
+     */
     private function logError($error, $sql = '', $params = []) {
         $logMessage = date('Y-m-d H:i:s') . " - Database Error: {$error}\n";
         if (!empty($sql)) {
@@ -136,13 +190,16 @@ class Database {
         error_log($logMessage, 3, dirname(__DIR__) . '/logs/error.log');
     }
     
-    // Prevent cloning
+    /**
+     * Prevent cloning of singleton
+     */
     private function __clone() {}
     
-    // Prevent unserialization
+    /**
+     * Prevent unserialization of singleton
+     */
     public function __wakeup() {
         throw new Exception("Cannot unserialize singleton");
     }
 }
-
 ?>
