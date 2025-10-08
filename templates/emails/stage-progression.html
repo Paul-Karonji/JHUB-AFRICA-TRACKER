@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Stage Update</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .email-container {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #17a2b8 0%, #117a8b 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+        .header p {
+            margin: 10px 0 0 0;
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .progress-badge {
+            background: #17a2b8;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 25px;
+            display: inline-block;
+            margin: 20px 0;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .stage-progress {
+            background: linear-gradient(135deg, #e9f7fa 0%, #d1ecf1 100%);
+            border: 2px solid #17a2b8;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 25px 0;
+            text-align: center;
+        }
+        .stage-numbers {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+            font-size: 18px;
+        }
+        .stage-old {
+            background: #6c757d;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        .stage-arrow {
+            margin: 0 15px;
+            font-size: 24px;
+            color: #17a2b8;
+        }
+        .stage-new {
+            background: #17a2b8;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(23, 162, 184, 0.3);
+        }
+        .stage-info {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: left;
+        }
+        .stage-info h4 {
+            color: #17a2b8;
+            margin-top: 0;
+            font-size: 20px;
+        }
+        .stage-info p {
+            color: #555;
+            margin: 5px 0;
+        }
+        .stage-timeline {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+        .stage-timeline h3 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 2px solid #17a2b8;
+            padding-bottom: 10px;
+        }
+        .timeline-stages {
+            display: flex;
+            flex-direction: column;
+            margin-top: 20px;
+        }
+        .timeline-stage {
+            display: flex;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 8px;
+            position: relative;
+        }
+        .timeline-stage.completed {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+        }
+        .timeline-stage.current {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            font-weight: bold;
+        }
+        .timeline-stage.upcoming {
+            background: #f8f9fa;
+            border-left: 4px solid #e0e0e0;
+            opacity: 0.7;
+        }
+        .stage-number-circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        .timeline-stage.completed .stage-number-circle {
+            background: #28a745;
+            color: white;
+        }
+        .timeline-stage.current .stage-number-circle {
+            background: #17a2b8;
+            color: white;
+        }
+        .timeline-stage.upcoming .stage-number-circle {
+            background: #e0e0e0;
+            color: #666;
+        }
+        .stage-content {
+            flex: 1;
+        }
+        .stage-title {
+            font-size: 16px;
+            margin: 0 0 5px 0;
+        }
+        .stage-desc {
+            font-size: 13px;
+            margin: 0;
+            color: #666;
+        }
+        .mentor-message {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 25px 0;
+        }
+        .mentor-message h3 {
+            margin-top: 0;
+            color: #856404;
+            font-size: 18px;
+        }
+        .mentor-message-content {
+            color: #333;
+            font-style: italic;
+            line-height: 1.7;
+        }
+        .next-focus {
+            background: white;
+            border: 2px solid #17a2b8;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+        .next-focus h3 {
+            margin-top: 0;
+            color: #17a2b8;
+            font-size: 18px;
+        }
+        .next-focus ul {
+            margin: 10px 0 0 0;
+            padding-left: 20px;
+        }
+        .next-focus li {
+            margin: 10px 0;
+            color: #555;
+        }
+        .button {
+            display: inline-block;
+            background: #17a2b8;
+            color: white !important;
+            padding: 14px 35px;
+            text-decoration: none;
+            border-radius: 6px;
+            margin: 20px 0;
+            font-weight: bold;
+            text-align: center;
+        }
+        .button:hover {
+            background: #138496;
+        }
+        .celebration {
+            text-align: center;
+            font-size: 48px;
+            margin: 20px 0;
+        }
+        .footer {
+            background: #333;
+            color: #fff;
+            padding: 30px;
+            text-align: center;
+        }
+        .footer p {
+            margin: 5px 0;
+            font-size: 13px;
+            opacity: 0.8;
+        }
+        .footer a {
+            color: #17a2b8;
+            text-decoration: none;
+        }
+        @media only screen and (max-width: 600px) {
+            .content {
+                padding: 20px;
+            }
+            .header {
+                padding: 30px 20px;
+            }
+            .stage-numbers {
+                flex-direction: column;
+            }
+            .stage-arrow {
+                transform: rotate(90deg);
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>🎉 Congratulations!</h1>
+            <p>Your Project Has Advanced to the Next Stage</p>
+        </div>
+        
+        <div class="content">
+            <div class="celebration">
+                🚀
+            </div>
+            
+            <p>Dear <strong>{{project_lead_name}}</strong>,</p>
+            
+            <div class="progress-badge">
+                ✓ STAGE PROGRESSION
+            </div>
+            
+            <p>Great news! Your project, <strong>{{project_name}}</strong>, has successfully progressed to the next stage of development in the JHUB AFRICA innovation ecosystem.</p>
+            
+            <div class="stage-progress">
+                <h3 style="margin-top: 0; color: #17a2b8;">Stage Progression</h3>
+                <div class="stage-numbers">
+                    <div class="stage-old">Stage {{old_stage}}</div>
+                    <div class="stage-arrow">→</div>
+                    <div class="stage-new">Stage {{new_stage}}</div>
+                </div>
+                
+                <div class="stage-info">
+                    <h4>{{stage_name}}</h4>
+                    <p>{{stage_description}}</p>
+                </div>
+            </div>
+            
+            <div class="stage-timeline">
+                <h3>Your Development Journey</h3>
+                <div class="timeline-stages">
+                    <div class="timeline-stage completed">
+                        <div class="stage-number-circle">1</div>
+                        <div class="stage-content">
+                            <p class="stage-title">Project Creation</p>
+                            <p class="stage-desc">Initial project setup and team building</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-stage {{stage_2_class}}">
+                        <div class="stage-number-circle">2</div>
+                        <div class="stage-content">
+                            <p class="stage-title">Mentorship</p>
+                            <p class="stage-desc">Mentor assignment and initial guidance</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-stage {{stage_3_class}}">
+                        <div class="stage-number-circle">3</div>
+                        <div class="stage-content">
+                            <p class="stage-title">Assessment</p>
+                            <p class="stage-desc">Project assessment and evaluation</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-stage {{stage_4_class}}">
+                        <div class="stage-number-circle">4</div>
+                        <div class="stage-content">
+                            <p class="stage-title">Learning and Development</p>
+                            <p class="stage-desc">Skills development and learning objectives</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-stage {{stage_5_class}}">
+                        <div class="stage-number-circle">5</div>
+                        <div class="stage-content">
+                            <p class="stage-title">Progress Tracking</p>
+                            <p class="stage-desc">Progress monitoring and feedback collection</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-stage {{stage_6_class}}">
+                        <div class="stage-number-circle">6</div>
+                        <div class="stage-content">
+                            <p class="stage-title">Showcase and Integration</p>
+                            <p class="stage-desc">Final showcase and ecosystem integration</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            {{#if mentor_message}}
+            <div class="mentor-message">
+                <h3>💬 Message from Your Mentor</h3>
+                <div class="mentor-message-content">
+                    "{{mentor_message}}"
+                </div>
+                <p style="margin: 15px 0 0 0; font-size: 14px;"><strong>— {{mentor_name}}</strong></p>
+            </div>
+            {{/if}}
+            
+            <div class="next-focus">
+                <h3>🎯 Focus Areas for This Stage</h3>
+                <p>To make the most of this stage, focus on:</p>
+                <ul>
+                    {{stage_focus_areas}}
+                </ul>
+            </div>
+            
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 25px 0;">
+                <p style="margin: 0;"><strong>📊 Track Your Progress:</strong></p>
+                <p style="margin: 10px 0 0 0; color: #555;">Log in to your dashboard to view detailed stage requirements, access resources, and communicate with your mentor.</p>
+            </div>
+            
+            <center>
+                <a href="{{site_url}}/dashboards/project/progress.php" class="button">View Your Dashboard</a>
+            </center>
+            
+            <p style="margin-top: 30px;">This progression reflects the hard work and dedication of your entire team. Keep up the excellent momentum as you continue your innovation journey!</p>
+            
+            <p>If you have any questions about this stage or need support, please reach out to your mentor or contact our support team at <a href="mailto:support@jhubafrica.com" style="color: #17a2b8; text-decoration: none;">support@jhubafrica.com</a></p>
+            
+            <p>Keep innovating!</p>
+            
+            <p>Best regards,<br>
+            <strong>JHUB AFRICA Team</strong></p>
+        </div>
+        
+        <div class="footer">
+            <p><strong>{{site_name}}</strong></p>
+            <p>Empowering African Innovation</p>
+            <p>&copy; {{current_year}} {{site_name}}. All rights reserved.</p>
+            <p style="margin-top: 15px; font-size: 11px;">
+                This is an automated message. Please do not reply directly to this email.<br>
+                For support, contact us at <a href="mailto:support@jhubafrica.com">support@jhubafrica.com</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

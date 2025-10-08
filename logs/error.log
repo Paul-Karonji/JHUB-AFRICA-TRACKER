@@ -2,3 +2,15 @@
 SQL: INSERT INTO projects (project_name, date, description, project_email, project_website, profile_name, password, project_lead_name, project_lead_email, current_stage, status, created_from_application, created_by_admin, created_at) VALUES (:project_name, :date, :description, :project_email, :project_website, :profile_name, :password, :project_lead_name, :project_lead_email, :current_stage, :status, :created_from_application, :created_by_admin, :created_at)
 Params: {"project_name":"techy","date":"2025-10-06","description":"badbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbad","project_email":null,"project_website":null,"profile_name":"Techy","password":"$2y$10$qzqnYEmm\/r\/Sdv884BrvoelYt5GdSX5qkH2cw9BOy4ZCuZSNDhVTW","project_lead_name":"Paul","project_lead_email":"karonjipaul56@gmail.com","current_stage":1,"status":"active","created_from_application":12,"created_by_admin":1,"created_at":"2025-10-07 11:33:19"}
 ---
+Uncaught exception: Undefined constant "ADMIN_NOTIFICATION_EMAIL" in C:\xampp\htdocs\jhub-africa-tracker\public\contact.php on line 41Uncaught exception: Undefined constant "SMTP_ENCRYPTION" in C:\xampp\htdocs\jhub-africa-tracker\classes\EmailService.php on line 30Uncaught exception: Undefined constant "SMTP_ENCRYPTION" in C:\xampp\htdocs\jhub-africa-tracker\classes\EmailService.php on line 30Uncaught exception: Undefined constant "SMTP_ENCRYPTION" in C:\xampp\htdocs\jhub-africa-tracker\classes\EmailService.php on line 30Uncaught exception: Undefined constant "SMTP_ENCRYPTION" in C:\xampp\htdocs\jhub-africa-tracker\classes\EmailService.php on line 30Uncaught exception: Undefined constant "SMTP_ENCRYPTION" in C:\xampp\htdocs\jhub-africa-tracker\classes\EmailService.php on line 30Uncaught exception: Undefined constant "SMTP_ENCRYPTION" in C:\xampp\htdocs\jhub-africa-tracker\classes\EmailService.php on line 30Uncaught exception: Undefined constant "EMAIL_TEMPLATES_DIR" in C:\xampp\htdocs\jhub-africa-tracker\classes\EmailService.php on line 147Uncaught exception: Undefined constant "EMAIL_TEMPLATES_DIR" in C:\xampp\htdocs\jhub-africa-tracker\classes\EmailService.php on line 147Uncaught exception: Undefined constant "EMAIL_TEMPLATES_DIR" in C:\xampp\htdocs\jhub-africa-tracker\classes\EmailService.php on line 1472025-10-08 09:03:06 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'project_id' in 'field list'
+SQL: UPDATE projects SET current_stage = ? WHERE project_id = ?
+Params: [2,22]
+---
+2025-10-08 09:03:33 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'project_id' in 'field list'
+SQL: UPDATE projects SET current_stage = ? WHERE project_id = ?
+Params: [2,22]
+---
+2025-10-08 09:03:57 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'project_id' in 'field list'
+SQL: UPDATE projects SET current_stage = ? WHERE project_id = ?
+Params: [2,22]
+---
