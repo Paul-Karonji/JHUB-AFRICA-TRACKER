@@ -1,13 +1,12 @@
 <?php
 /**
  * classes/Database.php
- * Database Connection Manager - COMPLETELY FIXED
+ * Database Connection Manager - FIXED FOR ERROR #3
  * 
  * FIXES APPLIED:
- * 1. update() method uses ONLY positional parameters (?)
- * 2. Added getAll() method
- * 3. Proper error logging
- * 4. Transaction safety
+ * 1. update() method now returns TRUE on success (even if 0 rows affected)
+ * 2. delete() method also returns TRUE on success
+ * 3. Proper boolean returns for all CRUD operations
  */
 
 class Database {
@@ -70,15 +69,15 @@ class Database {
     }
     
     /**
-     * Update records - FIXED VERSION
-     * Uses ONLY positional parameters (?) throughout
-     * This prevents PDO error about mixing named and positional parameters
+     * Update records - FIXED FOR ERROR #3
+     * Now returns TRUE on success, even if 0 rows were affected
+     * This fixes the "Failed to update stage" error when updating to same value
      *
      * @param string $table Table name
      * @param array $data Associative array of column => value
      * @param string $condition WHERE clause (e.g. "id = ?")
      * @param array $conditionParams Parameters for WHERE clause
-     * @return bool Success/failure
+     * @return bool TRUE on success, FALSE on error
      */
     public function update($table, $data, $condition, $conditionParams = []) {
         // Build SET clause with positional placeholders
@@ -96,15 +95,19 @@ class Database {
         // Merge SET values with WHERE condition parameters
         $params = array_merge($values, $conditionParams);
         
-        return $this->query($sql, $params);
+        // ✅ FIX: Return TRUE if query executed successfully, FALSE if error
+        $stmt = $this->query($sql, $params);
+        return ($stmt !== false);  // Returns TRUE even if 0 rows affected
     }
     
     /**
-     * Delete records
+     * Delete records - FIXED (same as update)
+     * @return bool TRUE on success, FALSE on error
      */
     public function delete($table, $condition, $params = []) {
         $sql = "DELETE FROM {$table} WHERE {$condition}";
-        return $this->query($sql, $params);
+        $stmt = $this->query($sql, $params);
+        return ($stmt !== false);  // Returns TRUE even if 0 rows affected
     }
     
     /**
@@ -131,7 +134,6 @@ class Database {
     
     /**
      * Get all records - Alias for getRows()
-     * Added because some code was calling Database::getAll()
      */
     public function getAll($sql, $params = []) {
         return $this->getRows($sql, $params);
@@ -191,12 +193,12 @@ class Database {
     }
     
     /**
-     * Prevent cloning of singleton
+     * Prevent cloning
      */
     private function __clone() {}
     
     /**
-     * Prevent unserialization of singleton
+     * Prevent unserialization
      */
     public function __wakeup() {
         throw new Exception("Cannot unserialize singleton");

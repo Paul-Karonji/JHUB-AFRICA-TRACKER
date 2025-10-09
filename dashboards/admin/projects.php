@@ -1,5 +1,5 @@
 <?php
-// dashboards/admin/projects.php - Complete Project Management
+// dashboards/admin/projects.php - Complete Project Management WITH COMMENTS
 require_once '../../includes/init.php';
 
 $auth->requireUserType(USER_TYPE_ADMIN);
@@ -80,7 +80,7 @@ if (isset($_GET['id'])) {
     }
 }
 
-// Get filters
+// List view - filters and search
 $statusFilter = $_GET['status'] ?? 'all';
 $stageFilter = $_GET['stage'] ?? 'all';
 $searchQuery = $_GET['search'] ?? '';
@@ -163,40 +163,22 @@ include '../../templates/header.php';
         <div class="row">
             <!-- Main Content -->
             <div class="col-lg-8">
+                <!-- Project Details -->
                 <div class="card shadow mb-4">
                     <div class="card-header">
                         <h5 class="mb-0">Project Information</h5>
                     </div>
                     <div class="card-body">
-                        <dl class="row">
-                            <dt class="col-sm-3">Project Name:</dt>
-                            <dd class="col-sm-9"><?php echo e($viewProject['project_name']); ?></dd>
-                            
-                            <dt class="col-sm-3">Project Lead:</dt>
-                            <dd class="col-sm-9"><?php echo e($viewProject['project_lead_name']); ?> (<?php echo e($viewProject['project_lead_email']); ?>)</dd>
-                            
-                            <dt class="col-sm-3">Profile Name:</dt>
-                            <dd class="col-sm-9"><?php echo e($viewProject['profile_name']); ?></dd>
-                            
-                            <dt class="col-sm-3">Description:</dt>
-                            <dd class="col-sm-9"><?php echo nl2br(e($viewProject['description'])); ?></dd>
-                            
-                            <?php if ($viewProject['project_website']): ?>
-                            <dt class="col-sm-3">Website:</dt>
-                            <dd class="col-sm-9"><a href="<?php echo e($viewProject['project_website']); ?>" target="_blank"><?php echo e($viewProject['project_website']); ?></a></dd>
-                            <?php endif; ?>
-                            
-                            <?php if ($viewProject['target_market']): ?>
-                            <dt class="col-sm-3">Target Market:</dt>
-                            <dd class="col-sm-9"><?php echo e($viewProject['target_market']); ?></dd>
-                            <?php endif; ?>
-                            
-                            <dt class="col-sm-3">Created:</dt>
-                            <dd class="col-sm-9"><?php echo formatDate($viewProject['created_at'], 'F j, Y'); ?></dd>
-                            
-                            <dt class="col-sm-3">Last Updated:</dt>
-                            <dd class="col-sm-9"><?php echo timeAgo($viewProject['updated_at']); ?></dd>
-                        </dl>
+                        <p><strong>Description:</strong></p>
+                        <p><?php echo nl2br(e($viewProject['description'])); ?></p>
+                        
+                        <?php if ($viewProject['project_website']): ?>
+                        <p><strong>Website:</strong> <a href="<?php echo e($viewProject['project_website']); ?>" target="_blank"><?php echo e($viewProject['project_website']); ?></a></p>
+                        <?php endif; ?>
+                        
+                        <p><strong>Project Lead:</strong> <?php echo e($viewProject['project_lead_name']); ?></p>
+                        <p><strong>Lead Email:</strong> <?php echo e($viewProject['project_lead_email']); ?></p>
+                        <p><strong>Created:</strong> <?php echo formatDate($viewProject['created_at']); ?></p>
                     </div>
                 </div>
 
@@ -207,54 +189,35 @@ include '../../templates/header.php';
                     </div>
                     <div class="card-body">
                         <?php if (empty($teamMembers)): ?>
-                            <p class="text-muted mb-0">No team members yet.</p>
+                            <p class="text-muted">No team members yet.</p>
                         <?php else: ?>
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>Name</th>
-                                            <th>Email</th>
-                                            <th>Role</th>
-                                            <th>Added</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php foreach ($teamMembers as $member): ?>
-                                        <tr>
-                                            <td><?php echo e($member['name']); ?></td>
-                                            <td><?php echo e($member['email']); ?></td>
-                                            <td><?php echo e($member['role']); ?></td>
-                                            <td><?php echo timeAgo($member['added_at']); ?></td>
-                                        </tr>
-                                        <?php endforeach; ?>
-                                    </tbody>
-                                </table>
+                            <div class="list-group">
+                                <?php foreach ($teamMembers as $member): ?>
+                                <div class="list-group-item">
+                                    <strong><?php echo e($member['name']); ?></strong> - <?php echo e($member['role']); ?>
+                                    <br><small class="text-muted"><?php echo e($member['email']); ?></small>
+                                </div>
+                                <?php endforeach; ?>
                             </div>
                         <?php endif; ?>
                     </div>
                 </div>
 
                 <!-- Mentors -->
-                <div class="card shadow">
+                <div class="card shadow mb-4">
                     <div class="card-header">
                         <h5 class="mb-0">Assigned Mentors (<?php echo count($mentors); ?>)</h5>
                     </div>
                     <div class="card-body">
                         <?php if (empty($mentors)): ?>
-                            <p class="text-muted mb-0">No mentors assigned yet.</p>
+                            <p class="text-muted">No mentors assigned yet.</p>
                         <?php else: ?>
-                            <div class="list-group list-group-flush">
+                            <div class="list-group">
                                 <?php foreach ($mentors as $mentor): ?>
                                 <div class="list-group-item">
-                                    <div class="d-flex align-items-center">
-                                        <img src="<?php echo getGravatar($mentor['email'], 50); ?>" class="rounded-circle me-3">
-                                        <div>
-                                            <h6 class="mb-0"><?php echo e($mentor['name']); ?></h6>
-                                            <small class="text-muted"><?php echo e($mentor['area_of_expertise']); ?></small>
-                                            <br><small>Joined: <?php echo timeAgo($mentor['assigned_at']); ?></small>
-                                        </div>
-                                    </div>
+                                    <strong><?php echo e($mentor['name']); ?></strong>
+                                    <br><small class="text-muted"><?php echo e($mentor['area_of_expertise']); ?></small>
+                                    <br><small>Joined: <?php echo formatDate($mentor['assigned_at']); ?></small>
                                 </div>
                                 <?php endforeach; ?>
                             </div>
@@ -265,35 +228,6 @@ include '../../templates/header.php';
 
             <!-- Sidebar -->
             <div class="col-lg-4">
-                <!-- Quick Stats -->
-                <div class="card shadow mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">Statistics</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-2">
-                            <strong>Team Members:</strong>
-                            <span class="float-end"><?php echo count($teamMembers); ?></span>
-                        </div>
-                        <div class="mb-2">
-                            <strong>Mentors:</strong>
-                            <span class="float-end"><?php echo count($mentors); ?></span>
-                        </div>
-                        <div class="mb-2">
-                            <strong>Resources:</strong>
-                            <span class="float-end"><?php echo $projectStats['resources']; ?></span>
-                        </div>
-                        <div class="mb-2">
-                            <strong>Assessments:</strong>
-                            <span class="float-end"><?php echo $projectStats['assessments']; ?></span>
-                        </div>
-                        <div>
-                            <strong>Learning Objectives:</strong>
-                            <span class="float-end"><?php echo $projectStats['learning']; ?></span>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Stage Management -->
                 <?php if ($viewProject['status'] === 'active'): ?>
                 <div class="card shadow mb-4">
@@ -318,92 +252,58 @@ include '../../templates/header.php';
                             </div>
                             
                             <button type="submit" class="btn btn-primary w-100">
-                                <i class="fas fa-save me-1"></i> Update Stage
+                                <i class="fas fa-sync-alt me-2"></i>Update Stage
                             </button>
                         </form>
                     </div>
                 </div>
                 <?php endif; ?>
 
-                <!-- Project Actions -->
-                <div class="card shadow">
+                <!-- Project Stats -->
+                <div class="card shadow mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Project Statistics</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Team Members:</strong> <?php echo count($teamMembers); ?></p>
+                        <p><strong>Mentors:</strong> <?php echo count($mentors); ?></p>
+                        <p><strong>Resources:</strong> <?php echo $projectStats['resources']; ?></p>
+                        <p><strong>Assessments:</strong> <?php echo $projectStats['assessments']; ?></p>
+                        <p class="mb-0"><strong>Learning Objectives:</strong> <?php echo $projectStats['learning']; ?></p>
+                    </div>
+                </div>
+
+                <!-- Terminate Project -->
+                <?php if ($viewProject['status'] === 'active'): ?>
+                <div class="card shadow border-danger">
                     <div class="card-header bg-danger text-white">
                         <h5 class="mb-0">Danger Zone</h5>
                     </div>
                     <div class="card-body">
-                        <?php if ($viewProject['status'] === 'active'): ?>
-                        <p class="small text-muted">Terminate this project if it should no longer continue.</p>
+                        <p class="text-danger">This action cannot be undone.</p>
                         <button class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#terminateModal">
-                            <i class="fas fa-ban me-1"></i> Terminate Project
+                            <i class="fas fa-ban me-2"></i>Terminate Project
                         </button>
-                        <?php elseif ($viewProject['status'] === 'terminated'): ?>
-                        <div class="alert alert-danger mb-0">
-                            <strong>Terminated</strong><br>
-                            <small>Reason: <?php echo e($viewProject['termination_reason']); ?></small>
-                        </div>
-                        <?php else: ?>
-                        <p class="text-muted mb-0">Project is <?php echo $viewProject['status']; ?></p>
-                        <?php endif; ?>
                     </div>
                 </div>
+                <?php endif; ?>
             </div>
         </div>
 
-        <!-- Terminate Modal -->
-        <div class="modal fade" id="terminateModal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header bg-danger text-white">
-                        <h5 class="modal-title">Terminate Project</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                    </div>
-                    <form method="POST">
-                        <?php echo Validator::csrfInput(); ?>
-                        <input type="hidden" name="action" value="terminate">
-                        <input type="hidden" name="project_id" value="<?php echo $viewProject['project_id']; ?>">
-                        
-                        <div class="modal-body">
-                            <div class="alert alert-warning">
-                                <i class="fas fa-exclamation-triangle me-2"></i>
-                                <strong>Warning:</strong> This action will terminate the project. This cannot be easily undone.
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label class="form-label">Reason for Termination <span class="text-danger">*</span></label>
-                                <textarea name="termination_reason" class="form-control" rows="3" required></textarea>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-danger">Terminate Project</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+        <!-- ✅ COMMENTS SECTION ADDED HERE -->
+        <?php include '../../templates/comments-section.php'; ?>
 
     <?php else: ?>
         <!-- Projects List View -->
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h1 class="h3 mb-0">Project Management</h1>
-                <p class="text-muted">Manage all innovation projects</p>
-            </div>
-            <a href="index.php" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
-            </a>
+            <h1 class="h3 mb-0">Project Management</h1>
         </div>
 
         <!-- Filters -->
         <div class="card shadow mb-4">
             <div class="card-body">
-                <form method="GET" class="row align-items-end">
-                    <div class="col-md-4 mb-2">
-                        <label class="form-label small">Search:</label>
-                        <input type="text" name="search" class="form-control" value="<?php echo e($searchQuery); ?>" placeholder="Project name or lead...">
-                    </div>
-                    <div class="col-md-3 mb-2">
-                        <label class="form-label small">Status:</label>
+                <form method="GET" class="row g-3">
+                    <div class="col-md-3">
                         <select name="status" class="form-select">
                             <option value="all" <?php echo $statusFilter === 'all' ? 'selected' : ''; ?>>All Status</option>
                             <option value="active" <?php echo $statusFilter === 'active' ? 'selected' : ''; ?>>Active</option>
@@ -411,8 +311,7 @@ include '../../templates/header.php';
                             <option value="terminated" <?php echo $statusFilter === 'terminated' ? 'selected' : ''; ?>>Terminated</option>
                         </select>
                     </div>
-                    <div class="col-md-3 mb-2">
-                        <label class="form-label small">Stage:</label>
+                    <div class="col-md-3">
                         <select name="stage" class="form-select">
                             <option value="all" <?php echo $stageFilter === 'all' ? 'selected' : ''; ?>>All Stages</option>
                             <?php for ($i = 1; $i <= 6; $i++): ?>
@@ -420,11 +319,11 @@ include '../../templates/header.php';
                             <?php endfor; ?>
                         </select>
                     </div>
-                    <div class="col-md-2 mb-2">
+                    <div class="col-md-4">
+                        <input type="text" name="search" class="form-control" placeholder="Search projects..." value="<?php echo e($searchQuery); ?>">
+                    </div>
+                    <div class="col-md-2">
                         <button type="submit" class="btn btn-primary w-100">Filter</button>
-                        <?php if ($statusFilter !== 'all' || $stageFilter !== 'all' || !empty($searchQuery)): ?>
-                            <a href="projects.php" class="btn btn-sm btn-outline-secondary w-100 mt-1">Clear</a>
-                        <?php endif; ?>
                     </div>
                 </form>
             </div>
@@ -432,19 +331,15 @@ include '../../templates/header.php';
 
         <!-- Projects Table -->
         <div class="card shadow">
-            <div class="card-header">
-                <h5 class="mb-0">Projects (<?php echo count($projects); ?>)</h5>
-            </div>
             <div class="card-body">
                 <?php if (empty($projects)): ?>
-                    <p class="text-muted text-center py-4 mb-0">No projects found matching your filters.</p>
+                    <p class="text-muted text-center py-4">No projects found.</p>
                 <?php else: ?>
                     <div class="table-responsive">
                         <table class="table table-hover">
                             <thead>
                                 <tr>
                                     <th>Project Name</th>
-                                    <th>Lead</th>
                                     <th>Stage</th>
                                     <th>Status</th>
                                     <th>Team</th>
@@ -456,15 +351,8 @@ include '../../templates/header.php';
                             <tbody>
                                 <?php foreach ($projects as $project): ?>
                                 <tr>
-                                    <td>
-                                        <a href="projects.php?id=<?php echo $project['project_id']; ?>">
-                                            <?php echo e($project['project_name']); ?>
-                                        </a>
-                                    </td>
-                                    <td><?php echo e($project['project_lead_name']); ?></td>
-                                    <td>
-                                        <span class="badge bg-primary">Stage <?php echo $project['current_stage']; ?></span>
-                                    </td>
+                                    <td><strong><?php echo e($project['project_name']); ?></strong></td>
+                                    <td><span class="badge bg-primary">Stage <?php echo $project['current_stage']; ?></span></td>
                                     <td>
                                         <span class="badge bg-<?php echo $project['status'] === 'active' ? 'success' : ($project['status'] === 'completed' ? 'info' : 'danger'); ?>">
                                             <?php echo ucfirst($project['status']); ?>
@@ -472,10 +360,10 @@ include '../../templates/header.php';
                                     </td>
                                     <td><?php echo $project['team_count']; ?></td>
                                     <td><?php echo $project['mentor_count']; ?></td>
-                                    <td><small><?php echo formatDate($project['created_at'], 'M d, Y'); ?></small></td>
+                                    <td><?php echo formatDate($project['created_at']); ?></td>
                                     <td>
-                                        <a href="projects.php?id=<?php echo $project['project_id']; ?>" class="btn btn-sm btn-primary">
-                                            <i class="fas fa-eye"></i>
+                                        <a href="?id=<?php echo $project['project_id']; ?>" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-eye"></i> View
                                         </a>
                                     </td>
                                 </tr>

@@ -310,20 +310,38 @@ include '../../templates/header.php';
                                 <?php echo timeAgo($resource['created_at']); ?>
                             </small>
                         </div>
-                        <div class="card-footer bg-white">
+                            <div class="card-footer bg-white">
+                            <?php 
+                            // Check if we have URL, file, or both
+                            $hasUrl = !empty($resource['resource_url']) && trim($resource['resource_url']) !== '';
+                            $hasFile = !empty($resource['file_path']) && trim($resource['file_path']) !== '';
+                            ?>
+                            
                             <div class="d-flex gap-2">
-                                <?php if ($resource['resource_url']): ?>
+                                <?php if ($hasUrl && $hasFile): ?>
+                                    <!-- Both URL and File available - show both buttons side by side -->
+                                    <a href="<?php echo e($resource['resource_url']); ?>" target="_blank" class="btn btn-sm btn-primary flex-fill">
+                                        <i class="fas fa-external-link-alt me-1"></i> View Link
+                                    </a>
+                                    <a href="../../assets/uploads/resources/<?php echo e($resource['file_path']); ?>" target="_blank" class="btn btn-sm btn-success flex-fill">
+                                        <i class="fas fa-download me-1"></i> Download
+                                    </a>
+                                <?php elseif ($hasUrl): ?>
+                                    <!-- Only URL available -->
                                     <a href="<?php echo e($resource['resource_url']); ?>" target="_blank" class="btn btn-sm btn-primary flex-fill">
                                         <i class="fas fa-external-link-alt me-1"></i> View
                                     </a>
-                                <?php elseif ($resource['file_path']): ?>
+                                <?php elseif ($hasFile): ?>
+                                    <!-- Only File available -->
                                     <a href="../../assets/uploads/resources/<?php echo e($resource['file_path']); ?>" target="_blank" class="btn btn-sm btn-primary flex-fill">
                                         <i class="fas fa-download me-1"></i> Download
                                     </a>
                                 <?php endif; ?>
+                                
+                                <!-- Delete button always present for mentor's own resources -->
                                 <a href="resources.php?delete=<?php echo $resource['resource_id']; ?>" 
                                    class="btn btn-sm btn-outline-danger"
-                                   onclick="return confirm('Are you sure you want to delete this resource?')">
+                                   onclick="return confirm('Are you sure you want to delete this resource?');">
                                     <i class="fas fa-trash"></i>
                                 </a>
                             </div>

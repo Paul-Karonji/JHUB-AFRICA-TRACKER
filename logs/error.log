@@ -14,3 +14,143 @@ Params: [2,22]
 SQL: UPDATE projects SET current_stage = ? WHERE project_id = ?
 Params: [2,22]
 ---
+Uncaught exception: Undefined constant "ADMIN_NOTIFICATION_EMAIL" in C:\xampp\htdocs\jhub-africa-tracker\public\contact.php on line 41Uncaught exception: Undefined constant "ADMIN_NOTIFICATION_EMAIL" in C:\xampp\htdocs\jhub-africa-tracker\public\contact.php on line 41Uncaught exception: Undefined constant "ADMIN_NOTIFICATION_EMAIL" in C:\xampp\htdocs\jhub-africa-tracker\public\contact.php on line 41Uncaught exception: Cannot access offset of type string on string in C:\xampp\htdocs\jhub-africa-tracker\classes\EmailService.php on line 802025-10-08 11:32:47 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'project_id' in 'field list'
+SQL: UPDATE projects SET current_stage = ? WHERE project_id = ?
+Params: [2,24]
+---
+2025-10-08 11:34:00 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'project_id' in 'field list'
+SQL: UPDATE projects SET current_stage = ? WHERE project_id = ?
+Params: [2,24]
+---
+2025-10-08 11:34:05 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'project_id' in 'field list'
+SQL: UPDATE projects SET current_stage = ? WHERE project_id = ?
+Params: [2,24]
+---
+2025-10-08 11:36:20 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'project_id' in 'field list'
+SQL: UPDATE projects SET current_stage = ? WHERE project_id = ?
+Params: [2,1]
+---
+2025-10-08 11:36:55 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'project_id' in 'field list'
+SQL: UPDATE projects SET current_stage = ? WHERE project_id = ?
+Params: [2,1]
+---
+2025-10-08 11:36:57 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'project_id' in 'field list'
+SQL: UPDATE projects SET current_stage = ? WHERE project_id = ?
+Params: [2,1]
+---
+2025-10-08 11:36:58 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'project_id' in 'field list'
+SQL: UPDATE projects SET current_stage = ? WHERE project_id = ?
+Params: [2,1]
+---
+2025-10-08 11:36:59 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'project_id' in 'field list'
+SQL: UPDATE projects SET current_stage = ? WHERE project_id = ?
+Params: [2,1]
+---
+2025-10-08 11:36:59 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'project_id' in 'field list'
+SQL: UPDATE projects SET current_stage = ? WHERE project_id = ?
+Params: [2,1]
+---
+2025-10-08 11:36:59 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'project_id' in 'field list'
+SQL: UPDATE projects SET current_stage = ? WHERE project_id = ?
+Params: [2,1]
+---
+2025-10-08 11:36:59 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'project_id' in 'field list'
+SQL: UPDATE projects SET current_stage = ? WHERE project_id = ?
+Params: [2,1]
+---
+2025-10-08 11:36:59 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'project_id' in 'field list'
+SQL: UPDATE projects SET current_stage = ? WHERE project_id = ?
+Params: [2,1]
+---
+2025-10-08 11:37:00 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'project_id' in 'field list'
+SQL: UPDATE projects SET current_stage = ? WHERE project_id = ?
+Params: [2,1]
+---
+2025-10-08 11:37:00 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'project_id' in 'field list'
+SQL: UPDATE projects SET current_stage = ? WHERE project_id = ?
+Params: [2,1]
+---
+2025-10-08 11:37:00 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'project_id' in 'field list'
+SQL: UPDATE projects SET current_stage = ? WHERE project_id = ?
+Params: [2,1]
+---
+2025-10-08 11:37:00 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'project_id' in 'field list'
+SQL: UPDATE projects SET current_stage = ? WHERE project_id = ?
+Params: [2,1]
+---
+2025-10-08 11:37:00 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'project_id' in 'field list'
+SQL: UPDATE projects SET current_stage = ? WHERE project_id = ?
+Params: [2,1]
+---
+2025-10-08 11:43:01 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'project_id' in 'field list'
+SQL: UPDATE projects SET current_stage = ? WHERE project_id = ?
+Params: [2,1]
+---
+2025-10-08 11:43:04 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'project_id' in 'field list'
+SQL: UPDATE projects SET current_stage = ? WHERE project_id = ?
+Params: [2,1]
+---
+2025-10-08 15:22:24 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'project_id' in 'field list'
+SQL: UPDATE projects SET current_stage = ? WHERE project_id = ?
+Params: [2,1]
+---
+Error [2]: include(../../templates/comments-section.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\jhub-africa-tracker\dashboards\admin\projects.php on line 294Error [2]: include(): Failed opening '../../templates/comments-section.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\jhub-africa-tracker\dashboards\admin\projects.php on line 2942025-10-08 16:47:19 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'project_id' in 'field list'
+SQL: INSERT INTO activity_logs (user_type, user_id, action, description, ip_address, user_agent, project_id, additional_data) VALUES (:user_type, :user_id, :action, :description, :ip_address, :user_agent, :project_id, :additional_data)
+Params: {"user_type":"admin","user_id":1,"action":"comment_posted","description":"Posted comment on project: mambo","ip_address":"::1","user_agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/140.0.0.0 Safari\/537.36","project_id":22,"additional_data":"{\"comment_id\":\"2\"}"}
+---
+2025-10-08 16:53:26 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'project_id' in 'field list'
+SQL: INSERT INTO activity_logs (user_type, user_id, action, description, ip_address, user_agent, project_id, additional_data) VALUES (:user_type, :user_id, :action, :description, :ip_address, :user_agent, :project_id, :additional_data)
+Params: {"user_type":"mentor","user_id":9,"action":"comment_posted","description":"Posted comment on project: mambo","ip_address":"::1","user_agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/140.0.0.0 Safari\/537.36","project_id":22,"additional_data":"{\"comment_id\":\"3\"}"}
+---
+Error [2]: Undefined array key "expertise" in C:\xampp\htdocs\jhub-africa-tracker\public\project-details.php on line 401Error [8192]: htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp\htdocs\jhub-africa-tracker\includes\helpers.php on line 1432025-10-08 17:05:27 - Database Error: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'as team_count,
+               (SELECT COUNT(*) FROM project_mentors WHERE pr...' at line 1
+SQL: 
+    
+               (SELECT COUNT(*) FROM project_innovators WHERE project_id = p.project_id AND is_active = 1) as team_count,
+               (SELECT COUNT(*) FROM project_mentors WHERE project_id = p.project_id AND is_active = 1) as mentor_count
+        FROM projects p
+        INNER JOIN project_mentors pm ON p.project_id = pm.project_id
+        WHERE pm.mentor_id = ? AND pm.is_active = 1
+        ORDER BY p.updated_at DESC
+    
+Params: [9]
+---
+2025-10-08 17:05:32 - Database Error: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'as team_count,
+               (SELECT COUNT(*) FROM project_mentors WHERE pr...' at line 1
+SQL: 
+    
+               (SELECT COUNT(*) FROM project_innovators WHERE project_id = p.project_id AND is_active = 1) as team_count,
+               (SELECT COUNT(*) FROM project_mentors WHERE project_id = p.project_id AND is_active = 1) as mentor_count
+        FROM projects p
+        INNER JOIN project_mentors pm ON p.project_id = pm.project_id
+        WHERE pm.mentor_id = ? AND pm.is_active = 1
+        ORDER BY p.updated_at DESC
+    
+Params: [9]
+---
+2025-10-08 17:05:33 - Database Error: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'as team_count,
+               (SELECT COUNT(*) FROM project_mentors WHERE pr...' at line 1
+SQL: 
+    
+               (SELECT COUNT(*) FROM project_innovators WHERE project_id = p.project_id AND is_active = 1) as team_count,
+               (SELECT COUNT(*) FROM project_mentors WHERE project_id = p.project_id AND is_active = 1) as mentor_count
+        FROM projects p
+        INNER JOIN project_mentors pm ON p.project_id = pm.project_id
+        WHERE pm.mentor_id = ? AND pm.is_active = 1
+        ORDER BY p.updated_at DESC
+    
+Params: [9]
+---
+2025-10-08 17:05:34 - Database Error: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'as team_count,
+               (SELECT COUNT(*) FROM project_mentors WHERE pr...' at line 1
+SQL: 
+    
+               (SELECT COUNT(*) FROM project_innovators WHERE project_id = p.project_id AND is_active = 1) as team_count,
+               (SELECT COUNT(*) FROM project_mentors WHERE project_id = p.project_id AND is_active = 1) as mentor_count
+        FROM projects p
+        INNER JOIN project_mentors pm ON p.project_id = pm.project_id
+        WHERE pm.mentor_id = ? AND pm.is_active = 1
+        ORDER BY p.updated_at DESC
+    
+Params: [9]
+---

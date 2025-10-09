@@ -18,7 +18,21 @@ require_once __DIR__ . '/../classes/Database.php';
 require_once __DIR__ . '/../classes/Auth.php';
 require_once __DIR__ . '/../classes/Validator.php';
 
+// --- Email Configuration (Final Production Setup) ---
+if (!defined('SMTP_HOST')) define('SMTP_HOST', 'smtp.gmail.com');
+if (!defined('SMTP_PORT')) define('SMTP_PORT', 587);
+if (!defined('SMTP_USERNAME')) define('SMTP_USERNAME', 'info.jhub@jkuat.ac.ke');
+if (!defined('SMTP_PASSWORD')) define('SMTP_PASSWORD', ''); // Gmail App Password
+if (!defined('SMTP_ENCRYPTION')) define('SMTP_ENCRYPTION', 'tls');
+if (!defined('SMTP_FROM_EMAIL')) define('SMTP_FROM_EMAIL', 'info.jhub@jkuat.ac.ke');
+if (!defined('SMTP_FROM_NAME')) define('SMTP_FROM_NAME', 'JHUB AFRICA');
+if (!defined('EMAIL_ENABLED')) define('EMAIL_ENABLED', true);
+if (!defined('EMAIL_DEBUG')) define('EMAIL_DEBUG', 0);
 
+if (!defined('ADMIN_NOTIFICATION_EMAIL')) define('ADMIN_NOTIFICATION_EMAIL', 'info.jhub@jkuat.ac.ke');
+if (!defined('EMAIL_TEMPLATES_DIR')) define('EMAIL_TEMPLATES_DIR', __DIR__ . '/../templates/emails/');
+
+if (!defined('ADMIN_NOTIFICATION_EMAIL')) define('ADMIN_NOTIFICATION_EMAIL', 'info.jhub@jkuat.ac.ke');
 
 // Load EmailService class (now PHPMailer will be available)
 require_once __DIR__ . '/../classes/EmailService.php';
@@ -47,7 +61,14 @@ function customErrorHandler($severity, $message, $file, $line) {
     
     $errorMessage = "Error [{$severity}]: {$message} in {$file} on line {$line}";
     
-    if (DEBUG_MODE) {
+    // ✅ FIX FOR ERROR #2: Don't output HTML in API/JSON contexts
+    $isApiRequest = (
+        strpos($_SERVER['REQUEST_URI'] ?? '', '/api/') !== false ||
+        strpos($_SERVER['SCRIPT_NAME'] ?? '', '/api/') !== false ||
+        (isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false)
+    );
+    
+    if (DEBUG_MODE && !$isApiRequest) {
         echo "<div style='background: #ffebee; color: #c62828; padding: 10px; margin: 10px; border: 1px solid #e57373; border-radius: 4px;'>";
         echo "<strong>Debug Error:</strong> " . htmlspecialchars($errorMessage);
         echo "</div>";
@@ -61,7 +82,14 @@ function customErrorHandler($severity, $message, $file, $line) {
 function customExceptionHandler($exception) {
     $errorMessage = "Uncaught exception: " . $exception->getMessage() . " in " . $exception->getFile() . " on line " . $exception->getLine();
     
-    if (DEBUG_MODE) {
+    // ✅ FIX FOR ERROR #2: Don't output HTML in API/JSON contexts
+    $isApiRequest = (
+        strpos($_SERVER['REQUEST_URI'] ?? '', '/api/') !== false ||
+        strpos($_SERVER['SCRIPT_NAME'] ?? '', '/api/') !== false ||
+        (isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false)
+    );
+    
+    if (DEBUG_MODE && !$isApiRequest) {
         echo "<div style='background: #ffebee; color: #c62828; padding: 10px; margin: 10px; border: 1px solid #e57373; border-radius: 4px;'>";
         echo "<strong>Debug Exception:</strong> " . htmlspecialchars($errorMessage);
         echo "<pre>" . htmlspecialchars($exception->getTraceAsString()) . "</pre>";
