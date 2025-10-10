@@ -58,7 +58,252 @@ body {
     padding: 2rem 0;
     min-height: calc(100vh - 140px); /* Account for navbar and footer */
 }
+/* ========================================
+   LOGO STYLING - Add to assets/css/main.css
+   ======================================== */
 
+/* Logo Container - Sidebar (Dashboard Pages) */
+.sidebar-brand {
+    padding: 15px 20px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.sidebar-brand .logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sidebar-brand img {
+    max-width: 180px;
+    height: auto;
+    max-height: 60px;
+    object-fit: contain;
+    transition: all 0.3s ease;
+}
+
+/* Collapsed sidebar logo */
+.sidebar.collapsed .sidebar-brand img {
+    max-width: 50px;
+    max-height: 50px;
+}
+
+.sidebar.collapsed .sidebar-brand {
+    padding: 15px 10px;
+}
+
+/* Logo fallback text */
+.sidebar-brand .logo-fallback {
+    color: white;
+    font-size: 1.2rem;
+    font-weight: bold;
+    display: none;
+}
+
+/* Show fallback if image fails */
+.sidebar-brand img[style*="display: none"] + .logo-fallback {
+    display: block;
+}
+
+
+/* ========================================
+   NAVBAR LOGO STYLING (Public Pages)
+   ======================================== */
+
+/* Navbar brand logo */
+.navbar-brand {
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+}
+
+.navbar-brand .logo-img {
+    max-height: 50px;
+    height: auto;
+    width: auto;
+    max-width: 200px;
+    object-fit: contain;
+    transition: all 0.3s ease;
+}
+
+.navbar-brand:hover .logo-img {
+    opacity: 0.9;
+    transform: scale(1.02);
+}
+
+/* Responsive navbar logo */
+@media (max-width: 768px) {
+    .navbar-brand .logo-img {
+        max-height: 40px;
+        max-width: 150px;
+    }
+}
+
+@media (max-width: 576px) {
+    .navbar-brand .logo-img {
+        max-height: 35px;
+        max-width: 130px;
+    }
+}
+
+
+/* ========================================
+   AUTH PAGES LOGO STYLING
+   ======================================== */
+
+.auth-logo-container {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.auth-logo-container img {
+    max-width: 220px;
+    height: auto;
+    max-height: 80px;
+    object-fit: contain;
+}
+
+/* Icon-based auth logo (when using FA icons as fallback) */
+.auth-logo {
+    margin-bottom: 1.5rem;
+}
+
+.auth-logo i {
+    font-size: 3rem;
+    color: var(--primary-color);
+}
+
+
+/* ========================================
+   APPLICATION PAGE HERO LOGO
+   ======================================== */
+
+.application-hero .logo-container {
+    margin-bottom: 1.5rem;
+}
+
+.application-hero .logo-img {
+    max-width: 250px;
+    height: auto;
+    max-height: 90px;
+    object-fit: contain;
+}
+
+@media (max-width: 768px) {
+    .application-hero .logo-img {
+        max-width: 200px;
+        max-height: 70px;
+    }
+}
+
+
+/* ========================================
+   FOOTER LOGO STYLING
+   ======================================== */
+
+.footer-logo {
+    max-width: 180px;
+    height: auto;
+    max-height: 60px;
+    object-fit: contain;
+    margin-bottom: 1rem;
+}
+
+
+/* ========================================
+   GENERAL LOGO UTILITIES
+   ======================================== */
+
+.logo-responsive {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+.logo-center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.logo-white-bg {
+    background: white;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+/* Print-friendly logo */
+@media print {
+    .sidebar-brand img,
+    .navbar-brand .logo-img {
+        max-height: 40px;
+    }
+}
+
+
+/* ========================================
+   MOBILE OPTIMIZATIONS
+   ======================================== */
+
+@media (max-width: 992px) {
+    /* Sidebar logo on tablet */
+    .sidebar-brand img {
+        max-width: 160px;
+        max-height: 55px;
+    }
+}
+
+@media (max-width: 576px) {
+    /* Sidebar logo on mobile */
+    .sidebar-brand img {
+        max-width: 140px;
+        max-height: 45px;
+    }
+    
+    .sidebar-brand {
+        padding: 12px 15px;
+    }
+}
+
+
+/* ========================================
+   LOADING STATE FOR LOGO
+   ======================================== */
+
+.logo-loading {
+    display: inline-block;
+    width: 200px;
+    height: 60px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+    border-radius: 4px;
+}
+
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+
+/* ========================================
+   HIGH DPI DISPLAY OPTIMIZATION
+   ======================================== */
+
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    /* Logo appears crisp on retina displays */
+    .sidebar-brand img,
+    .navbar-brand .logo-img {
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
+    }
+}
 /* ========================================
    NAVIGATION STYLES
    ======================================== */

@@ -154,3 +154,16 @@ SQL:
     
 Params: [9]
 ---
+2025-10-09 17:04:07 - Database Error: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'as team_count,
+               (SELECT COUNT(*) FROM project_mentors WHERE pr...' at line 1
+SQL: 
+    
+               (SELECT COUNT(*) FROM project_innovators WHERE project_id = p.project_id AND is_active = 1) as team_count,
+               (SELECT COUNT(*) FROM project_mentors WHERE project_id = p.project_id AND is_active = 1) as mentor_count
+        FROM projects p
+        INNER JOIN project_mentors pm ON p.project_id = pm.project_id
+        WHERE pm.mentor_id = ? AND pm.is_active = 1
+        ORDER BY p.updated_at DESC
+    
+Params: [9]
+---
