@@ -275,12 +275,28 @@ include '../../templates/header.php';
                                             By: <?php echo e($resource['mentor_name']); ?> • <?php echo timeAgo($resource['created_at']); ?>
                                         </small>
                                     </div>
-                                    <div>
-                                        <?php if ($resource['resource_url']): ?>
+                                      <div>
+                                        <?php 
+                                        // Check if we have URL, file, or both
+                                        $hasUrl = !empty($resource['resource_url']) && trim($resource['resource_url']) !== '';
+                                        $hasFile = !empty($resource['file_path']) && trim($resource['file_path']) !== '';
+                                        ?>
+                                        
+                                        <?php if ($hasUrl && $hasFile): ?>
+                                            <!-- Both available - show both buttons -->
+                                            <div class="btn-group">
+                                                <a href="<?php echo e($resource['resource_url']); ?>" target="_blank" class="btn btn-sm btn-outline-primary" title="View Link">
+                                                    <i class="fas fa-external-link-alt"></i>
+                                                </a>
+                                                <a href="../../assets/uploads/resources/<?php echo e($resource['file_path']); ?>" target="_blank" class="btn btn-sm btn-outline-success" title="Download File">
+                                                    <i class="fas fa-download"></i>
+                                                </a>
+                                            </div>
+                                        <?php elseif ($hasUrl): ?>
                                             <a href="<?php echo e($resource['resource_url']); ?>" target="_blank" class="btn btn-sm btn-outline-primary">
                                                 <i class="fas fa-external-link-alt"></i>
                                             </a>
-                                        <?php elseif ($resource['file_path']): ?>
+                                        <?php elseif ($hasFile): ?>
                                             <a href="../../assets/uploads/resources/<?php echo e($resource['file_path']); ?>" target="_blank" class="btn btn-sm btn-outline-primary">
                                                 <i class="fas fa-download"></i>
                                             </a>

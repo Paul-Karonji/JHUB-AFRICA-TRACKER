@@ -1,18 +1,5 @@
 <?php
-/**
- * api/applications/review.php
- * Admin Application Review API - COMPLETE DEBUGGED VERSION
- * 
- * FIXES:
- * 1. Proper error handling with JSON responses
- * 2. Clean output buffering
- * 3. Detailed error logging
- * 4. Transaction safety
- */
 
-// ========================================
-// CRITICAL: Clean all output first
-// ========================================
 while (ob_get_level()) {
     ob_end_clean();
 }
@@ -255,21 +242,27 @@ try {
             ]);
 
             // 3. Build and send rejection email
-            $emailContent = buildRejectionEmail($application, $rejectionReason, $adminMessage);
-
-            try {
-                sendEmailNotification(
-                    $application['project_lead_email'],
-                    'Update on Your JHUB AFRICA Application',
-                    $emailContent,
-                    'application_rejected',
-                    []
-                );
-            } catch (Exception $e) {
-                // Log email error but don't fail the rejection
-                error_log('Email send failed: ' . $e->getMessage());
-            }
-
+           try {
+    // Initialize EmailService if not already
+    if (!isset($emailService)) {
+        $emailService = new EmailService($database);
+    }
+    
+    $emailService->sendTemplateEmail(
+        $application['project_lead_email'],
+        'application_rejected',
+        [
+            'applicant_name' => $application['project_lead_name'],
+            'project_name' => $application['project_name'],
+            'application_id' => 'APP-' . str_pad($applicationId, 6, '0', STR_PAD_LEFT),
+            'review_date' => date('F j, Y'),
+            'rejection_reason' => $rejectionReason . (!empty($adminMessage) ? "\n\n" . $adminMessage : '')
+        ]
+    );
+} catch (Exception $e) {
+    // Log email error but don't fail the rejection
+    error_log('Rejection email failed: ' . $e->getMessage());
+}
             // Commit transaction
             $database->commit();
 

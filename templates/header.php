@@ -34,6 +34,10 @@ if ($currentUserType === USER_TYPE_ADMIN) {
 // Get base URL
 $baseUrl = SITE_URL ?? 'http://localhost/jhub-africa-tracker';
 $pageTitle = isset($pageTitle) ? $pageTitle . ' - ' . SITE_NAME : SITE_NAME;
+
+// Logo path configuration - CENTRALIZED
+$logoPath = $baseUrl . '/assets/images/logo/JHUB Africa Logo.png';
+$logoAlt = 'JHUB AFRICA - Innovations for Transformation';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -99,17 +103,50 @@ $pageTitle = isset($pageTitle) ? $pageTitle . ' - ' . SITE_NAME : SITE_NAME;
             width: 80px;
         }
         
+        /* UPDATED: Logo Styles */
         .sidebar-brand {
-            padding: 20px;
+            padding: 15px 20px;
             text-align: center;
             border-bottom: 1px solid rgba(255,255,255,0.1);
-            font-size: 1.2rem;
-            font-weight: bold;
+            background: rgba(255, 255, 255, 0.05);
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .sidebar-brand .logo-container {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .sidebar-brand img {
-            max-width: 100%;
+            max-width: 180px;
             height: auto;
+            max-height: 60px;
+            object-fit: contain;
+            transition: all 0.3s ease;
+            display: block;
+        }
+        
+        .sidebar.collapsed .sidebar-brand img {
+            max-width: 50px;
+            max-height: 50px;
+        }
+        
+        .sidebar.collapsed .sidebar-brand {
+            padding: 15px 10px;
+        }
+        
+        /* Logo fallback */
+        .sidebar-brand .logo-fallback {
+            color: white;
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-align: center;
+            line-height: 1.3;
         }
         
         .sidebar-nav {
@@ -203,41 +240,24 @@ $pageTitle = isset($pageTitle) ? $pageTitle . ' - ' . SITE_NAME : SITE_NAME;
             color: var(--project-color);
         }
         
-        /* Cards */
-        .card {
+        /* Mobile Menu Toggle */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
             border: none;
-            box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
-            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            color: #333;
+            cursor: pointer;
         }
         
-        .border-left-primary {
-            border-left: 4px solid #2c409a !important;
-        }
-        
-        .border-left-success {
-            border-left: 4px solid #3fa845 !important;
-        }
-        
-        .border-left-info {
-            border-left: 4px solid #253683 !important;
-        }
-        
-        .border-left-warning {
-            border-left: 4px solid #f6c23e !important;
-        }
-        
-        .border-left-danger {
-            border-left: 4px solid #e74a3b !important;
-        }
-        
-        /* Mobile Responsive */
-        @media (max-width: 768px) {
+        /* Responsive Design */
+        @media (max-width: 992px) {
             .sidebar {
-                transform: translateX(-250px);
+                margin-left: -250px;
             }
             
             .sidebar.show {
-                transform: translateX(0);
+                margin-left: 0;
             }
             
             .main-content {
@@ -245,53 +265,52 @@ $pageTitle = isset($pageTitle) ? $pageTitle . ' - ' . SITE_NAME : SITE_NAME;
             }
             
             .mobile-menu-toggle {
-                display: block !important;
+                display: block;
+            }
+            
+            /* Adjust logo for tablet */
+            .sidebar-brand img {
+                max-width: 160px;
+                max-height: 55px;
             }
         }
         
-        .mobile-menu-toggle {
-            display: none;
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
-        
-        /* Loading Spinner */
-        .spinner-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-        }
-        
-        .spinner-overlay.show {
-            display: flex;
+        @media (max-width: 576px) {
+            .content-wrapper {
+                padding: 15px;
+            }
+            
+            .top-navbar {
+                padding: 10px 15px;
+            }
+            
+            /* Adjust logo for mobile */
+            .sidebar-brand img {
+                max-width: 140px;
+                max-height: 45px;
+            }
+            
+            .sidebar-brand {
+                padding: 12px 15px;
+                min-height: 70px;
+            }
         }
     </style>
 </head>
 <body class="<?php echo $userRoleClass; ?>">
-    
-    <!-- Loading Spinner -->
-    <div class="spinner-overlay" id="globalSpinner">
-        <div class="spinner-border text-light" role="status" style="width: 3rem; height: 3rem;">
-            <span class="visually-hidden">Loading...</span>
-        </div>
-    </div>
-
     <div class="main-wrapper">
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
+            <!-- Logo Section - UPDATED -->
             <div class="sidebar-brand">
-                <img src="<?php echo $baseUrl; ?>/assets/images/logo.png" alt="JHUB AFRICA" 
-                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                <span style="display: none;">JHUB AFRICA</span>
+                <a href="<?php echo $baseUrl . $dashboardLink; ?>" class="logo-container">
+                    <img src="<?php echo $logoPath; ?>" 
+                         alt="<?php echo $logoAlt; ?>"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                    <div class="logo-fallback" style="display: none;">
+                        JHUB<br>AFRICA
+                    </div>
+                </a>
             </div>
             
             <nav class="sidebar-nav">
@@ -336,25 +355,17 @@ $pageTitle = isset($pageTitle) ? $pageTitle . ' - ' . SITE_NAME : SITE_NAME;
                         <i class="fas fa-tachometer-alt"></i>
                         <span>Dashboard</span>
                     </a>
-                    <a href="<?php echo $baseUrl; ?>/dashboards/mentor/available-projects.php" class="nav-link">
-                        <i class="fas fa-search"></i>
-                        <span>Browse Projects</span>
+                    <a href="<?php echo $baseUrl; ?>/dashboards/mentor/projects.php" class="nav-link">
+                        <i class="fas fa-project-diagram"></i>
+                        <span>My Projects</span>
                     </a>
                     <a href="<?php echo $baseUrl; ?>/dashboards/mentor/resources.php" class="nav-link">
-                        <i class="fas fa-folder"></i>
+                        <i class="fas fa-book"></i>
                         <span>Resources</span>
-                    </a>
-                    <a href="<?php echo $baseUrl; ?>/dashboards/mentor/assessments.php" class="nav-link">
-                        <i class="fas fa-clipboard-check"></i>
-                        <span>Assessments</span>
-                    </a>
-                    <a href="<?php echo $baseUrl; ?>/dashboards/mentor/learning.php" class="nav-link">
-                        <i class="fas fa-graduation-cap"></i>
-                        <span>Learning</span>
                     </a>
                     <a href="<?php echo $baseUrl; ?>/dashboards/mentor/profile.php" class="nav-link">
                         <i class="fas fa-user"></i>
-                        <span>My Profile</span>
+                        <span>Profile</span>
                     </a>
                 
                 <?php elseif ($currentUserType === USER_TYPE_PROJECT): ?>
@@ -367,8 +378,12 @@ $pageTitle = isset($pageTitle) ? $pageTitle . ' - ' . SITE_NAME : SITE_NAME;
                         <i class="fas fa-users"></i>
                         <span>Team</span>
                     </a>
+                    <a href="<?php echo $baseUrl; ?>/dashboards/project/mentors.php" class="nav-link">
+                        <i class="fas fa-user-tie"></i>
+                        <span>Mentors</span>
+                    </a>
                     <a href="<?php echo $baseUrl; ?>/dashboards/project/resources.php" class="nav-link">
-                        <i class="fas fa-folder"></i>
+                        <i class="fas fa-book"></i>
                         <span>Resources</span>
                     </a>
                     <a href="<?php echo $baseUrl; ?>/dashboards/project/assessments.php" class="nav-link">
@@ -410,90 +425,49 @@ $pageTitle = isset($pageTitle) ? $pageTitle . ' - ' . SITE_NAME : SITE_NAME;
                     <button class="mobile-menu-toggle me-3" onclick="toggleSidebar()">
                         <i class="fas fa-bars"></i>
                     </button>
-                    <button class="btn btn-link text-dark" onclick="toggleSidebar()" title="Toggle Sidebar">
+                    <button class="btn btn-link text-dark d-none d-lg-block" onclick="toggleSidebar()" title="Toggle Sidebar">
                         <i class="fas fa-bars"></i>
                     </button>
                 </div>
                 
                 <div class="d-flex align-items-center gap-3">
-                    <!-- Notifications (placeholder) -->
+                    <!-- Notifications -->
                     <div class="dropdown">
-                        <button class="btn btn-link text-dark position-relative" type="button" 
-                                id="notificationDropdown" data-bs-toggle="dropdown">
+                        <button class="btn btn-link text-dark position-relative" type="button" data-bs-toggle="dropdown">
                             <i class="fas fa-bell"></i>
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" 
-                                  style="font-size: 0.6rem;">
-                                0
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                3
                             </span>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><h6 class="dropdown-header">Notifications</h6></li>
+                            <li><a class="dropdown-item" href="#">New application submitted</a></li>
+                            <li><a class="dropdown-item" href="#">Project update available</a></li>
+                            <li><a class="dropdown-item" href="#">Mentor assigned</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><span class="dropdown-item-text text-muted">No new notifications</span></li>
+                            <li><a class="dropdown-item text-center" href="#">View All</a></li>
                         </ul>
                     </div>
                     
-                    <!-- User Menu -->
+                    <!-- User Profile -->
                     <div class="dropdown">
-                        <button class="btn btn-link text-dark d-flex align-items-center text-decoration-none" 
-                                type="button" id="userDropdown" data-bs-toggle="dropdown">
-                            <img src="<?php echo getGravatar($currentUserName, 32); ?>" 
-                                 class="rounded-circle me-2" alt="User">
-                            <div class="text-start d-none d-md-block">
-                                <div class="fw-bold"><?php echo e($currentUserName); ?></div>
-                                <small class="user-badge"><?php echo $userRole; ?></small>
-                            </div>
-                            <i class="fas fa-chevron-down ms-2"></i>
+                        <button class="btn btn-link text-dark d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
+                            <span class="user-badge"><?php echo e($userRole); ?></span>
+                            <span class="d-none d-md-inline"><?php echo e($currentUserName); ?></span>
+                            <i class="fas fa-chevron-down"></i>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><h6 class="dropdown-header"><?php echo e($currentUserName); ?></h6></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="<?php echo $dashboardLink; ?>">
-                                <i class="fas fa-tachometer-alt me-2"></i> Dashboard
-                            </a></li>
-                            <?php if ($currentUserType === USER_TYPE_ADMIN): ?>
-                            <li><a class="dropdown-item" href="<?php echo $baseUrl; ?>/dashboards/admin/settings.php">
-                                <i class="fas fa-cog me-2"></i> Settings
-                            </a></li>
-                            <?php else: ?>
-                            <li><a class="dropdown-item" href="<?php echo $baseUrl; ?>/dashboards/<?php echo strtolower($userRole); ?>/profile.php">
-                                <i class="fas fa-user me-2"></i> My Profile
-                            </a></li>
-                            <?php endif; ?>
+                            <li><h6 class="dropdown-header">Account</h6></li>
+                            <li><a class="dropdown-item" href="<?php echo $baseUrl . $dashboardLink; ?>">Dashboard</a></li>
+                            <li><a class="dropdown-item" href="<?php echo $baseUrl; ?>/dashboards/<?php echo strtolower($userRole); ?>/profile.php">Profile</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item text-danger" href="<?php echo $baseUrl; ?>/auth/logout.php">
-                                <i class="fas fa-sign-out-alt me-2"></i> Logout
+                                <i class="fas fa-sign-out-alt me-2"></i>Logout
                             </a></li>
                         </ul>
                     </div>
                 </div>
             </nav>
 
-            <!-- Content Wrapper -->
+            <!-- Page Content -->
             <div class="content-wrapper">
-                <?php
-                // Display flash messages if any
-                if (isset($_SESSION['success_message'])):
-                ?>
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <i class="fas fa-check-circle me-2"></i>
-                    <?php echo e($_SESSION['success_message']); ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-                <?php
-                    unset($_SESSION['success_message']);
-                endif;
-
-                if (isset($_SESSION['error_message'])):
-                ?>
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <i class="fas fa-exclamation-triangle me-2"></i>
-                    <?php echo e($_SESSION['error_message']); ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-                <?php
-                    unset($_SESSION['error_message']);
-                endif;
-                ?>
-                
-                <!-- Main Content Goes Here -->

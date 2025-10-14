@@ -37,12 +37,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $emailBody .= "Subject: {$contactData['subject']}\n\n";
             $emailBody .= "Message:\n{$contactData['message']}\n";
             
+            // ✅ FIX: Remove $contactData parameter - it's not file attachments!
+            // The 5th parameter should be file attachments array, not contact data
+            // Contact data is already included in the $emailBody above
             if (sendEmailNotification(
                 ADMIN_NOTIFICATION_EMAIL,
                 'New Contact Form: ' . $contactData['subject'],
                 $emailBody,
-                'contact_form',
-                $contactData
+                'contact_form'  // ← Removed: $contactData (was line 45)
+                // If you need to attach files later, pass: [['path' => 'file.pdf', 'name' => 'doc.pdf']]
             )) {
                 $success = 'Thank you for contacting us! We will get back to you within 24-48 hours.';
                 $_POST = []; // Clear form

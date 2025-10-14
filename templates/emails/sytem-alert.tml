@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Notification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .email-container {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+        .header p {
+            margin: 10px 0 0 0;
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        
+        /* Alert Type Variations */
+        .header.alert-info {
+            background: linear-gradient(135deg, #17a2b8 0%, #117a8b 100%);
+        }
+        .header.alert-warning {
+            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+        }
+        .header.alert-danger {
+            background: linear-gradient(135deg, #dc3545 0%, #bd2130 100%);
+        }
+        .header.alert-success {
+            background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+        }
+        
+        .alert-badge {
+            padding: 12px 25px;
+            border-radius: 25px;
+            display: inline-block;
+            margin: 20px 0;
+            font-weight: bold;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+        .alert-badge.info {
+            background: #17a2b8;
+            color: white;
+        }
+        .alert-badge.warning {
+            background: #ffc107;
+            color: #333;
+        }
+        .alert-badge.danger {
+            background: #dc3545;
+            color: white;
+        }
+        .alert-badge.success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .alert-icon {
+            text-align: center;
+            font-size: 60px;
+            margin: 20px 0;
+        }
+        
+        .message-box {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 25px 0;
+            border-left: 4px solid #6c757d;
+        }
+        .message-box.info {
+            background: #e7f6f9;
+            border-left-color: #17a2b8;
+        }
+        .message-box.warning {
+            background: #fff3cd;
+            border-left-color: #ffc107;
+        }
+        .message-box.danger {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+        }
+        .message-box.success {
+            background: #d4edda;
+            border-left-color: #28a745;
+        }
+        
+        .message-box h3 {
+            margin-top: 0;
+            font-size: 18px;
+        }
+        .message-box.info h3 {
+            color: #0c5460;
+        }
+        .message-box.warning h3 {
+            color: #856404;
+        }
+        .message-box.danger h3 {
+            color: #721c24;
+        }
+        .message-box.success h3 {
+            color: #155724;
+        }
+        
+        .alert-details {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+        .alert-details h3 {
+            margin-top: 0;
+            color: #333;
+            font-size: 18px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+        .detail-row {
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: flex-start;
+        }
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        .detail-label {
+            font-weight: bold;
+            width: 140px;
+            color: #555;
+            flex-shrink: 0;
+        }
+        .detail-value {
+            flex: 1;
+            color: #333;
+        }
+        
+        .action-required {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 25px 0;
+            text-align: center;
+        }
+        .action-required h3 {
+            margin-top: 0;
+            color: #856404;
+            font-size: 20px;
+        }
+        .action-required ul {
+            text-align: left;
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+        .action-required li {
+            margin: 8px 0;
+            color: #333;
+        }
+        
+        .button {
+            display: inline-block;
+            background: #6c757d;
+            color: white !important;
+            padding: 14px 35px;
+            text-decoration: none;
+            border-radius: 6px;
+            margin: 10px 5px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .button:hover {
+            background: #5a6268;
+        }
+        .button.primary {
+            background: #3b54c7;
+        }
+        .button.primary:hover {
+            background: #2a3f9e;
+        }
+        
+        .timestamp {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+            margin: 25px 0;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .footer {
+            background: #333;
+            color: #fff;
+            padding: 30px;
+            text-align: center;
+        }
+        .footer p {
+            margin: 5px 0;
+            font-size: 13px;
+            opacity: 0.8;
+        }
+        .footer a {
+            color: #17a2b8;
+            text-decoration: none;
+        }
+        
+        @media only screen and (max-width: 600px) {
+            .content {
+                padding: 20px;
+            }
+            .header {
+                padding: 30px 20px;
+            }
+            .detail-row {
+                flex-direction: column;
+            }
+            .detail-label {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+            .button {
+                display: block;
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header {{alert_type}}">
+            <h1>{{alert_icon}} System Notification</h1>
+            <p>{{alert_title}}</p>
+        </div>
+        
+        <div class="content">
+            <div class="alert-icon">
+                {{alert_emoji}}
+            </div>
+            
+            <p>Dear <strong>{{recipient_name}}</strong>,</p>
+            
+            <div class="alert-badge {{alert_type}}">
+                {{alert_priority}} PRIORITY
+            </div>
+            
+            <p>{{alert_greeting}}</p>
+            
+            <div class="message-box {{alert_type}}">
+                <h3>{{message_title}}</h3>
+                <div style="color: #333; line-height: 1.8;">
+                    {{message_content}}
+                </div>
+            </div>
+            
+            {{#if show_details}}
+            <div class="alert-details">
+                <h3>Notification Details</h3>
+                <div class="detail-row">
+                    <div class="detail-label">Alert Type:</div>
+                    <div class="detail-value">{{alert_category}}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Affected Entity:</div>
+                    <div class="detail-value">{{affected_entity}}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Status:</div>
+                    <div class="detail-value">{{current_status}}</div>
+                </div>
+                {{#if reference_id}}
+                <div class="detail-row">
+                    <div class="detail-label">Reference ID:</div>
+                    <div class="detail-value">{{reference_id}}</div>
+                </div>
+                {{/if}}
+            </div>
+            {{/if}}
+            
+            {{#if action_required}}
+            <div class="action-required">
+                <h3>⚠️ Action Required</h3>
+                <p style="margin: 10px 0;">Please take the following actions:</p>
+                <ul>
+                    {{action_items}}
+                </ul>
+                {{#if deadline}}
+                <p style="margin-top: 15px; font-weight: bold; color: #856404;">
+                    Deadline: {{deadline}}
+                </p>
+                {{/if}}
+            </div>
+            {{/if}}
+            
+            {{#if additional_info}}
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 25px 0;">
+                <p style="margin: 0;"><strong>Additional Information:</strong></p>
+                <p style="margin: 10px 0 0 0; color: #555;">{{additional_info}}</p>
+            </div>
+            {{/if}}
+            
+            <div class="timestamp">
+                <strong>Notification Time:</strong> {{notification_time}}<br>
+                <strong>Time Zone:</strong> East Africa Time (EAT)
+            </div>
+            
+            {{#if show_buttons}}
+            <center>
+                {{#if primary_button_text}}
+                <a href="{{primary_button_url}}" class="button primary">{{primary_button_text}}</a>
+                {{/if}}
+                {{#if secondary_button_text}}
+                <a href="{{secondary_button_url}}" class="button">{{secondary_button_text}}</a>
+                {{/if}}
+            </center>
+            {{/if}}
+            
+            <div style="background: #e7f6f9; border-left: 4px solid #17a2b8; padding: 15px; border-radius: 6px; margin: 25px 0;">
+                <p style="margin: 0;"><strong>ℹ️ Need Help?</strong></p>
+                <p style="margin: 10px 0 0 0; color: #0c5460;">
+                    If you have questions about this notification or need assistance, please contact our support team:
+                </p>
+                <p style="margin: 10px 0 0 0;">
+                    📧 Email: <a href="mailto:support@jhubafrica.com" style="color: #17a2b8; text-decoration: none; font-weight: bold;">support@jhubafrica.com</a><br>
+                    📞 Phone: +254 XXX XXX XXX<br>
+                    🕐 Support Hours: Monday - Friday, 9:00 AM - 5:00 PM EAT
+                </p>
+            </div>
+            
+            <p style="margin-top: 30px;">{{closing_message}}</p>
+            
+            <p>Best regards,<br>
+            <strong>{{site_name}} Team</strong></p>
+        </div>
+        
+        <div class="footer">
+            <p><strong>{{site_name}}</strong></p>
+            <p>Empowering African Innovation</p>
+            <p>&copy; {{current_year}} {{site_name}}. All rights reserved.</p>
+            <p style="margin-top: 15px; font-size: 11px;">
+                This is an automated system notification.<br>
+                For support, contact us at <a href="mailto:support@jhubafrica.com">support@jhubafrica.com</a>
+            </p>
+            <p style="margin-top: 10px; font-size: 11px; opacity: 0.6;">
+                You received this email because you are a registered user of {{site_name}}.<br>
+                {{#if unsubscribe_url}}
+                <a href="{{unsubscribe_url}}" style="color: #17a2b8;">Manage notification preferences</a>
+                {{/if}}
+            </p>
+        </div>
+    </div>
+</body>
+</html>

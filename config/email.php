@@ -5,10 +5,10 @@
 // SMTP Configuration (for production)
 define('SMTP_HOST', 'smtp.gmail.com'); // Change to your SMTP server
 define('SMTP_PORT', 587); // 587 for TLS, 465 for SSL
-define('SMTP_USERNAME', 'your-email@gmail.com'); // Your email
-define('SMTP_PASSWORD', 'your-app-password'); // Your email password or app password
+define('SMTP_USERNAME', 'info.jhub@jkuat.ac.ke'); // Your email
+define('SMTP_PASSWORD', ''); // Your email password or app password
 define('SMTP_ENCRYPTION', 'tls'); // 'tls' or 'ssl'
-define('SMTP_FROM_EMAIL', 'noreply@jhubafrica.com');
+define('SMTP_FROM_EMAIL', 'info.jhub@jkuat.ac.ke');
 define('SMTP_FROM_NAME', 'JHUB AFRICA');
 
 // Email Settings

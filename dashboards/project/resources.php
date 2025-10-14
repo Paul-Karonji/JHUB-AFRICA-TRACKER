@@ -158,16 +158,40 @@ include '../../templates/header.php';
                                 </div>
                             </div>
                         </div>
+                        <?php
+// Find this section in dashboards/project/resources.php (around line 135-145)
+// Replace the card-footer section with this improved code:
+
+?>
                         <div class="card-footer bg-white">
-                            <?php if ($resource['resource_url']): ?>
+                            <?php 
+                            // Check if we have URL, file, or both
+                            $hasUrl = !empty($resource['resource_url']) && trim($resource['resource_url']) !== '';
+                            $hasFile = !empty($resource['file_path']) && trim($resource['file_path']) !== '';
+                            ?>
+                            
+                            <?php if ($hasUrl && $hasFile): ?>
+                                <!-- Both URL and File available - show both buttons -->
+                                <div class="d-flex gap-2">
+                                    <a href="<?php echo e($resource['resource_url']); ?>" target="_blank" class="btn btn-primary flex-fill">
+                                        <i class="fas fa-external-link-alt me-1"></i> View Link
+                                    </a>
+                                    <a href="../../assets/uploads/resources/<?php echo e($resource['file_path']); ?>" target="_blank" class="btn btn-success flex-fill">
+                                        <i class="fas fa-download me-1"></i> Download File
+                                    </a>
+                                </div>
+                            <?php elseif ($hasUrl): ?>
+                                <!-- Only URL available -->
                                 <a href="<?php echo e($resource['resource_url']); ?>" target="_blank" class="btn btn-primary w-100">
                                     <i class="fas fa-external-link-alt me-1"></i> View Resource
                                 </a>
-                            <?php elseif ($resource['file_path']): ?>
+                            <?php elseif ($hasFile): ?>
+                                <!-- Only File available -->
                                 <a href="../../assets/uploads/resources/<?php echo e($resource['file_path']); ?>" target="_blank" class="btn btn-primary w-100">
                                     <i class="fas fa-download me-1"></i> Download Resource
                                 </a>
                             <?php else: ?>
+                                <!-- No resource link or file -->
                                 <button class="btn btn-secondary w-100" disabled>No link available</button>
                             <?php endif; ?>
                         </div>

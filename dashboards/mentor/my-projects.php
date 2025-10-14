@@ -432,5 +432,5 @@ include '../../templates/header.php';
         <?php endif; ?>
     <?php endif; ?>
 </div>
-
+ <?php include '../../templates/comments-section.php'; ?>
 <?php include '../../templates/footer.php'; ?>

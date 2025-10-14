@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Mentor Assigned</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .email-container {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+        .header p {
+            margin: 10px 0 0 0;
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .success-badge {
+            background: #28a745;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 25px;
+            display: inline-block;
+            margin: 20px 0;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .mentor-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: 2px solid #28a745;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 25px 0;
+            text-align: center;
+        }
+        .mentor-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: #28a745;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            font-weight: bold;
+            margin: 0 auto 15px auto;
+        }
+        .mentor-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin: 10px 0 5px 0;
+        }
+        .mentor-title {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+        .mentor-bio {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            text-align: left;
+            color: #555;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .mentor-expertise {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            text-align: left;
+        }
+        .expertise-tag {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            margin: 3px;
+        }
+        .info-box {
+            background: #e7f6ec;
+            border-left: 4px solid #28a745;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 25px 0;
+        }
+        .info-box h3 {
+            margin-top: 0;
+            color: #28a745;
+            font-size: 18px;
+        }
+        .next-steps {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+        .next-steps h3 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 2px solid #28a745;
+            padding-bottom: 10px;
+        }
+        .next-steps ol {
+            padding-left: 20px;
+        }
+        .next-steps li {
+            margin: 15px 0;
+            color: #555;
+            line-height: 1.6;
+        }
+        .button {
+            display: inline-block;
+            background: #28a745;
+            color: white !important;
+            padding: 14px 35px;
+            text-decoration: none;
+            border-radius: 6px;
+            margin: 20px 0;
+            font-weight: bold;
+            text-align: center;
+        }
+        .button:hover {
+            background: #218838;
+        }
+        .stage-info {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 25px 0;
+            text-align: center;
+        }
+        .stage-info strong {
+            color: #856404;
+            font-size: 16px;
+        }
+        .footer {
+            background: #333;
+            color: #fff;
+            padding: 30px;
+            text-align: center;
+        }
+        .footer p {
+            margin: 5px 0;
+            font-size: 13px;
+            opacity: 0.8;
+        }
+        .footer a {
+            color: #28a745;
+            text-decoration: none;
+        }
+        @media only screen and (max-width: 600px) {
+            .content {
+                padding: 20px;
+            }
+            .header {
+                padding: 30px 20px;
+            }
+            .mentor-card {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>🎯 Great News!</h1>
+            <p>A Mentor Has Been Assigned to Your Project</p>
+        </div>
+        
+        <div class="content">
+            <p>Dear <strong>{{project_lead_name}}</strong>,</p>
+            
+            <div class="success-badge">
+                ✓ MENTOR ASSIGNED
+            </div>
+            
+            <p>Exciting news! A mentor has been assigned to guide your project, <strong>{{project_name}}</strong>, through its development journey in the JHUB AFRICA ecosystem.</p>
+            
+            <div class="mentor-card">
+                <div class="mentor-avatar">
+                    {{mentor_initials}}
+                </div>
+                <div class="mentor-name">{{mentor_name}}</div>
+                <div class="mentor-title">Expert Mentor</div>
+                
+                <div class="mentor-bio">
+                    <strong>About Your Mentor:</strong><br>
+                    {{mentor_bio}}
+                </div>
+                
+                <div class="mentor-expertise">
+                    <strong>Areas of Expertise:</strong><br>
+                    <div style="margin-top: 10px;">
+                        {{mentor_expertise}}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stage-info">
+                <strong>🚀 Your Project Has Advanced to Stage 2: Mentorship</strong><br>
+                <span style="font-size: 14px; color: #666;">You're now entering the guided development phase!</span>
+            </div>
+            
+            <div class="info-box">
+                <h3>What This Means for Your Project</h3>
+                <p>Your assigned mentor will provide:</p>
+                <ul style="margin: 10px 0; padding-left: 20px;">
+                    <li>Strategic guidance and industry insights</li>
+                    <li>Technical expertise and problem-solving support</li>
+                    <li>Network connections and partnership opportunities</li>
+                    <li>Resources, tools, and learning materials</li>
+                    <li>Regular feedback and milestone assessments</li>
+                </ul>
+            </div>
+            
+            <div class="next-steps">
+                <h3>Next Steps</h3>
+                <ol>
+                    <li><strong>Review Your Dashboard:</strong> Log in to view your mentor's profile and shared resources.</li>
+                    <li><strong>Introduce Your Team:</strong> Prepare a brief introduction of your team members and current progress.</li>
+                    <li><strong>Explore Resources:</strong> Check the mentor-provided resources available in your dashboard.</li>
+                    <li><strong>Schedule a Meeting:</strong> Reach out to your mentor to schedule an initial discussion about your project goals.</li>
+                    <li><strong>Set Clear Objectives:</strong> Identify specific areas where you need guidance and support.</li>
+                </ol>
+            </div>
+            
+            <center>
+                <a href="{{site_url}}/dashboards/project/mentors.php" class="button">View Mentor Profile</a>
+            </center>
+            
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 25px 0;">
+                <p style="margin: 0;"><strong>💬 Communication Tips:</strong></p>
+                <ul style="margin: 10px 0 0 0; padding-left: 20px; color: #555;">
+                    <li>Be open and honest about challenges you're facing</li>
+                    <li>Come prepared with specific questions and topics</li>
+                    <li>Implement feedback and share your progress regularly</li>
+                    <li>Leverage your mentor's network for connections</li>
+                </ul>
+            </div>
+            
+            <p>This is an important milestone in your innovation journey. Make the most of this mentorship opportunity by actively engaging, asking questions, and applying the guidance you receive.</p>
+            
+            <p style="margin-top: 30px;">If you have any questions about working with your mentor or need assistance, please contact us at <a href="mailto:support@jhubafrica.com" style="color: #28a745; text-decoration: none;">support@jhubafrica.com</a></p>
+            
+            <p>We're excited to see your project grow and succeed!</p>
+            
+            <p>Best regards,<br>
+            <strong>JHUB AFRICA Team</strong></p>
+        </div>
+        
+        <div class="footer">
+            <p><strong>{{site_name}}</strong></p>
+            <p>Empowering African Innovation</p>
+            <p>&copy; {{current_year}} {{site_name}}. All rights reserved.</p>
+            <p style="margin-top: 15px; font-size: 11px;">
+                This is an automated message. Please do not reply directly to this email.<br>
+                For support, contact us at <a href="mailto:support@jhubafrica.com">support@jhubafrica.com</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>
