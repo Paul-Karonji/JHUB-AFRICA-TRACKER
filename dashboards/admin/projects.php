@@ -1,41 +1,32 @@
 <?php
-// dashboards/admin/projects.php - Complete Project Management WITH COMMENTS
+// dashboards/admin/projects.php - Updated with admin override capabilities
 require_once '../../includes/init.php';
+require_once '../../includes/mentor-consensus-functions.php';
 
 $auth->requireUserType(USER_TYPE_ADMIN);
 
 $adminId = $auth->getUserId();
 $errors = [];
 $success = '';
+$action = $_GET['action'] ?? 'list';
+$projectId = $_GET['project_id'] ?? null;
 
-// Handle project actions
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
+// Handle project stage override
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'admin_override_stage') {
     if (!$auth->validateCSRFToken($_POST['csrf_token'] ?? '')) {
         $errors[] = 'Invalid security token';
     } else {
-        $action = $_POST['action'];
-        $projectId = intval($_POST['project_id'] ?? 0);
+        $projectId = intval($_POST['project_id']);
+        $targetStage = intval($_POST['target_stage']);
+        $overrideReason = trim($_POST['override_reason'] ?? '');
         
-        if ($action === 'terminate' && $projectId) {
-            $reason = trim($_POST['termination_reason'] ?? 'No reason provided');
+        if ($targetStage >= 1 && $targetStage <= 6) {
+            $project = $database->getRow("SELECT * FROM projects WHERE project_id = ?", [$projectId]);
             
-            $updated = $database->update('projects', [
-                'status' => 'terminated',
-                'termination_reason' => $reason
-            ], 'project_id = ?', [$projectId]);
-            
-            if ($updated) {
-                logActivity('admin', $adminId, 'project_terminated', "Terminated project ID: $projectId");
-                $success = 'Project terminated successfully';
-            } else {
-                $errors[] = 'Failed to terminate project';
-            }
-        } elseif ($action === 'update_stage' && $projectId) {
-            $newStage = intval($_POST['new_stage'] ?? 0);
-            
-            if ($newStage >= 1 && $newStage <= 6) {
-                $updateData = ['current_stage' => $newStage];
-                if ($newStage == 6) {
+            if ($project) {
+                $updateData = ['current_stage' => $targetStage];
+                
+                if ($targetStage == 6) {
                     $updateData['status'] = 'completed';
                     $updateData['completion_date'] = date('Y-m-d H:i:s');
                 }
@@ -43,338 +34,440 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $updated = $database->update('projects', $updateData, 'project_id = ?', [$projectId]);
                 
                 if ($updated) {
-                    logActivity('admin', $adminId, 'project_stage_updated', "Updated project stage to $newStage");
-                    $success = 'Project stage updated successfully';
+                    // Log the admin override
+                    logActivity(
+                        'admin', 
+                        $adminId, 
+                        'stage_override', 
+                        "Admin override: Set project '{$project['project_name']}' to stage {$targetStage}. Reason: {$overrideReason}",
+                        $projectId,
+                        ['old_stage' => $project['current_stage'], 'new_stage' => $targetStage, 'reason' => $overrideReason]
+                    );
+                    
+                    // Send notification
+                    sendEmailNotification(
+                        $project['project_lead_email'],
+                        'Project Stage Updated by Administrator',
+                        "Your project '{$project['project_name']}' has been updated to Stage {$targetStage} by an administrator.\n\nReason: {$overrideReason}\n\nBest regards,\nJHUB AFRICA Team",
+                        NOTIFY_STAGE_UPDATED
+                    );
+                    
+                    $success = "Project stage updated to {$targetStage} successfully!";
                 } else {
-                    $errors[] = 'Failed to update stage';
+                    $errors[] = 'Failed to update project stage';
                 }
+            } else {
+                $errors[] = 'Project not found';
             }
+        } else {
+            $errors[] = 'Invalid stage number';
         }
     }
 }
 
-// View single project
-$viewProject = null;
-if (isset($_GET['id'])) {
-    $projectId = intval($_GET['id']);
-    $viewProject = $database->getRow("SELECT * FROM projects WHERE project_id = ?", [$projectId]);
+// Get projects with consensus status
+if ($action === 'list') {
+    $projects = $database->getRows("
+        SELECT p.*,
+               (SELECT COUNT(*) FROM project_mentors WHERE project_id = p.project_id AND is_active = 1) as mentor_count,
+               (SELECT COUNT(*) FROM project_innovators WHERE project_id = p.project_id AND is_active = 1) as team_count
+        FROM projects p
+        WHERE p.status = 'active'
+        ORDER BY p.updated_at DESC
+    ");
     
-    if ($viewProject) {
-        $teamMembers = $database->getRows("
-            SELECT * FROM project_innovators 
-            WHERE project_id = ? AND is_active = 1
-        ", [$projectId]);
-        
-        $mentors = $database->getRows("
-            SELECT m.*, pm.assigned_at
-            FROM mentors m
-            INNER JOIN project_mentors pm ON m.mentor_id = pm.mentor_id
-            WHERE pm.project_id = ? AND pm.is_active = 1
-        ", [$projectId]);
-        
-        $projectStats = [
-            'resources' => $database->count('mentor_resources', 'project_id = ? AND is_deleted = 0', [$projectId]),
-            'assessments' => $database->count('project_assessments', 'project_id = ? AND is_deleted = 0', [$projectId]),
-            'learning' => $database->count('learning_objectives', 'project_id = ? AND is_deleted = 0', [$projectId])
-        ];
+    // Add consensus information for each project
+    foreach ($projects as &$project) {
+        $project['consensus_status'] = checkMentorConsensusForStageProgression($project['project_id'], $project['current_stage']);
+        $project['mentor_approvals'] = getMentorApprovalStatus($project['project_id'], $project['current_stage']);
     }
 }
 
-// List view - filters and search
-$statusFilter = $_GET['status'] ?? 'all';
-$stageFilter = $_GET['stage'] ?? 'all';
-$searchQuery = $_GET['search'] ?? '';
+$pageTitle = 'Project Management';
+$breadcrumbs = [
+    ['title' => 'Admin Dashboard', 'url' => BASE_URL . '/dashboards/admin/'],
+    ['title' => 'Projects', 'url' => '']
+];
 
-// Build query
-$whereConditions = [];
-$params = [];
-
-if ($statusFilter !== 'all') {
-    $whereConditions[] = "p.status = ?";
-    $params[] = $statusFilter;
-}
-
-if ($stageFilter !== 'all') {
-    $whereConditions[] = "p.current_stage = ?";
-    $params[] = intval($stageFilter);
-}
-
-if (!empty($searchQuery)) {
-    $whereConditions[] = "(p.project_name LIKE ? OR p.project_lead_name LIKE ?)";
-    $searchTerm = "%{$searchQuery}%";
-    $params[] = $searchTerm;
-    $params[] = $searchTerm;
-}
-
-$whereClause = !empty($whereConditions) ? 'WHERE ' . implode(' AND ', $whereConditions) : '';
-
-// Get projects
-$projects = $database->getRows("
-    SELECT p.*, 
-           COUNT(DISTINCT pi.pi_id) as team_count,
-           COUNT(DISTINCT pm.mentor_id) as mentor_count
-    FROM projects p
-    LEFT JOIN project_innovators pi ON p.project_id = pi.project_id AND pi.is_active = 1
-    LEFT JOIN project_mentors pm ON p.project_id = pm.project_id AND pm.is_active = 1
-    $whereClause
-    GROUP BY p.project_id
-    ORDER BY p.created_at DESC
-", $params);
-
-$pageTitle = "Project Management";
 include '../../templates/header.php';
 ?>
 
-<div class="admin-dashboard">
-    <?php if ($success): ?>
-    <div class="alert alert-success alert-dismissible fade show">
-        <i class="fas fa-check-circle me-2"></i><?php echo e($success); ?>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-project-diagram text-primary me-2"></i>Project Management
+        </h1>
+        <div class="btn-group">
+            <a href="<?php echo BASE_URL; ?>/dashboards/admin/create-project.php" class="btn btn-primary btn-sm">
+                <i class="fas fa-plus me-1"></i>Create Project
+            </a>
+            <a href="<?php echo BASE_URL; ?>/dashboards/admin/applications.php" class="btn btn-info btn-sm">
+                <i class="fas fa-file-alt me-1"></i>Applications
+            </a>
+        </div>
     </div>
-    <?php endif; ?>
 
     <?php if (!empty($errors)): ?>
-    <div class="alert alert-danger alert-dismissible fade show">
-        <?php foreach ($errors as $error): ?>
-            <div><?php echo e($error); ?></div>
-        <?php endforeach; ?>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <div class="alert alert-danger">
+            <ul class="mb-0">
+                <?php foreach ($errors as $error): ?>
+                    <li><?php echo e($error); ?></li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+    <?php endif; ?>
+
+    <?php if ($success): ?>
+        <div class="alert alert-success"><?php echo e($success); ?></div>
+    <?php endif; ?>
+
+    <!-- Projects Table with Consensus Status -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Active Projects & Stage Progression Status</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover" id="projectsTable">
+                    <thead>
+                        <tr>
+                            <th>Project</th>
+                            <th>Current Stage</th>
+                            <th>Mentor Consensus</th>
+                            <th>Team</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($projects as $project): ?>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div>
+                                        <div class="font-weight-bold"><?php echo e($project['project_name']); ?></div>
+                                        <div class="text-muted small">Created: <?php echo formatDate($project['created_at']); ?></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <span class="badge bg-primary me-2">Stage <?php echo $project['current_stage']; ?></span>
+                                    <div>
+                                        <div class="small font-weight-bold"><?php echo getStageName($project['current_stage']); ?></div>
+                                        <div class="text-muted small"><?php echo round(($project['current_stage'] / 6) * 100); ?>% Complete</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <?php if ($project['mentor_count'] == 0): ?>
+                                    <span class="badge bg-secondary">No Mentors</span>
+                                <?php elseif ($project['consensus_status']['can_progress']): ?>
+                                    <div class="text-success">
+                                        <i class="fas fa-check-circle me-1"></i>
+                                        <strong>Ready to Progress</strong>
+                                        <div class="small">All <?php echo $project['mentor_count']; ?> mentors approved</div>
+                                    </div>
+                                <?php else: ?>
+                                    <div class="text-warning">
+                                        <i class="fas fa-clock me-1"></i>
+                                        <strong>Pending Consensus</strong>
+                                        <div class="small">
+                                            <?php echo $project['consensus_status']['approved_mentors']; ?>/<?php echo $project['consensus_status']['total_mentors']; ?> approved
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Show pending mentors -->
+                                    <?php if (!empty($project['consensus_status']['pending_mentors'])): ?>
+                                        <div class="small text-muted mt-1">
+                                            Waiting for: 
+                                            <?php 
+                                            $pendingNames = array_map(function($m) { return $m['name']; }, $project['consensus_status']['pending_mentors']);
+                                            echo implode(', ', $pendingNames);
+                                            ?>
+                                        </div>
+                                    <?php endif; ?>
+                                <?php endif; ?>
+                            </td>
+                            <td>
+                                <div class="text-center">
+                                    <div class="font-weight-bold"><?php echo $project['team_count']; ?></div>
+                                    <div class="small text-muted">Members</div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-<?php echo $project['status'] === 'active' ? 'success' : 'secondary'; ?>">
+                                    <?php echo ucfirst($project['status']); ?>
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="<?php echo BASE_URL; ?>/public/project-details.php?id=<?php echo $project['project_id']; ?>" 
+                                       class="btn btn-outline-primary" target="_blank">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    
+                                    <?php if ($project['current_stage'] < 6): ?>
+                                        <button type="button" class="btn btn-outline-warning" 
+                                                onclick="showStageOverrideModal(<?php echo $project['project_id']; ?>, '<?php echo e($project['project_name']); ?>', <?php echo $project['current_stage']; ?>)">
+                                            <i class="fas fa-fast-forward"></i>
+                                        </button>
+                                    <?php endif; ?>
+                                    
+                                    <button type="button" class="btn btn-outline-info" 
+                                            onclick="showConsensusDetails(<?php echo $project['project_id']; ?>)">
+                                        <i class="fas fa-users"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-    <?php endif; ?>
-
-    <?php if ($viewProject): ?>
-        <!-- Single Project View -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <a href="projects.php" class="text-decoration-none text-muted mb-2 d-block">
-                    <i class="fas fa-arrow-left me-1"></i> Back to All Projects
-                </a>
-                <h1 class="h3 mb-0"><?php echo e($viewProject['project_name']); ?></h1>
-                <p class="text-muted">Project Details & Management</p>
-            </div>
-            <div>
-                <span class="badge bg-primary fs-6 me-2">Stage <?php echo $viewProject['current_stage']; ?></span>
-                <span class="badge bg-<?php echo $viewProject['status'] === 'active' ? 'success' : ($viewProject['status'] === 'completed' ? 'info' : 'danger'); ?> fs-6">
-                    <?php echo ucfirst($viewProject['status']); ?>
-                </span>
-            </div>
-        </div>
-
-        <div class="row">
-            <!-- Main Content -->
-            <div class="col-lg-8">
-                <!-- Project Details -->
-                <div class="card shadow mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">Project Information</h5>
-                    </div>
-                    <div class="card-body">
-                        <p><strong>Description:</strong></p>
-                        <p><?php echo nl2br(e($viewProject['description'])); ?></p>
-                        
-                        <?php if ($viewProject['project_website']): ?>
-                        <p><strong>Website:</strong> <a href="<?php echo e($viewProject['project_website']); ?>" target="_blank"><?php echo e($viewProject['project_website']); ?></a></p>
-                        <?php endif; ?>
-                        
-                        <p><strong>Project Lead:</strong> <?php echo e($viewProject['project_lead_name']); ?></p>
-                        <p><strong>Lead Email:</strong> <?php echo e($viewProject['project_lead_email']); ?></p>
-                        <p><strong>Created:</strong> <?php echo formatDate($viewProject['created_at']); ?></p>
-                    </div>
-                </div>
-
-                <!-- Team Members -->
-                <div class="card shadow mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">Team Members (<?php echo count($teamMembers); ?>)</h5>
-                    </div>
-                    <div class="card-body">
-                        <?php if (empty($teamMembers)): ?>
-                            <p class="text-muted">No team members yet.</p>
-                        <?php else: ?>
-                            <div class="list-group">
-                                <?php foreach ($teamMembers as $member): ?>
-                                <div class="list-group-item">
-                                    <strong><?php echo e($member['name']); ?></strong> - <?php echo e($member['role']); ?>
-                                    <br><small class="text-muted"><?php echo e($member['email']); ?></small>
-                                </div>
-                                <?php endforeach; ?>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                </div>
-
-                <!-- Mentors -->
-                <div class="card shadow mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">Assigned Mentors (<?php echo count($mentors); ?>)</h5>
-                    </div>
-                    <div class="card-body">
-                        <?php if (empty($mentors)): ?>
-                            <p class="text-muted">No mentors assigned yet.</p>
-                        <?php else: ?>
-                            <div class="list-group">
-                                <?php foreach ($mentors as $mentor): ?>
-                                <div class="list-group-item">
-                                    <strong><?php echo e($mentor['name']); ?></strong>
-                                    <br><small class="text-muted"><?php echo e($mentor['area_of_expertise']); ?></small>
-                                    <br><small>Joined: <?php echo formatDate($mentor['assigned_at']); ?></small>
-                                </div>
-                                <?php endforeach; ?>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Sidebar -->
-            <div class="col-lg-4">
-                <!-- Stage Management -->
-                <?php if ($viewProject['status'] === 'active'): ?>
-                <div class="card shadow mb-4">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0">Stage Management</h5>
-                    </div>
-                    <div class="card-body">
-                        <form method="POST">
-                            <?php echo Validator::csrfInput(); ?>
-                            <input type="hidden" name="action" value="update_stage">
-                            <input type="hidden" name="project_id" value="<?php echo $viewProject['project_id']; ?>">
-                            
-                            <div class="mb-3">
-                                <label class="form-label">Update Stage:</label>
-                                <select name="new_stage" class="form-select" required>
-                                    <?php for ($i = 1; $i <= 6; $i++): ?>
-                                        <option value="<?php echo $i; ?>" <?php echo $viewProject['current_stage'] == $i ? 'selected' : ''; ?>>
-                                            Stage <?php echo $i; ?>
-                                        </option>
-                                    <?php endfor; ?>
-                                </select>
-                            </div>
-                            
-                            <button type="submit" class="btn btn-primary w-100">
-                                <i class="fas fa-sync-alt me-2"></i>Update Stage
-                            </button>
-                        </form>
-                    </div>
-                </div>
-                <?php endif; ?>
-
-                <!-- Project Stats -->
-                <div class="card shadow mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">Project Statistics</h5>
-                    </div>
-                    <div class="card-body">
-                        <p><strong>Team Members:</strong> <?php echo count($teamMembers); ?></p>
-                        <p><strong>Mentors:</strong> <?php echo count($mentors); ?></p>
-                        <p><strong>Resources:</strong> <?php echo $projectStats['resources']; ?></p>
-                        <p><strong>Assessments:</strong> <?php echo $projectStats['assessments']; ?></p>
-                        <p class="mb-0"><strong>Learning Objectives:</strong> <?php echo $projectStats['learning']; ?></p>
-                    </div>
-                </div>
-
-                <!-- Terminate Project -->
-                <?php if ($viewProject['status'] === 'active'): ?>
-                <div class="card shadow border-danger">
-                    <div class="card-header bg-danger text-white">
-                        <h5 class="mb-0">Danger Zone</h5>
-                    </div>
-                    <div class="card-body">
-                        <p class="text-danger">This action cannot be undone.</p>
-                        <button class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#terminateModal">
-                            <i class="fas fa-ban me-2"></i>Terminate Project
-                        </button>
-                    </div>
-                </div>
-                <?php endif; ?>
-            </div>
-        </div>
-
-        <!-- ✅ COMMENTS SECTION ADDED HERE -->
-        <?php include '../../templates/comments-section.php'; ?>
-
-    <?php else: ?>
-        <!-- Projects List View -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="h3 mb-0">Project Management</h1>
-        </div>
-
-        <!-- Filters -->
-        <div class="card shadow mb-4">
-            <div class="card-body">
-                <form method="GET" class="row g-3">
-                    <div class="col-md-3">
-                        <select name="status" class="form-select">
-                            <option value="all" <?php echo $statusFilter === 'all' ? 'selected' : ''; ?>>All Status</option>
-                            <option value="active" <?php echo $statusFilter === 'active' ? 'selected' : ''; ?>>Active</option>
-                            <option value="completed" <?php echo $statusFilter === 'completed' ? 'selected' : ''; ?>>Completed</option>
-                            <option value="terminated" <?php echo $statusFilter === 'terminated' ? 'selected' : ''; ?>>Terminated</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <select name="stage" class="form-select">
-                            <option value="all" <?php echo $stageFilter === 'all' ? 'selected' : ''; ?>>All Stages</option>
-                            <?php for ($i = 1; $i <= 6; $i++): ?>
-                                <option value="<?php echo $i; ?>" <?php echo $stageFilter == $i ? 'selected' : ''; ?>>Stage <?php echo $i; ?></option>
-                            <?php endfor; ?>
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <input type="text" name="search" class="form-control" placeholder="Search projects..." value="<?php echo e($searchQuery); ?>">
-                    </div>
-                    <div class="col-md-2">
-                        <button type="submit" class="btn btn-primary w-100">Filter</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- Projects Table -->
-        <div class="card shadow">
-            <div class="card-body">
-                <?php if (empty($projects)): ?>
-                    <p class="text-muted text-center py-4">No projects found.</p>
-                <?php else: ?>
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Project Name</th>
-                                    <th>Stage</th>
-                                    <th>Status</th>
-                                    <th>Team</th>
-                                    <th>Mentors</th>
-                                    <th>Created</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($projects as $project): ?>
-                                <tr>
-                                    <td><strong><?php echo e($project['project_name']); ?></strong></td>
-                                    <td><span class="badge bg-primary">Stage <?php echo $project['current_stage']; ?></span></td>
-                                    <td>
-                                        <span class="badge bg-<?php echo $project['status'] === 'active' ? 'success' : ($project['status'] === 'completed' ? 'info' : 'danger'); ?>">
-                                            <?php echo ucfirst($project['status']); ?>
-                                        </span>
-                                    </td>
-                                    <td><?php echo $project['team_count']; ?></td>
-                                    <td><?php echo $project['mentor_count']; ?></td>
-                                    <td><?php echo formatDate($project['created_at']); ?></td>
-                                    <td>
-                                        <a href="?id=<?php echo $project['project_id']; ?>" class="btn btn-sm btn-primary">
-                                            <i class="fas fa-eye"></i> View
-                                        </a>
-                                    </td>
-                                </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                <?php endif; ?>
-            </div>
-        </div>
-    <?php endif; ?>
 </div>
+
+<!-- Stage Override Modal -->
+<div class="modal fade" id="stageOverrideModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST">
+                <div class="modal-header">
+                    <h5 class="modal-title">Admin Stage Override</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="csrf_token" value="<?php echo $auth->generateCSRFToken(); ?>">
+                    <input type="hidden" name="action" value="admin_override_stage">
+                    <input type="hidden" id="override_project_id" name="project_id">
+                    
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Admin Override:</strong> This will bypass mentor consensus and immediately update the project stage.
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Project</label>
+                        <input type="text" class="form-control" id="override_project_name" readonly>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-6">
+                            <label class="form-label">Current Stage</label>
+                            <input type="text" class="form-control" id="override_current_stage" readonly>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Target Stage <span class="text-danger">*</span></label>
+                            <select class="form-control" name="target_stage" id="override_target_stage" required>
+                                <option value="">Select Stage</option>
+                                <option value="1">Stage 1: Project Creation</option>
+                                <option value="2">Stage 2: Mentorship</option>
+                                <option value="3">Stage 3: Assessment</option>
+                                <option value="4">Stage 4: Learning and Development</option>
+                                <option value="5">Stage 5: Progress Tracking</option>
+                                <option value="6">Stage 6: Showcase and Integration</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Override Reason <span class="text-danger">*</span></label>
+                        <textarea class="form-control" name="override_reason" rows="3" 
+                                  placeholder="Please provide a reason for this admin override..." required></textarea>
+                        <div class="form-text">This reason will be logged and sent to the project team.</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-warning">
+                        <i class="fas fa-fast-forward me-2"></i>Override Stage
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Consensus Details Modal -->
+<div class="modal fade" id="consensusDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Mentor Consensus Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="consensusDetailsContent">
+                    <div class="text-center">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Show stage override modal
+function showStageOverrideModal(projectId, projectName, currentStage) {
+    document.getElementById('override_project_id').value = projectId;
+    document.getElementById('override_project_name').value = projectName;
+    document.getElementById('override_current_stage').value = 'Stage ' + currentStage;
+    
+    // Reset target stage
+    document.getElementById('override_target_stage').value = '';
+    
+    new bootstrap.Modal(document.getElementById('stageOverrideModal')).show();
+}
+
+// Show consensus details
+function showConsensusDetails(projectId) {
+    const modal = new bootstrap.Modal(document.getElementById('consensusDetailsModal'));
+    const contentDiv = document.getElementById('consensusDetailsContent');
+    
+    // Show loading
+    contentDiv.innerHTML = `
+        <div class="text-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    `;
+    
+    modal.show();
+    
+    // Fetch consensus details
+    fetch(`<?php echo BASE_URL; ?>/api/projects/update-stage.php`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            csrf_token: '<?php echo $auth->generateCSRFToken(); ?>',
+            project_id: projectId,
+            action: 'get_consensus_status'
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            let html = `
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <h6>Current Stage</h6>
+                        <p><strong>Stage ${data.project_stage}:</strong> ${getStageName(data.project_stage)}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Consensus Status</h6>
+                        <p class="${data.consensus.can_progress ? 'text-success' : 'text-warning'}">
+                            <i class="fas fa-${data.consensus.can_progress ? 'check-circle' : 'clock'} me-1"></i>
+                            ${data.consensus.reason}
+                        </p>
+                    </div>
+                </div>
+                
+                <h6>Mentor Approvals</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Mentor</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            data.mentor_approvals.forEach(approval => {
+                html += `
+                    <tr>
+                        <td>${approval.mentor_name}</td>
+                        <td>
+                            ${approval.approved_for_next_stage ? 
+                                '<span class="badge bg-success">Approved</span>' : 
+                                '<span class="badge bg-warning">Pending</span>'
+                            }
+                        </td>
+                        <td>
+                            ${approval.approval_date ? 
+                                new Date(approval.approval_date).toLocaleDateString() : 
+                                '-'
+                            }
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            if (!data.consensus.can_progress && data.consensus.pending_mentors.length > 0) {
+                html += `
+                    <div class="alert alert-info mt-3">
+                        <strong>Waiting for approval from:</strong><br>
+                        ${data.consensus.pending_mentors.map(m => m.name).join(', ')}
+                    </div>
+                `;
+            }
+            
+            contentDiv.innerHTML = html;
+        } else {
+            contentDiv.innerHTML = `
+                <div class="alert alert-danger">
+                    Failed to load consensus details: ${data.message}
+                </div>
+            `;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        contentDiv.innerHTML = `
+            <div class="alert alert-danger">
+                An error occurred while loading consensus details.
+            </div>
+        `;
+    });
+}
+
+// Helper function to get stage name
+function getStageName(stage) {
+    const stageNames = {
+        1: 'Project Creation',
+        2: 'Mentorship',
+        3: 'Assessment',
+        4: 'Learning and Development',
+        5: 'Progress Tracking and Feedback',
+        6: 'Showcase and Integration'
+    };
+    return stageNames[stage] || 'Unknown Stage';
+}
+
+// Initialize DataTable if available
+$(document).ready(function() {
+    if ($.fn.DataTable) {
+        $('#projectsTable').DataTable({
+            "pageLength": 25,
+            "order": [[ 0, "asc" ]],
+            "columnDefs": [
+                { "orderable": false, "targets": [5] }
+            ]
+        });
+    }
+});
+</script>
 
 <?php include '../../templates/footer.php'; ?>

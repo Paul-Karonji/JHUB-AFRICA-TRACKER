@@ -1,38 +1,85 @@
 <?php
+// api/comments/get-comment.php - API endpoint to get single comment details
+header('Content-Type: application/json');
+require_once '../../includes/init.php';
+
+// Only accept GET requests
+if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+    http_response_code(405);
+    echo json_encode(['success' => false, 'message' => 'Method not allowed']);
+    exit;
+}
+
+try {
+    // Validate required parameter
+    if (!isset($_GET['id']) || empty($_GET['id'])) {
+        throw new Exception('Comment ID is required');
+    }
+
+    $commentId = intval($_GET['id']);
+
+    // Require admin authentication for accessing comment details
+    if (!$auth->isLoggedIn() || $auth->getUserType() !== USER_TYPE_ADMIN) {
+        throw new Exception('Administrative access required');
+    }
+
+    // Get comment details
+    $comment = $database->getRow("
+        SELECT c.*, p.project_name
+        FROM comments c
+        INNER JOIN projects p ON c.project_id = p.project_id
+        WHERE c.comment_id = ?
+    ", [$commentId]);
+
+    if (!$comment) {
+        throw new Exception('Comment not found');
+    }
+
+    echo json_encode([
+        'success' => true,
+        'comment' => $comment
+    ]);
+
+} catch (Exception $e) {
+    http_response_code(400);
+    echo json_encode([
+        'success' => false,
+        'message' => $e->getMessage()
+    ]);
+    
+    error_log('Get comment error: ' . $e->getMessage());
+}
+
+// =====================================================================================
+// includes/functions.php - Updated with new consensus and moderation functions
+// =====================================================================================
+
+<?php
 // includes/functions.php
-// Core functions with safe loading of new consensus features
+// Updated core functions with mentor consensus and comment moderation support
+
+// Include the mentor consensus functions
+require_once __DIR__ . '/mentor-consensus-functions.php';
 
 /**
- * Enhanced project metrics with consensus status (if available)
+ * Enhanced project metrics with consensus status
  */
 function getProjectMetrics($projectId) {
-    $database = Database::getInstance();
+    global $database;
     
     $metrics = [
         'team_size' => $database->count('project_innovators', 'project_id = ? AND is_active = 1', [$projectId]),
         'mentor_count' => $database->count('project_mentors', 'project_id = ? AND is_active = 1', [$projectId]),
         'resources_count' => $database->count('mentor_resources', 'project_id = ? AND is_deleted = 0', [$projectId]),
         'assessments_count' => $database->count('project_assessments', 'project_id = ? AND is_deleted = 0', [$projectId]),
-        'approved_comments_count' => $database->count('comments', 'project_id = ? AND is_deleted = 0', [$projectId]),
-        'pending_comments_count' => 0 // Will be updated if moderation functions are available
+        'approved_comments_count' => $database->count('comments', 'project_id = ? AND is_deleted = 0 AND (commenter_type != "investor" OR is_approved = 1)', [$projectId]),
+        'pending_comments_count' => $database->count('comments', 'project_id = ? AND commenter_type = "investor" AND is_approved = 0 AND is_deleted = 0', [$projectId])
     ];
     
-    // Add consensus information if functions are available
-    if (function_exists('checkMentorConsensusForStageProgression')) {
-        $project = $database->getRow("SELECT current_stage FROM projects WHERE project_id = ?", [$projectId]);
-        if ($project) {
-            $metrics['consensus_status'] = checkMentorConsensusForStageProgression($projectId, $project['current_stage']);
-        }
-        
-        // Update comment counts with moderation awareness
-        $metrics['approved_comments_count'] = $database->count('comments', 
-            'project_id = ? AND is_deleted = 0 AND (commenter_type != "investor" OR is_approved = 1)', 
-            [$projectId]
-        );
-        $metrics['pending_comments_count'] = $database->count('comments', 
-            'project_id = ? AND commenter_type = "investor" AND is_approved = 0 AND is_deleted = 0', 
-            [$projectId]
-        );
+    // Add consensus information
+    $project = $database->getRow("SELECT current_stage FROM projects WHERE project_id = ?", [$projectId]);
+    if ($project) {
+        $metrics['consensus_status'] = checkMentorConsensusForStageProgression($projectId, $project['current_stage']);
     }
     
     return $metrics;
@@ -42,7 +89,7 @@ function getProjectMetrics($projectId) {
  * Enhanced project team lookup with better formatting
  */
 function getProjectTeam($projectId) {
-    $database = Database::getInstance();
+    global $database;
     
     return $database->getRows("
         SELECT pi.*, 
@@ -58,41 +105,22 @@ function getProjectTeam($projectId) {
 }
 
 /**
- * Enhanced mentor lookup with approval status (if available)
+ * Enhanced mentor lookup with approval status
  */
 function getProjectMentors($projectId) {
-    $database = Database::getInstance();
+    global $database;
     
-    // Check if mentor_stage_approvals table exists
-    $hasConsensusTable = false;
-    try {
-        $database->query("SELECT 1 FROM mentor_stage_approvals LIMIT 1");
-        $hasConsensusTable = true;
-    } catch (Exception $e) {
-        // Table doesn't exist yet
-    }
-    
-    if ($hasConsensusTable) {
-        $mentors = $database->getRows("
-            SELECT m.*, pm.assigned_at, pm.notes,
-                   msa.approved_for_next_stage, msa.approval_date
-            FROM mentors m
-            INNER JOIN project_mentors pm ON m.mentor_id = pm.mentor_id
-            LEFT JOIN mentor_stage_approvals msa ON m.mentor_id = msa.mentor_id 
-                AND msa.project_id = pm.project_id 
-                AND msa.current_stage = (SELECT current_stage FROM projects WHERE project_id = pm.project_id)
-            WHERE pm.project_id = ? AND pm.is_active = 1
-            ORDER BY pm.assigned_at ASC
-        ", [$projectId]);
-    } else {
-        $mentors = $database->getRows("
-            SELECT m.*, pm.assigned_at, pm.notes
-            FROM mentors m
-            INNER JOIN project_mentors pm ON m.mentor_id = pm.mentor_id
-            WHERE pm.project_id = ? AND pm.is_active = 1
-            ORDER BY pm.assigned_at ASC
-        ", [$projectId]);
-    }
+    $mentors = $database->getRows("
+        SELECT m.*, pm.assigned_at, pm.notes,
+               msa.approved_for_next_stage, msa.approval_date
+        FROM mentors m
+        INNER JOIN project_mentors pm ON m.mentor_id = pm.mentor_id
+        LEFT JOIN mentor_stage_approvals msa ON m.mentor_id = msa.mentor_id 
+            AND msa.project_id = pm.project_id 
+            AND msa.current_stage = (SELECT current_stage FROM projects WHERE project_id = pm.project_id)
+        WHERE pm.project_id = ? AND pm.is_active = 1
+        ORDER BY pm.assigned_at ASC
+    ", [$projectId]);
     
     return $mentors;
 }
@@ -101,7 +129,7 @@ function getProjectMentors($projectId) {
  * Enhanced activity logging with better categorization
  */
 function logActivity($userType, $userId, $action, $description, $projectId = null, $additionalData = null) {
-    $database = Database::getInstance();
+    global $database;
     
     try {
         $activityData = [
@@ -127,7 +155,7 @@ function logActivity($userType, $userId, $action, $description, $projectId = nul
  * Enhanced email notification with better templating
  */
 function sendEmailNotification($recipientEmail, $subject, $messageBody, $notificationType, $projectId = null) {
-    $database = Database::getInstance();
+    global $database;
     
     try {
         // Queue the email notification
@@ -139,14 +167,6 @@ function sendEmailNotification($recipientEmail, $subject, $messageBody, $notific
             'related_project_id' => $projectId,
             'status' => 'pending'
         ];
-        
-        // Check if status column exists
-        try {
-            $database->query("SELECT status FROM email_notifications LIMIT 1");
-        } catch (Exception $e) {
-            // Remove status if column doesn't exist
-            unset($notificationData['status']);
-        }
         
         $notificationId = $database->insert('email_notifications', $notificationData);
         
@@ -163,7 +183,7 @@ function sendEmailNotification($recipientEmail, $subject, $messageBody, $notific
 }
 
 /**
- * Enhanced stage progression with consensus checking (if available)
+ * Enhanced stage progression with consensus checking
  */
 function canProjectProgress($projectId) {
     $project = getProjectById($projectId);
@@ -176,21 +196,16 @@ function canProjectProgress($projectId) {
         return false;
     }
     
-    // Check mentor consensus if function is available
-    if (function_exists('checkMentorConsensusForStageProgression')) {
-        $consensus = checkMentorConsensusForStageProgression($projectId, $project['current_stage']);
-        return $consensus['can_progress'];
-    }
-    
-    // Fallback: if no consensus system, allow progression
-    return true;
+    // Check mentor consensus
+    $consensus = checkMentorConsensusForStageProgression($projectId, $project['current_stage']);
+    return $consensus['can_progress'];
 }
 
 /**
  * Get project by ID with enhanced details
  */
 function getProjectById($projectId) {
-    $database = Database::getInstance();
+    global $database;
     
     $project = $database->getRow("
         SELECT p.*,
@@ -204,11 +219,7 @@ function getProjectById($projectId) {
         $project['stage_name'] = getStageName($project['current_stage']);
         $project['stage_description'] = getStageDescription($project['current_stage']);
         $project['stage_progress'] = getStageProgress($project['current_stage']);
-        
-        // Add consensus status if function is available
-        if (function_exists('checkMentorConsensusForStageProgression')) {
-            $project['consensus_status'] = checkMentorConsensusForStageProgression($projectId, $project['current_stage']);
-        }
+        $project['consensus_status'] = checkMentorConsensusForStageProgression($projectId, $project['current_stage']);
     }
     
     return $project;
@@ -218,86 +229,47 @@ function getProjectById($projectId) {
  * Enhanced comment visibility check
  */
 function getProjectComments($projectId, $viewerType = null, $viewerId = null, $includeReplies = true) {
-    $database = Database::getInstance();
-    
-    // Check if we have the new comment moderation functions
-    if (function_exists('getVisibleProjectComments')) {
-        return getVisibleProjectComments($projectId, $viewerType, $viewerId);
-    }
-    
-    // Fallback to simple comment retrieval
-    $conditions = ["c.project_id = ?", "c.is_deleted = 0"];
-    $params = [$projectId];
-    
-    // Basic admin privacy check (if this is an admin viewer)
-    if ($viewerType === 'admin') {
-        $conditions[] = "(c.commenter_type != 'admin' OR c.commenter_id = ?)";
-        $params[] = $viewerId;
-    }
-    
-    $whereClause = implode(' AND ', $conditions);
-    
-    return $database->getRows("
-        SELECT c.*
-        FROM comments c
-        WHERE {$whereClause}
-        AND c.parent_comment_id IS NULL
-        ORDER BY c.created_at DESC
-    ", $params);
+    return getVisibleProjectComments($projectId, $viewerType, $viewerId);
 }
 
 /**
  * Check if user can moderate comments
  */
 function canModerateComments($userType) {
-    return $userType === 'admin';
+    return $userType === USER_TYPE_ADMIN;
 }
 
 /**
  * Check if user can override stage progression
  */
 function canOverrideStageProgression($userType) {
-    return $userType === 'admin';
+    return $userType === USER_TYPE_ADMIN;
 }
 
 /**
  * Get pending moderation counts for dashboard
  */
 function getPendingModerationCounts() {
-    $database = Database::getInstance();
+    global $database;
     
-    $counts = [
-        'pending_comments' => 0,
-        'projects_needing_consensus' => 0
-    ];
-    
-    // Check if comment moderation columns exist
-    try {
-        $counts['pending_comments'] = $database->count('comments', 
+    return [
+        'pending_comments' => $database->count('comments', 
             'commenter_type = "investor" AND is_approved = 0 AND is_deleted = 0'
-        );
-    } catch (Exception $e) {
-        // Moderation not available yet
-    }
-    
-    // Check if consensus system is available
-    if (function_exists('checkMentorConsensusForStageProgression')) {
-        $counts['projects_needing_consensus'] = $database->count('projects p', 
+        ),
+        'projects_needing_consensus' => $database->count('projects p', 
             'p.status = "active" AND p.current_stage < 6 AND EXISTS (
                 SELECT 1 FROM project_mentors pm 
                 WHERE pm.project_id = p.project_id AND pm.is_active = 1
             )'
-        );
-    }
-    
-    return $counts;
+        )
+    ];
 }
 
 /**
  * Enhanced stage progression statistics
  */
 function getStageProgressionStats() {
-    $database = Database::getInstance();
+    global $database;
     
     $stats = [];
     
@@ -308,20 +280,18 @@ function getStageProgressionStats() {
         );
     }
     
-    // Projects ready to progress (if consensus system is available)
+    // Projects ready to progress
     $readyToProgress = 0;
-    if (function_exists('checkMentorConsensusForStageProgression')) {
-        $projects = $database->getRows("
-            SELECT project_id, current_stage 
-            FROM projects 
-            WHERE status = 'active' AND current_stage < 6
-        ");
-        
-        foreach ($projects as $project) {
-            $consensus = checkMentorConsensusForStageProgression($project['project_id'], $project['current_stage']);
-            if ($consensus['can_progress']) {
-                $readyToProgress++;
-            }
+    $projects = $database->getRows("
+        SELECT project_id, current_stage 
+        FROM projects 
+        WHERE status = 'active' AND current_stage < 6
+    ");
+    
+    foreach ($projects as $project) {
+        $consensus = checkMentorConsensusForStageProgression($project['project_id'], $project['current_stage']);
+        if ($consensus['can_progress']) {
+            $readyToProgress++;
         }
     }
     
@@ -338,28 +308,28 @@ function getStageProgressionStats() {
 function hasPermission($action, $userType, $resourceId = null, $userId = null) {
     switch ($action) {
         case 'moderate_comments':
-            return $userType === 'admin';
+            return $userType === USER_TYPE_ADMIN;
             
         case 'override_stage':
-            return $userType === 'admin';
+            return $userType === USER_TYPE_ADMIN;
             
         case 'approve_stage_progression':
-            if ($userType !== 'mentor' || !$resourceId || !$userId) {
+            if ($userType !== USER_TYPE_MENTOR || !$resourceId || !$userId) {
                 return false;
             }
             // Check if mentor is assigned to project
-            $database = Database::getInstance();
-            return $database->count('project_mentors', 
+            global $database;
+            return $database->exists('project_mentors', 
                 'project_id = ? AND mentor_id = ? AND is_active = 1', 
                 [$resourceId, $userId]
-            ) > 0;
+            );
             
         case 'view_admin_comments':
             // Admins can only see their own comments, not other admin comments
             return false;
             
         case 'view_pending_comments':
-            return $userType === 'admin';
+            return $userType === USER_TYPE_ADMIN;
             
         default:
             return false;
@@ -367,22 +337,47 @@ function hasPermission($action, $userType, $resourceId = null, $userId = null) {
 }
 
 /**
+ * Enhanced notification system
+ */
+function notifyMentorsOfStageProgression($projectId, $oldStage, $newStage) {
+    global $database;
+    
+    $project = $database->getRow("SELECT project_name FROM projects WHERE project_id = ?", [$projectId]);
+    $mentors = $database->getRows("
+        SELECT m.name, m.email
+        FROM mentors m
+        INNER JOIN project_mentors pm ON m.mentor_id = pm.mentor_id
+        WHERE pm.project_id = ? AND pm.is_active = 1
+    ", [$projectId]);
+    
+    foreach ($mentors as $mentor) {
+        sendEmailNotification(
+            $mentor['email'],
+            "Project Advanced: {$project['project_name']}",
+            "The project '{$project['project_name']}' has progressed from Stage {$oldStage} to Stage {$newStage}.\n\nBest regards,\nJHUB AFRICA Team",
+            NOTIFY_STAGE_UPDATED,
+            $projectId
+        );
+    }
+}
+
+/**
  * Helper function to validate project access
  */
 function validateProjectAccess($projectId, $userType, $userId) {
-    $database = Database::getInstance();
+    global $database;
     
     switch ($userType) {
-        case 'admin':
+        case USER_TYPE_ADMIN:
             return true; // Admins can access all projects
             
-        case 'mentor':
-            return $database->count('project_mentors', 
+        case USER_TYPE_MENTOR:
+            return $database->exists('project_mentors', 
                 'project_id = ? AND mentor_id = ? AND is_active = 1', 
                 [$projectId, $userId]
-            ) > 0;
+            );
             
-        case 'project':
+        case USER_TYPE_PROJECT:
             return $projectId == $userId; // Project users can only access their own project
             
         default:
@@ -394,25 +389,18 @@ function validateProjectAccess($projectId, $userType, $userId) {
  * Get project statistics for dashboards
  */
 function getProjectStatistics($projectId = null) {
-    $database = Database::getInstance();
+    global $database;
     
     if ($projectId) {
         // Individual project stats
-        $stats = [
+        return [
             'metrics' => getProjectMetrics($projectId),
             'team' => getProjectTeam($projectId),
-            'mentors' => getProjectMentors($projectId)
+            'mentors' => getProjectMentors($projectId),
+            'consensus' => checkMentorConsensusForStageProgression($projectId, 
+                $database->getValue("SELECT current_stage FROM projects WHERE project_id = ?", [$projectId])
+            )
         ];
-        
-        // Add consensus if available
-        if (function_exists('checkMentorConsensusForStageProgression')) {
-            $currentStage = $database->getRow("SELECT current_stage FROM projects WHERE project_id = ?", [$projectId]);
-            if ($currentStage) {
-                $stats['consensus'] = checkMentorConsensusForStageProgression($projectId, $currentStage['current_stage']);
-            }
-        }
-        
-        return $stats;
     } else {
         // System-wide stats
         return [
@@ -440,7 +428,7 @@ function isProjectCompleted($projectId) {
 }
 
 function getMentorProjects($mentorId) {
-    $database = Database::getInstance();
+    global $database;
     
     return $database->getRows("
         SELECT p.*, pm.assigned_at,
@@ -454,13 +442,9 @@ function getMentorProjects($mentorId) {
 
 // Initialize mentor approvals for existing projects (migration helper)
 function initializeMentorApprovals() {
-    $database = Database::getInstance();
+    global $database;
     
     try {
-        // Check if table exists first
-        $database->query("SELECT 1 FROM mentor_stage_approvals LIMIT 1");
-        
-        // If we get here, table exists, so initialize approvals
         $database->query("
             INSERT IGNORE INTO mentor_stage_approvals 
             (project_id, mentor_id, current_stage, approved_for_next_stage)
@@ -476,4 +460,5 @@ function initializeMentorApprovals() {
         return false;
     }
 }
+
 ?>
