@@ -22,7 +22,7 @@ require_once __DIR__ . '/../classes/Validator.php';
 if (!defined('SMTP_HOST')) define('SMTP_HOST', 'smtp.gmail.com');
 if (!defined('SMTP_PORT')) define('SMTP_PORT', 587);
 if (!defined('SMTP_USERNAME')) define('SMTP_USERNAME', 'info.jhub@jkuat.ac.ke');
-if (!defined('SMTP_PASSWORD')) define('SMTP_PASSWORD', ''); // Gmail App Password
+if (!defined('SMTP_PASSWORD')) define('SMTP_PASSWORD', 'agza ugcq lzhj wgiu'); // Gmail App Password
 if (!defined('SMTP_ENCRYPTION')) define('SMTP_ENCRYPTION', 'tls');
 if (!defined('SMTP_FROM_EMAIL')) define('SMTP_FROM_EMAIL', 'info.jhub@jkuat.ac.ke');
 if (!defined('SMTP_FROM_NAME')) define('SMTP_FROM_NAME', 'JHUB AFRICA');
