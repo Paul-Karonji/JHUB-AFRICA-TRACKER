@@ -1,300 +1,413 @@
 <?php
-// api/projects/mentors.php
-// Mentor assignment to projects API
+/**
+ * api/projects/mentors.php
+ * 100% COMPLETE FILE - Mentor Assignment API with Approval Record Creation
+ */
 
 header('Content-Type: application/json');
 require_once '../../includes/init.php';
 
-// Require authentication
-if (!$auth->isValidSession()) {
-    http_response_code(401);
-    echo json_encode(['success' => false, 'message' => 'Authentication required']);
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    echo json_encode(['success' => false, 'message' => 'Method not allowed']);
     exit;
 }
 
-$userType = $auth->getUserType();
-$userId = $auth->getUserId();
-
 try {
-    // Handle POST requests (join/leave project)
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $input = json_decode(file_get_contents('php://input'), true);
-        
-        if (!$input) {
-            throw new Exception('Invalid request data');
-        }
+    $input = json_decode(file_get_contents('php://input'), true);
+    
+    if (!$input) {
+        throw new Exception('Invalid request data');
+    }
 
-        // Validate CSRF token
-        if (!isset($input['csrf_token']) || !$auth->validateCSRFToken($input['csrf_token'])) {
-            throw new Exception('Invalid security token');
-        }
+    if (!isset($input['csrf_token']) || !$auth->validateCSRFToken($input['csrf_token'])) {
+        throw new Exception('Invalid security token');
+    }
 
-        $action = $input['action'] ?? '';
-        $projectId = intval($input['project_id'] ?? 0);
+    $userType = $auth->getUserType();
+    $userId = $auth->getUserId();
+    
+    if (!isset($input['action'])) {
+        throw new Exception('Action is required');
+    }
+    
+    if (!isset($input['project_id'])) {
+        throw new Exception('Project ID is required');
+    }
 
-        if (!$projectId) {
-            throw new Exception('Project ID is required');
-        }
+    $action = $input['action'];
+    $projectId = intval($input['project_id']);
 
-        // Verify project exists and is active
-        $project = $database->getRow(
-            "SELECT * FROM projects WHERE project_id = ? AND status = 'active'",
-            [$projectId]
-        );
+    $project = $database->getRow(
+        "SELECT * FROM projects WHERE project_id = ? AND status = 'active'",
+        [$projectId]
+    );
 
-        if (!$project) {
-            throw new Exception('Project not found or not active');
-        }
+    if (!$project) {
+        throw new Exception('Project not found or not active');
+    }
 
-        switch ($action) {
-            case 'join':
-                // Mentor joins project (self-assignment)
-                if ($userType !== USER_TYPE_MENTOR) {
-                    throw new Exception('Only mentors can join projects');
-                }
+    switch ($action) {
+        case 'join':
+            if ($userType !== USER_TYPE_MENTOR) {
+                throw new Exception('Only mentors can join projects');
+            }
 
-                // Check if already assigned
-                $existing = $database->getRow(
-                    "SELECT * FROM project_mentors 
-                     WHERE mentor_id = ? AND project_id = ? AND is_active = 1",
-                    [$userId, $projectId]
-                );
+            $mentorId = $userId;
 
-                if ($existing) {
+            $existing = $database->getRow(
+                "SELECT * FROM project_mentors WHERE project_id = ? AND mentor_id = ?",
+                [$projectId, $mentorId]
+            );
+
+            if ($existing) {
+                if ($existing['is_active']) {
                     throw new Exception('You are already assigned to this project');
+                } else {
+                    $updated = $database->update(
+                        'project_mentors',
+                        ['is_active' => 1, 'assigned_at' => date('Y-m-d H:i:s')],
+                        'pm_id = ?',
+                        [$existing['pm_id']]
+                    );
+                    
+                    if (!$updated) {
+                        throw new Exception('Failed to rejoin project');
+                    }
+                    
+                    $assignmentId = $existing['pm_id'];
                 }
-
-                // Add mentor assignment
+            } else {
                 $assignmentData = [
                     'project_id' => $projectId,
-                    'mentor_id' => $userId,
+                    'mentor_id' => $mentorId,
                     'assigned_by_mentor' => 1,
                     'is_active' => 1
                 ];
-
+                
                 $assignmentId = $database->insert('project_mentors', $assignmentData);
-
+                
                 if (!$assignmentId) {
                     throw new Exception('Failed to join project');
                 }
+            }
 
-                // Get mentor details
-                $mentor = $database->getRow(
-                    "SELECT * FROM mentors WHERE mentor_id = ?",
-                    [$userId]
-                );
-
-                // Progress to Stage 2 if still in Stage 1
-                if ($project['current_stage'] == 1) {
-                    $database->update(
-                        'projects',
-                        ['current_stage' => 2],
-                        'project_id = ?',
-                        [$projectId]
-                    );
-
-                    // Log stage progression
-                    logActivity(
-                        'system',
-                        null,
-                        'stage_updated',
-                        "Project progressed to Stage 2 (Mentorship) after mentor assignment",
-                        $projectId,
-                        ['old_stage' => 1, 'new_stage' => 2]
-                    );
-                }
-
-                // Log activity
-                logActivity(
-                    USER_TYPE_MENTOR,
-                    $userId,
-                    'mentor_joined',
-                    "Mentor {$mentor['name']} joined project",
-                    $projectId
-                );
-
-                // Send notification to project lead
-                sendEmailNotification(
-                    $project['project_lead_email'],
-                    'New Mentor Assigned to Your Project',
-                    "Good news! {$mentor['name']}, an expert in {$mentor['area_of_expertise']}, has joined your project '{$project['project_name']}' as a mentor.\n\nYou can now collaborate with your mentor through the project dashboard.\n\nBest regards,\nJHUB AFRICA Team",
-                    NOTIFY_MENTOR_ASSIGNED
-                );
-
-                echo json_encode([
-                    'success' => true,
-                    'message' => 'Successfully joined project! You can now mentor this innovation.',
-                    'assignment_id' => $assignmentId
-                ]);
-                break;
-
-            case 'leave':
-                // Mentor leaves project
-                if ($userType !== USER_TYPE_MENTOR && $userType !== USER_TYPE_ADMIN) {
-                    throw new Exception('Access denied');
-                }
-
-                $mentorId = ($userType === USER_TYPE_ADMIN && isset($input['mentor_id'])) 
-                    ? intval($input['mentor_id']) 
-                    : $userId;
-
-                // Check if assigned
-                $assignment = $database->getRow(
-                    "SELECT * FROM project_mentors 
-                     WHERE mentor_id = ? AND project_id = ? AND is_active = 1",
-                    [$mentorId, $projectId]
-                );
-
-                if (!$assignment) {
-                    throw new Exception('Mentor is not assigned to this project');
-                }
-
-                // Soft delete assignment
+            if ($project['current_stage'] == 1) {
                 $database->update(
-                    'project_mentors',
-                    ['is_active' => 0],
-                    'pm_id = ?',
-                    [$assignment['pm_id']]
+                    'projects',
+                    ['current_stage' => 2],
+                    'project_id = ?',
+                    [$projectId]
                 );
 
-                // Get mentor details
-                $mentor = $database->getRow(
-                    "SELECT * FROM mentors WHERE mentor_id = ?",
-                    [$mentorId]
-                );
-
-                // Log activity
                 logActivity(
-                    $userType,
-                    $userId,
-                    'mentor_left',
-                    "Mentor {$mentor['name']} left project",
-                    $projectId
+                    'system',
+                    null,
+                    'stage_updated',
+                    "Project progressed to Stage 2 (Mentorship) after mentor assignment",
+                    $projectId,
+                    ['old_stage' => 1, 'new_stage' => 2]
                 );
+                
+                resetMentorApprovalsForStage($projectId, 2);
+            }
+            
+            createInitialMentorApproval($projectId, $mentorId);
 
-                echo json_encode([
-                    'success' => true,
-                    'message' => 'Successfully left project. Your contributions remain with the project.'
-                ]);
-                break;
+            $mentor = $database->getRow(
+                "SELECT * FROM mentors WHERE mentor_id = ?",
+                [$mentorId]
+            );
 
-            case 'assign':
-                // Admin assigns mentor to project
-                if ($userType !== USER_TYPE_ADMIN) {
-                    throw new Exception('Only admins can assign mentors');
-                }
+            logActivity(
+                USER_TYPE_MENTOR,
+                $userId,
+                'mentor_joined',
+                "Mentor {$mentor['name']} joined project",
+                $projectId
+            );
 
-                $mentorId = intval($input['mentor_id'] ?? 0);
+            sendEmailNotification(
+                $project['project_lead_email'],
+                'New Mentor Assigned to Your Project',
+                "Good news! {$mentor['name']}, an expert in {$mentor['area_of_expertise']}, has joined your project '{$project['project_name']}' as a mentor.\n\nBest regards,\nJHUB AFRICA Team",
+                'mentor_assigned',
+                $projectId
+            );
 
-                if (!$mentorId) {
-                    throw new Exception('Mentor ID is required');
-                }
+            echo json_encode([
+                'success' => true,
+                'message' => 'Successfully joined project!',
+                'assignment_id' => $assignmentId
+            ]);
+            break;
 
-                // Verify mentor exists
-                $mentor = $database->getRow(
-                    "SELECT * FROM mentors WHERE mentor_id = ? AND is_active = 1",
-                    [$mentorId]
-                );
+        case 'leave':
+            if ($userType !== USER_TYPE_MENTOR && $userType !== USER_TYPE_ADMIN) {
+                throw new Exception('Access denied');
+            }
 
-                if (!$mentor) {
-                    throw new Exception('Mentor not found');
-                }
+            $mentorId = ($userType === USER_TYPE_ADMIN && isset($input['mentor_id'])) 
+                ? intval($input['mentor_id']) 
+                : $userId;
 
-                // Check if already assigned
-                $existing = $database->getRow(
-                    "SELECT * FROM project_mentors 
-                     WHERE mentor_id = ? AND project_id = ? AND is_active = 1",
-                    [$mentorId, $projectId]
-                );
+            $assignment = $database->getRow(
+                "SELECT * FROM project_mentors 
+                 WHERE mentor_id = ? AND project_id = ? AND is_active = 1",
+                [$mentorId, $projectId]
+            );
 
-                if ($existing) {
+            if (!$assignment) {
+                throw new Exception('Mentor is not assigned to this project');
+            }
+
+            $database->update(
+                'project_mentors',
+                ['is_active' => 0],
+                'pm_id = ?',
+                [$assignment['pm_id']]
+            );
+
+            $mentor = $database->getRow(
+                "SELECT * FROM mentors WHERE mentor_id = ?",
+                [$mentorId]
+            );
+
+            logActivity(
+                $userType,
+                $userId,
+                'mentor_left',
+                "Mentor {$mentor['name']} left project",
+                $projectId
+            );
+
+            $database->update(
+                'mentor_stage_approvals',
+                ['approved_for_next_stage' => 0],
+                'project_id = ? AND mentor_id = ?',
+                [$projectId, $mentorId]
+            );
+
+            echo json_encode([
+                'success' => true,
+                'message' => 'Mentor has left the project'
+            ]);
+            break;
+
+        case 'assign':
+            if ($userType !== USER_TYPE_ADMIN) {
+                throw new Exception('Only administrators can assign mentors');
+            }
+
+            if (!isset($input['mentor_id'])) {
+                throw new Exception('Mentor ID is required');
+            }
+
+            $mentorId = intval($input['mentor_id']);
+
+            $mentor = $database->getRow(
+                "SELECT * FROM mentors WHERE mentor_id = ? AND is_active = 1",
+                [$mentorId]
+            );
+
+            if (!$mentor) {
+                throw new Exception('Mentor not found or inactive');
+            }
+
+            $existing = $database->getRow(
+                "SELECT * FROM project_mentors WHERE project_id = ? AND mentor_id = ?",
+                [$projectId, $mentorId]
+            );
+
+            if ($existing) {
+                if ($existing['is_active']) {
                     throw new Exception('Mentor is already assigned to this project');
+                } else {
+                    $database->update(
+                        'project_mentors',
+                        ['is_active' => 1, 'assigned_at' => date('Y-m-d H:i:s')],
+                        'pm_id = ?',
+                        [$existing['pm_id']]
+                    );
+                    $assignmentId = $existing['pm_id'];
                 }
-
-                // Add assignment
+            } else {
                 $assignmentData = [
                     'project_id' => $projectId,
                     'mentor_id' => $mentorId,
                     'assigned_by_mentor' => 0,
-                    'is_active' => 1,
-                    'notes' => $input['notes'] ?? null
+                    'is_active' => 1
                 ];
-
+                
                 $assignmentId = $database->insert('project_mentors', $assignmentData);
-
+                
                 if (!$assignmentId) {
                     throw new Exception('Failed to assign mentor');
                 }
+            }
 
-                // Progress to Stage 2 if still in Stage 1
-                if ($project['current_stage'] == 1) {
-                    $database->update(
-                        'projects',
-                        ['current_stage' => 2],
-                        'project_id = ?',
-                        [$projectId]
-                    );
-                }
+            if ($project['current_stage'] == 1) {
+                $database->update(
+                    'projects',
+                    ['current_stage' => 2],
+                    'project_id = ?',
+                    [$projectId]
+                );
 
-                // Log activity
                 logActivity(
-                    USER_TYPE_ADMIN,
-                    $userId,
-                    'mentor_assigned',
-                    "Admin assigned mentor {$mentor['name']} to project",
-                    $projectId
+                    'system',
+                    null,
+                    'stage_updated',
+                    "Project progressed to Stage 2 (Mentorship) after mentor assignment",
+                    $projectId,
+                    ['old_stage' => 1, 'new_stage' => 2]
                 );
+                
+                resetMentorApprovalsForStage($projectId, 2);
+            }
 
-                // Send notifications
-                sendEmailNotification(
-                    $mentor['email'],
-                    'You Have Been Assigned to a Project',
-                    "You have been assigned as a mentor to the project '{$project['project_name']}'.\n\nPlease login to your mentor dashboard to view project details and start mentoring.\n\nBest regards,\nJHUB AFRICA Team",
-                    NOTIFY_MENTOR_ASSIGNED
-                );
+            createInitialMentorApproval($projectId, $mentorId);
 
-                sendEmailNotification(
-                    $project['project_lead_email'],
-                    'New Mentor Assigned to Your Project',
-                    "Good news! {$mentor['name']}, an expert in {$mentor['area_of_expertise']}, has been assigned to your project '{$project['project_name']}'.\n\nBest regards,\nJHUB AFRICA Team",
-                    NOTIFY_MENTOR_ASSIGNED
-                );
+            logActivity(
+                USER_TYPE_ADMIN,
+                $userId,
+                'mentor_assigned',
+                "Admin assigned mentor {$mentor['name']} to project",
+                $projectId
+            );
 
-                echo json_encode([
-                    'success' => true,
-                    'message' => 'Mentor assigned successfully',
-                    'assignment_id' => $assignmentId
-                ]);
-                break;
+            sendEmailNotification(
+                $mentor['email'],
+                'You Have Been Assigned to a Project',
+                "Hi {$mentor['name']},\n\nYou have been assigned to mentor '{$project['project_name']}'.\n\nBest regards,\nJHUB AFRICA Team",
+                'mentor_assigned',
+                $projectId
+            );
 
-            default:
-                throw new Exception('Invalid action');
-        }
+            sendEmailNotification(
+                $project['project_lead_email'],
+                'New Mentor Assigned to Your Project',
+                "Good news! {$mentor['name']} has been assigned to mentor '{$project['project_name']}'.\n\nBest regards,\nJHUB AFRICA Team",
+                'mentor_assigned',
+                $projectId
+            );
 
-    } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        // Get mentors for a project
-        $projectId = intval($_GET['project_id'] ?? 0);
+            echo json_encode([
+                'success' => true,
+                'message' => 'Mentor assigned successfully',
+                'assignment_id' => $assignmentId
+            ]);
+            break;
 
-        if (!$projectId) {
-            throw new Exception('Project ID is required');
-        }
+        case 'remove':
+            if ($userType !== USER_TYPE_ADMIN) {
+                throw new Exception('Only administrators can remove mentors');
+            }
 
-        $mentors = $database->getRows("
-            SELECT m.*, pm.assigned_at, pm.notes, pm.assigned_by_mentor
-            FROM project_mentors pm
-            INNER JOIN mentors m ON pm.mentor_id = m.mentor_id
-            WHERE pm.project_id = ? AND pm.is_active = 1
-            ORDER BY pm.assigned_at ASC
-        ", [$projectId]);
+            if (!isset($input['mentor_id'])) {
+                throw new Exception('Mentor ID is required');
+            }
 
-        echo json_encode([
-            'success' => true,
-            'data' => $mentors,
-            'count' => count($mentors)
-        ]);
+            $mentorId = intval($input['mentor_id']);
 
-    } else {
-        throw new Exception('Method not allowed');
+            $assignment = $database->getRow(
+                "SELECT * FROM project_mentors 
+                 WHERE mentor_id = ? AND project_id = ? AND is_active = 1",
+                [$mentorId, $projectId]
+            );
+
+            if (!$assignment) {
+                throw new Exception('Mentor is not assigned to this project');
+            }
+
+            $database->update(
+                'project_mentors',
+                ['is_active' => 0],
+                'pm_id = ?',
+                [$assignment['pm_id']]
+            );
+
+            $mentor = $database->getRow(
+                "SELECT * FROM mentors WHERE mentor_id = ?",
+                [$mentorId]
+            );
+
+            logActivity(
+                USER_TYPE_ADMIN,
+                $userId,
+                'mentor_removed',
+                "Admin removed mentor {$mentor['name']} from project",
+                $projectId
+            );
+
+            $database->update(
+                'mentor_stage_approvals',
+                ['approved_for_next_stage' => 0],
+                'project_id = ? AND mentor_id = ?',
+                [$projectId, $mentorId]
+            );
+
+            sendEmailNotification(
+                $mentor['email'],
+                'Removed from Project',
+                "Hi {$mentor['name']},\n\nYou have been removed from '{$project['project_name']}'.\n\nBest regards,\nJHUB AFRICA Team",
+                'system_alert',
+                $projectId
+            );
+
+            echo json_encode([
+                'success' => true,
+                'message' => 'Mentor removed successfully'
+            ]);
+            break;
+
+        case 'list':
+            $mentors = $database->getRows(
+                "SELECT m.*, 
+                        pm.assigned_at, 
+                        pm.is_active,
+                        msa.approved_for_next_stage,
+                        msa.approval_date
+                 FROM mentors m
+                 INNER JOIN project_mentors pm ON m.mentor_id = pm.mentor_id
+                 LEFT JOIN mentor_stage_approvals msa ON m.mentor_id = msa.mentor_id 
+                           AND msa.project_id = pm.project_id 
+                           AND msa.current_stage = ?
+                 WHERE pm.project_id = ?
+                 ORDER BY pm.assigned_at DESC",
+                [$project['current_stage'], $projectId]
+            );
+
+            echo json_encode([
+                'success' => true,
+                'mentors' => $mentors,
+                'project' => [
+                    'id' => $project['project_id'],
+                    'name' => $project['project_name'],
+                    'current_stage' => $project['current_stage'],
+                    'status' => $project['status']
+                ]
+            ]);
+            break;
+
+        case 'get_approval_status':
+            $consensus = getProjectConsensusStatus($projectId);
+            $mentorsWithStatus = getMentorsWithApprovalStatus($projectId, $project['current_stage']);
+
+            echo json_encode([
+                'success' => true,
+                'consensus' => $consensus,
+                'mentors' => $mentorsWithStatus,
+                'project' => [
+                    'id' => $project['project_id'],
+                    'name' => $project['project_name'],
+                    'current_stage' => $project['current_stage']
+                ]
+            ]);
+            break;
+
+        default:
+            throw new Exception('Invalid action: ' . $action);
     }
 
 } catch (Exception $e) {
@@ -303,6 +416,4 @@ try {
         'success' => false,
         'message' => $e->getMessage()
     ]);
-    
-    error_log('Mentor assignment error: ' . $e->getMessage());
 }
