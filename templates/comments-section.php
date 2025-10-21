@@ -1,25 +1,69 @@
 <?php
 /**
  * templates/comments-section.php
- * Universal Comments Section Component
- * Can be included in admin, mentor, or project dashboards
+ * UPDATED: Universal Comments Section with Approval Filtering
  * 
  * Required variables:
  * - $projectId: The project ID
- * - $auth: Auth instance (already available from init.php)
- * - $database: Database instance (already available from init.php)
+ * - $auth: Auth instance
+ * - $database: Database instance
+ * 
+ * CHANGES:
+ * - Filters comments by approval status
+ * - Shows only investor comments to public
+ * - Shows all approved comments to authenticated users
+ * - Admins see a link to moderate pending comments
  */
 
 if (!isset($projectId)) {
     die('Project ID is required for comments section');
 }
 
-// Get all comments for this project
-$comments = $database->getRows("
-    SELECT * FROM comments 
-    WHERE project_id = ? AND is_deleted = 0 AND parent_comment_id IS NULL
-    ORDER BY created_at DESC
-", [$projectId]);
+// Determine comment visibility based on user type
+$isAdmin = $auth->isLoggedIn() && $auth->getUserType() === USER_TYPE_ADMIN;
+$isAuthenticated = $auth->isLoggedIn();
+
+if ($isAdmin) {
+    // Admins see ALL approved comments + indicator for pending ones
+    $comments = $database->getRows("
+        SELECT * FROM comments 
+        WHERE project_id = ? 
+          AND is_deleted = 0 
+          AND parent_comment_id IS NULL
+          AND is_approved = 1
+        ORDER BY created_at DESC
+    ", [$projectId]);
+    
+    // Get pending count for admin indicator
+    $pendingCount = $database->count(
+        'comments',
+        'project_id = ? AND is_deleted = 0 AND is_approved = 0',
+        [$projectId]
+    );
+    
+} elseif ($isAuthenticated) {
+    // Authenticated users (mentor/innovator) see all approved comments
+    $comments = $database->getRows("
+        SELECT * FROM comments 
+        WHERE project_id = ? 
+          AND is_deleted = 0 
+          AND parent_comment_id IS NULL
+          AND is_approved = 1
+        ORDER BY created_at DESC
+    ", [$projectId]);
+    
+} else {
+    // Public users see ONLY approved investor comments
+    $comments = $database->getRows("
+        SELECT * FROM comments 
+        WHERE project_id = ? 
+          AND is_deleted = 0 
+          AND parent_comment_id IS NULL
+          AND is_approved = 1
+          AND commenter_type = 'investor'
+        ORDER BY created_at DESC
+    ", [$projectId]);
+}
 
 $commentsCount = count($comments);
 ?>
@@ -33,6 +77,19 @@ $commentsCount = count($comments);
         </h5>
     </div>
     <div class="card-body">
+        
+        <!-- Admin Pending Comments Notice -->
+        <?php if ($isAdmin && $pendingCount > 0): ?>
+        <div class="alert alert-warning mb-4">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong><?php echo $pendingCount; ?></strong> comment<?php echo $pendingCount > 1 ? 's' : ''; ?> 
+            pending approval.
+            <a href="<?php echo SITE_URL; ?>/dashboards/admin/moderate-comments.php?project_id=<?php echo $projectId; ?>" 
+               class="btn btn-sm btn-warning ms-2">
+                <i class="fas fa-gavel"></i> Review Now
+            </a>
+        </div>
+        <?php endif; ?>
         
         <!-- Comment Form for Authenticated Users -->
         <?php if ($auth->isLoggedIn()): ?>
@@ -61,6 +118,14 @@ $commentsCount = count($comments);
         
         <hr>
         
+        <!-- Public Comment Notice -->
+        <?php if (!$isAuthenticated): ?>
+        <div class="alert alert-info mb-4">
+            <i class="fas fa-info-circle me-2"></i>
+            Public comments are welcome! However, they will only be visible after admin approval to maintain quality and prevent spam.
+        </div>
+        <?php endif; ?>
+        
         <!-- Comments List -->
         <div id="commentsList">
             <?php if (empty($comments)): ?>
@@ -85,21 +150,35 @@ $commentsCount = count($comments);
                                     ($comment['commenter_type'] === 'mentor' ? 'primary' : 
                                     ($comment['commenter_type'] === 'innovator' ? 'success' : 'info')); 
                             ?>">
-                                <i class="fas fa-<?php 
-                                    echo $comment['commenter_type'] === 'admin' ? 'user-shield' : 
-                                        ($comment['commenter_type'] === 'mentor' ? 'user-tie' : 
-                                        ($comment['commenter_type'] === 'innovator' ? 'user-cog' : 'user')); 
-                                ?> me-1"></i>
                                 <?php echo htmlspecialchars($comment['commenter_name']); ?>
                             </strong>
-                            <span class="badge bg-secondary ms-2"><?php echo ucfirst($comment['commenter_type']); ?></span>
+                            <span class="badge bg-<?php 
+                                echo $comment['commenter_type'] === 'admin' ? 'danger' : 
+                                    ($comment['commenter_type'] === 'mentor' ? 'primary' : 
+                                    ($comment['commenter_type'] === 'innovator' ? 'success' : 'info')); 
+                            ?> ms-2">
+                                <?php echo ucfirst($comment['commenter_type']); ?>
+                            </span>
+                            <?php if ($isAdmin): ?>
+                                <span class="badge bg-success ms-1" title="Approved">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            <?php endif; ?>
                         </div>
                         <small class="text-muted">
-                            <i class="fas fa-clock me-1"></i>
                             <?php echo formatDate($comment['created_at']); ?>
                         </small>
                     </div>
-                    <p class="mb-0"><?php echo nl2br(htmlspecialchars($comment['comment_text'])); ?></p>
+                    
+                    <div class="comment-text mt-2">
+                        <?php echo nl2br(htmlspecialchars($comment['comment_text'])); ?>
+                    </div>
+                    
+                    <?php if ($comment['is_edited']): ?>
+                    <div class="mt-2">
+                        <small class="text-muted"><i class="fas fa-edit"></i> Edited</small>
+                    </div>
+                    <?php endif; ?>
                 </div>
                 <?php endforeach; ?>
             <?php endif; ?>
@@ -111,8 +190,7 @@ $commentsCount = count($comments);
 function submitComment(event) {
     event.preventDefault();
     
-    const form = document.getElementById('commentForm');
-    const submitBtn = form.querySelector('button[type="submit"]');
+    const submitBtn = event.target.querySelector('button[type="submit"]');
     const originalBtnText = submitBtn.innerHTML;
     const alertDiv = document.getElementById('commentAlert');
     
@@ -145,15 +223,16 @@ function submitComment(event) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alertDiv.innerHTML = '<div class="alert alert-success"><i class="fas fa-check-circle me-2"></i>' + data.message + '</div>';
+            const alertClass = data.message_type === 'info' ? 'alert-info' : 'alert-success';
+            alertDiv.innerHTML = `<div class="alert ${alertClass}"><i class="fas fa-check-circle me-2"></i>${data.message}</div>`;
             
             // Clear form
             document.getElementById('comment_text').value = '';
             
-            // Reload page after 1 second to show new comment
+            // Reload page after 1.5 seconds to show new comment (if auto-approved)
             setTimeout(() => {
                 window.location.reload();
-            }, 1000);
+            }, 1500);
         } else {
             alertDiv.innerHTML = '<div class="alert alert-danger"><i class="fas fa-exclamation-triangle me-2"></i>' + data.message + '</div>';
             submitBtn.disabled = false;
@@ -176,5 +255,9 @@ function submitComment(event) {
 .comment-item:hover {
     background-color: #f8f9fa !important;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.comment-text {
+    line-height: 1.6;
 }
 </style>

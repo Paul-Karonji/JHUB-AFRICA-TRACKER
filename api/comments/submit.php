@@ -1,6 +1,13 @@
 <?php
-// api/comments/submit.php
-// Universal Comment Submission API (Works for Admin, Mentor, Project, Investor)
+/**
+ * api/comments/submit.php
+ * UPDATED: Universal Comment Submission API with Approval Logic
+ * 
+ * Changes:
+ * - Admin/Mentor/Innovator comments are auto-approved
+ * - Investor (public) comments require admin approval
+ * - Different success messages based on approval status
+ */
 
 header('Content-Type: application/json');
 require_once '../../includes/init.php';
@@ -50,6 +57,10 @@ try {
     }
 
     // Determine commenter type and details
+    $isAutoApproved = false;
+    $approvedBy = null;
+    $approvedAt = null;
+    
     if ($auth->isLoggedIn()) {
         // Authenticated user (admin, mentor, or project)
         $userType = $auth->getUserType();
@@ -62,6 +73,9 @@ try {
             $commenterName = $user['name'] ?? $user['email'];
             $commenterEmail = $user['email'];
             $commenterId = $userId;
+            $isAutoApproved = true; // Auto-approve admin comments
+            $approvedBy = $userId;
+            $approvedAt = date('Y-m-d H:i:s');
             
         } elseif ($userType === USER_TYPE_MENTOR) {
             $user = $database->getRow("SELECT name, email FROM mentors WHERE mentor_id = ?", [$userId]);
@@ -69,6 +83,9 @@ try {
             $commenterName = $user['name'];
             $commenterEmail = $user['email'];
             $commenterId = $userId;
+            $isAutoApproved = true; // Auto-approve mentor comments
+            // For mentors, we'll set approved_by to NULL since they approved their own
+            $approvedAt = date('Y-m-d H:i:s');
             
         } elseif ($userType === USER_TYPE_PROJECT) {
             $user = $database->getRow("SELECT project_name as name, project_lead_email as email FROM projects WHERE project_id = ?", [$userId]);
@@ -76,13 +93,15 @@ try {
             $commenterName = $user['name'];
             $commenterEmail = $user['email'];
             $commenterId = $userId;
+            $isAutoApproved = true; // Auto-approve innovator comments
+            $approvedAt = date('Y-m-d H:i:s');
             
         } else {
             throw new Exception('Invalid user type');
         }
         
     } else {
-        // Public user (investor)
+        // Public user (investor) - requires approval
         if (empty($input['commenter_name']) || empty($input['commenter_email'])) {
             throw new Exception('Name and email are required for public comments');
         }
@@ -91,6 +110,7 @@ try {
         $commenterName = trim($input['commenter_name']);
         $commenterEmail = trim($input['commenter_email']);
         $commenterId = null;
+        $isAutoApproved = false; // Investor comments need approval
         
         // Validate email
         if (!filter_var($commenterEmail, FILTER_VALIDATE_EMAIL)) {
@@ -98,7 +118,7 @@ try {
         }
     }
 
-    // Prepare comment data
+    // Prepare comment data with approval logic
     $commentData = [
         'project_id' => $projectId,
         'commenter_type' => $commenterType,
@@ -106,6 +126,9 @@ try {
         'commenter_email' => $commenterEmail,
         'commenter_id' => $commenterId,
         'comment_text' => $commentText,
+        'is_approved' => $isAutoApproved ? 1 : 0,
+        'approved_by' => $approvedBy,
+        'approved_at' => $approvedAt,
         'parent_comment_id' => !empty($input['parent_comment_id']) ? intval($input['parent_comment_id']) : null,
         'ip_address' => $_SERVER['REMOTE_ADDR'] ?? null,
         'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? null
@@ -126,17 +149,51 @@ try {
             'comment_posted',
             "Posted comment on project: {$project['project_name']}",
             $projectId,
-            ['comment_id' => $commentId]
+            ['comment_id' => $commentId, 'is_auto_approved' => $isAutoApproved]
         );
+    }
+
+    // If investor comment (needs approval), notify admins
+    if (!$isAutoApproved) {
+        // Get all active admins
+        $admins = $database->getRows("SELECT admin_id, admin_name, username FROM admins WHERE is_active = 1");
+        
+        foreach ($admins as $admin) {
+            // Create notification for each admin
+            $database->insert('notifications', [
+                'user_id' => $admin['admin_id'],
+                'user_type' => 'admin',
+                'title' => 'New Comment Pending Approval',
+                'message' => "A new public comment from {$commenterName} needs approval on project: {$project['project_name']}",
+                'notification_type' => 'warning',
+                'action_url' => '/dashboards/admin/moderate-comments.php',
+                'metadata' => json_encode([
+                    'comment_id' => $commentId,
+                    'project_id' => $projectId,
+                    'commenter_email' => $commenterEmail
+                ])
+            ]);
+        }
     }
 
     // Get the posted comment with formatted date
     $postedComment = $database->getRow("SELECT * FROM comments WHERE comment_id = ?", [$commentId]);
     $postedComment['created_at_formatted'] = formatDate($postedComment['created_at']);
 
+    // Different messages based on approval status
+    if ($isAutoApproved) {
+        $message = 'Comment posted successfully!';
+        $messageType = 'success';
+    } else {
+        $message = 'Comment submitted successfully! It will be visible after admin approval.';
+        $messageType = 'info';
+    }
+
     echo json_encode([
         'success' => true,
-        'message' => 'Comment posted successfully!',
+        'message' => $message,
+        'message_type' => $messageType,
+        'is_approved' => $isAutoApproved,
         'comment' => $postedComment
     ]);
 
@@ -149,4 +206,3 @@ try {
     
     error_log('Comment submission error: ' . $e->getMessage());
 }
-?>

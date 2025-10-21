@@ -12,6 +12,15 @@ $currentUserType = $auth->getUserType() ?? null;
 $currentUserId = $auth->getUserId() ?? null;
 $currentUserName = $auth->getUserIdentifier() ?? 'Guest';
 
+// Get pending comments count for admin badge
+$pendingCommentsCount = 0;
+if ($currentUserType === USER_TYPE_ADMIN) {
+    $pendingCommentsCount = $database->count(
+        'comments', 
+        'is_deleted = 0 AND is_approved = 0'
+    );
+}
+
 // Determine user role for styling
 $userRole = '';
 $userRoleClass = '';
@@ -160,6 +169,8 @@ $logoAlt = 'JHUB AFRICA - Innovations for Transformation';
             align-items: center;
             transition: all 0.3s;
             border-left: 3px solid transparent;
+            text-decoration: none;
+            position: relative;
         }
         
         .sidebar-nav .nav-link:hover {
@@ -180,8 +191,33 @@ $logoAlt = 'JHUB AFRICA - Innovations for Transformation';
             text-align: center;
         }
         
-        .sidebar.collapsed .nav-link span {
+        .sidebar.collapsed .nav-link span:not(.badge) {
             display: none;
+        }
+        
+        /* Badge Styles */
+        .nav-link .badge {
+            font-size: 0.7rem;
+            padding: 0.25em 0.6em;
+            border-radius: 10px;
+            margin-left: auto;
+        }
+        
+        .sidebar.collapsed .nav-link .badge {
+            position: absolute;
+            right: 5px;
+            top: 5px;
+            transform: scale(0.8);
+        }
+        
+        /* Badge Animation */
+        @keyframes pulse-warning {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.1); }
+        }
+        
+        .nav-link .badge.bg-warning {
+            animation: pulse-warning 2s infinite;
         }
         
         /* Main Content */
@@ -301,7 +337,7 @@ $logoAlt = 'JHUB AFRICA - Innovations for Transformation';
     <div class="main-wrapper">
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
-            <!-- Logo Section - UPDATED -->
+            <!-- Logo Section -->
             <div class="sidebar-brand">
                 <a href="<?php echo $baseUrl . $dashboardLink; ?>" class="logo-container">
                     <img src="<?php echo $logoPath; ?>" 
@@ -328,6 +364,16 @@ $logoAlt = 'JHUB AFRICA - Innovations for Transformation';
                         <i class="fas fa-project-diagram"></i>
                         <span>Projects</span>
                     </a>
+                    
+                    <!-- MODERATION LINK - NEW -->
+                    <a href="<?php echo $baseUrl; ?>/dashboards/admin/moderate-comments.php" class="nav-link">
+                        <i class="fas fa-gavel"></i>
+                        <span>Moderate Comments</span>
+                        <?php if ($pendingCommentsCount > 0): ?>
+                            <span class="badge bg-warning text-dark"><?php echo $pendingCommentsCount; ?></span>
+                        <?php endif; ?>
+                    </a>
+                    
                     <a href="<?php echo $baseUrl; ?>/dashboards/admin/mentors.php" class="nav-link">
                         <i class="fas fa-user-tie"></i>
                         <span>Mentors</span>
@@ -435,15 +481,21 @@ $logoAlt = 'JHUB AFRICA - Innovations for Transformation';
                     <div class="dropdown">
                         <button class="btn btn-link text-dark position-relative" type="button" data-bs-toggle="dropdown">
                             <i class="fas fa-bell"></i>
+                            <?php if ($pendingCommentsCount > 0): ?>
                             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                3
+                                <?php echo $pendingCommentsCount; ?>
                             </span>
+                            <?php endif; ?>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><h6 class="dropdown-header">Notifications</h6></li>
+                            <?php if ($pendingCommentsCount > 0): ?>
+                            <li><a class="dropdown-item" href="<?php echo $baseUrl; ?>/dashboards/admin/moderate-comments.php">
+                                <i class="fas fa-gavel text-warning"></i> <?php echo $pendingCommentsCount; ?> comment(s) pending approval
+                            </a></li>
+                            <?php endif; ?>
                             <li><a class="dropdown-item" href="#">New application submitted</a></li>
                             <li><a class="dropdown-item" href="#">Project update available</a></li>
-                            <li><a class="dropdown-item" href="#">Mentor assigned</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item text-center" href="#">View All</a></li>
                         </ul>
@@ -471,3 +523,14 @@ $logoAlt = 'JHUB AFRICA - Innovations for Transformation';
 
             <!-- Page Content -->
             <div class="content-wrapper">
+                <!-- Flash Messages -->
+                <?php if (isset($_SESSION['flash_message'])): ?>
+                <div class="alert alert-<?php echo $_SESSION['flash_type'] ?? 'info'; ?> alert-dismissible fade show">
+                    <?php echo $_SESSION['flash_message']; ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <?php 
+                    unset($_SESSION['flash_message']);
+                    unset($_SESSION['flash_type']);
+                endif; 
+                ?>
