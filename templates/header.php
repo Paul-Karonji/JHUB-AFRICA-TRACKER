@@ -397,22 +397,38 @@ $logoAlt = 'JHUB AFRICA - Innovations for Transformation';
                 
                 <?php elseif ($currentUserType === USER_TYPE_MENTOR): ?>
                     <!-- Mentor Navigation -->
-                    <a href="<?php echo $baseUrl; ?>/dashboards/mentor/index.php" class="nav-link">
-                        <i class="fas fa-tachometer-alt"></i>
-                        <span>Dashboard</span>
-                    </a>
-                    <a href="<?php echo $baseUrl; ?>/dashboards/mentor/projects.php" class="nav-link">
-                        <i class="fas fa-project-diagram"></i>
-                        <span>My Projects</span>
-                    </a>
-                    <a href="<?php echo $baseUrl; ?>/dashboards/mentor/resources.php" class="nav-link">
-                        <i class="fas fa-book"></i>
-                        <span>Resources</span>
-                    </a>
-                    <a href="<?php echo $baseUrl; ?>/dashboards/mentor/profile.php" class="nav-link">
-                        <i class="fas fa-user"></i>
-                        <span>Profile</span>
-                    </a>
+                       <a href="<?php echo $baseUrl; ?>/dashboards/mentor/index.php" class="nav-link">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Dashboard</span>
+                        </a>
+                        <a href="<?php echo $baseUrl; ?>/dashboards/mentor/available-projects.php" class="nav-link">
+                            <i class="fas fa-search"></i>
+                            <span>Browse Projects</span>
+                        </a>
+                        <a href="<?php echo $baseUrl; ?>/dashboards/mentor/my-projects.php" class="nav-link">
+                            <i class="fas fa-project-diagram"></i>
+                            <span>My Projects</span>
+                        </a>
+                        <a href="<?php echo $baseUrl; ?>/dashboards/mentor/resources.php" class="nav-link">
+                            <i class="fas fa-book"></i>
+                            <span>Resources</span>
+                        </a>
+                        <a href="<?php echo $baseUrl; ?>/dashboards/mentor/assessments.php" class="nav-link">
+                            <i class="fas fa-clipboard-check"></i>
+                            <span>Assessments</span>
+                        </a>
+                        <a href="<?php echo $baseUrl; ?>/dashboards/mentor/learning.php" class="nav-link">
+                            <i class="fas fa-graduation-cap"></i>
+                            <span>Learning</span>
+                        </a>
+                        
+                        <!-- Divider -->
+                        <div style="border-top: 1px solid rgba(255,255,255,0.1); margin: 10px 0;"></div>
+                        
+                        <a href="<?php echo $baseUrl; ?>/dashboards/mentor/profile.php" class="nav-link">
+                            <i class="fas fa-user"></i>
+                            <span>My Profile</span>
+                        </a>
                 
                 <?php elseif ($currentUserType === USER_TYPE_PROJECT): ?>
                     <!-- Project Navigation -->

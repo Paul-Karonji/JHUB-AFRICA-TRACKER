@@ -1,18 +1,12 @@
 <?php
 /**
  * templates/comments-section.php
- * UPDATED: Universal Comments Section with Approval Filtering
+ * FIXED: Universal Comments Section with Better Debugging
  * 
  * Required variables:
  * - $projectId: The project ID
  * - $auth: Auth instance
  * - $database: Database instance
- * 
- * CHANGES:
- * - Filters comments by approval status
- * - Shows only investor comments to public
- * - Shows all approved comments to authenticated users
- * - Admins see a link to moderate pending comments
  */
 
 if (!isset($projectId)) {
@@ -21,7 +15,14 @@ if (!isset($projectId)) {
 
 // Determine comment visibility based on user type
 $isAdmin = $auth->isLoggedIn() && $auth->getUserType() === USER_TYPE_ADMIN;
+$isMentor = $auth->isLoggedIn() && $auth->getUserType() === USER_TYPE_MENTOR;
+$isProject = $auth->isLoggedIn() && $auth->getUserType() === USER_TYPE_PROJECT;
 $isAuthenticated = $auth->isLoggedIn();
+
+// DEBUG: Log current user info
+if ($isAuthenticated) {
+    error_log("Comments Debug - User Type: " . $auth->getUserType() . ", User ID: " . $auth->getUserId());
+}
 
 if ($isAdmin) {
     // Admins see ALL approved comments + indicator for pending ones
@@ -41,6 +42,9 @@ if ($isAdmin) {
         [$projectId]
     );
     
+    // DEBUG
+    error_log("Admin viewing comments. Approved: " . count($comments) . ", Pending: " . $pendingCount);
+    
 } elseif ($isAuthenticated) {
     // Authenticated users (mentor/innovator) see all approved comments
     $comments = $database->getRows("
@@ -51,6 +55,9 @@ if ($isAdmin) {
           AND is_approved = 1
         ORDER BY created_at DESC
     ", [$projectId]);
+    
+    // DEBUG
+    error_log("Authenticated user (" . $auth->getUserType() . ") viewing " . count($comments) . " approved comments");
     
 } else {
     // Public users see ONLY approved investor comments
@@ -79,7 +86,7 @@ $commentsCount = count($comments);
     <div class="card-body">
         
         <!-- Admin Pending Comments Notice -->
-        <?php if ($isAdmin && $pendingCount > 0): ?>
+        <?php if ($isAdmin && isset($pendingCount) && $pendingCount > 0): ?>
         <div class="alert alert-warning mb-4">
             <i class="fas fa-exclamation-triangle me-2"></i>
             <strong><?php echo $pendingCount; ?></strong> comment<?php echo $pendingCount > 1 ? 's' : ''; ?> 
@@ -94,7 +101,22 @@ $commentsCount = count($comments);
         <!-- Comment Form for Authenticated Users -->
         <?php if ($auth->isLoggedIn()): ?>
         <div class="mb-4 p-3 bg-light rounded">
-            <h6 class="mb-3"><i class="fas fa-edit me-2"></i>Leave a Comment</h6>
+            <h6 class="mb-3">
+                <i class="fas fa-edit me-2"></i>Leave a Comment
+                <?php if ($isAdmin): ?>
+                    <span class="badge bg-danger ms-2">Admin</span>
+                <?php elseif ($isMentor): ?>
+                    <span class="badge bg-primary ms-2">Mentor</span>
+                <?php elseif ($isProject): ?>
+                    <span class="badge bg-success ms-2">Innovator</span>
+                <?php endif; ?>
+            </h6>
+            
+            <div class="alert alert-info mb-3">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>Note:</strong> Your comment will be automatically approved and visible immediately.
+            </div>
+            
             <form id="commentForm" onsubmit="submitComment(event)">
                 <input type="hidden" id="csrf_token" value="<?php echo $auth->generateCSRFToken(); ?>">
                 <input type="hidden" id="project_id" value="<?php echo $projectId; ?>">
@@ -104,7 +126,22 @@ $commentsCount = count($comments);
                     <textarea class="form-control" id="comment_text" rows="4" 
                               placeholder="Share your feedback, questions, or suggestions..." 
                               required minlength="10"></textarea>
-                    <div class="form-text">Minimum 10 characters</div>
+                    <div class="form-text">Minimum 10 characters. Your comment will be posted as: 
+                        <strong>
+                        <?php 
+                        if ($isAdmin) {
+                            $user = $database->getRow("SELECT admin_name FROM admins WHERE admin_id = ?", [$auth->getUserId()]);
+                            echo htmlspecialchars($user['admin_name'] ?? 'Admin');
+                        } elseif ($isMentor) {
+                            $user = $database->getRow("SELECT name FROM mentors WHERE mentor_id = ?", [$auth->getUserId()]);
+                            echo htmlspecialchars($user['name'] ?? 'Mentor');
+                        } elseif ($isProject) {
+                            $user = $database->getRow("SELECT project_lead_name FROM projects WHERE project_id = ?", [$auth->getUserId()]);
+                            echo htmlspecialchars($user['project_lead_name'] ?? 'Innovator');
+                        }
+                        ?>
+                        </strong>
+                    </div>
                 </div>
                 
                 <div id="commentAlert"></div>
@@ -142,8 +179,8 @@ $commentsCount = count($comments);
                     echo $comment['commenter_type'] === 'admin' ? 'danger' : 
                         ($comment['commenter_type'] === 'mentor' ? 'primary' : 
                         ($comment['commenter_type'] === 'innovator' ? 'success' : 'info')); 
-                ?> bg-light">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
+                ?> bg-white shadow-sm rounded">
+                    <div class="d-flex justify-content-between align-items-start">
                         <div>
                             <strong class="text-<?php 
                                 echo $comment['commenter_type'] === 'admin' ? 'danger' : 
@@ -208,11 +245,13 @@ function submitComment(event) {
     
     // Validate
     if (formData.comment_text.length < 10) {
-        alertDiv.innerHTML = '<div class="alert alert-danger">Comment must be at least 10 characters long.</div>';
+        alertDiv.innerHTML = '<div class="alert alert-danger"><i class="fas fa-exclamation-triangle me-2"></i>Comment must be at least 10 characters long.</div>';
         submitBtn.disabled = false;
         submitBtn.innerHTML = originalBtnText;
         return;
     }
+    
+    console.log('Submitting comment:', formData); // DEBUG
     
     // Submit via AJAX
     fetch('<?php echo SITE_URL; ?>/api/comments/submit.php', {
@@ -220,8 +259,13 @@ function submitComment(event) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('Response status:', response.status); // DEBUG
+        return response.json();
+    })
     .then(data => {
+        console.log('Response data:', data); // DEBUG
+        
         if (data.success) {
             const alertClass = data.message_type === 'info' ? 'alert-info' : 'alert-success';
             alertDiv.innerHTML = `<div class="alert ${alertClass}"><i class="fas fa-check-circle me-2"></i>${data.message}</div>`;
@@ -229,10 +273,15 @@ function submitComment(event) {
             // Clear form
             document.getElementById('comment_text').value = '';
             
-            // Reload page after 1.5 seconds to show new comment (if auto-approved)
+            // Show additional info if auto-approved
+            if (data.is_approved) {
+                alertDiv.innerHTML += '<div class="alert alert-success mt-2"><i class="fas fa-check-double me-2"></i>Your comment has been automatically approved and is now visible!</div>';
+            }
+            
+            // Reload page after 2 seconds to show new comment
             setTimeout(() => {
                 window.location.reload();
-            }, 1500);
+            }, 2000);
         } else {
             alertDiv.innerHTML = '<div class="alert alert-danger"><i class="fas fa-exclamation-triangle me-2"></i>' + data.message + '</div>';
             submitBtn.disabled = false;
@@ -240,7 +289,8 @@ function submitComment(event) {
         }
     })
     .catch(error => {
-        alertDiv.innerHTML = '<div class="alert alert-danger"><i class="fas fa-exclamation-triangle me-2"></i>Network error: ' + error.message + '</div>';
+        console.error('Error:', error); // DEBUG
+        alertDiv.innerHTML = '<div class="alert alert-danger"><i class="fas fa-exclamation-triangle me-2"></i>Network error: ' + error.message + '. Please check the console for details.</div>';
         submitBtn.disabled = false;
         submitBtn.innerHTML = originalBtnText;
     });
@@ -254,10 +304,17 @@ function submitComment(event) {
 
 .comment-item:hover {
     background-color: #f8f9fa !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+    transform: translateY(-2px);
 }
 
 .comment-text {
     line-height: 1.6;
+    color: #495057;
+}
+
+#commentForm textarea:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
 }
 </style>
