@@ -1,5 +1,5 @@
 <?php
-// api/system/test-email.php - Test Email Configuration (Admin Only)
+// api/system/test-email.php - Send Test Email
 header('Content-Type: application/json');
 require_once '../../includes/init.php';
 
@@ -30,57 +30,155 @@ try {
         throw new Exception('Invalid security token');
     }
 
-    // Validate required fields
-    if (empty($input['email'])) {
-        throw new Exception('Email address is required');
-    }
-
-    $testEmail = filter_var($input['email'], FILTER_VALIDATE_EMAIL);
+    // Validate email
+    $testEmail = filter_var($input['email'] ?? '', FILTER_VALIDATE_EMAIL);
     if (!$testEmail) {
         throw new Exception('Invalid email address');
     }
 
+    // Load email settings from database
+    function getEmailSetting($key, $default = '') {
+        global $database;
+        $setting = $database->getRow("SELECT setting_value FROM system_settings WHERE setting_key = ?", [$key]);
+        return $setting ? $setting['setting_value'] : $default;
+    }
+
+    $emailEnabled = getEmailSetting('email_enabled', 0);
+    if (!$emailEnabled) {
+        throw new Exception('Email notifications are disabled. Please enable them in Email Settings first.');
+    }
+
+    // Get SMTP settings
+    $smtpHost = getEmailSetting('smtp_host', 'smtp.gmail.com');
+    $smtpPort = intval(getEmailSetting('smtp_port', 587));
+    $smtpUsername = getEmailSetting('smtp_username', '');
+    $smtpPassword = getEmailSetting('smtp_password', '');
+    $smtpEncryption = getEmailSetting('smtp_encryption', 'tls');
+    $fromEmail = getEmailSetting('smtp_from_email', 'noreply@jhubafrica.com');
+    $fromName = getEmailSetting('smtp_from_name', 'JHUB AFRICA');
+
+    // Validate required settings
+    if (empty($smtpHost) || empty($smtpUsername) || empty($smtpPassword)) {
+        throw new Exception('SMTP settings are incomplete. Please configure all required fields.');
+    }
+
+    // Import PHPMailer classes
+    require_once '../../vendor/PHPMailer/PHPMailer.php';
+    require_once '../../vendor/PHPMailer/SMTP.php';
+    require_once '../../vendor/PHPMailer/Exception.php';
+
+    use PHPMailer\PHPMailer\PHPMailer;
+    use PHPMailer\PHPMailer\SMTP;
+    use PHPMailer\PHPMailer\Exception;
+
+    // Create PHPMailer instance
+    $mail = new PHPMailer(true);
+
+    // Enable verbose debug output for testing
+    $mail->SMTPDebug = 0; // Set to 2 for detailed debugging if needed
+    $mail->Debugoutput = 'error_log';
+
+    // Server settings
+    $mail->isSMTP();
+    $mail->Host = $smtpHost;
+    $mail->SMTPAuth = true;
+    $mail->Username = $smtpUsername;
+    $mail->Password = $smtpPassword;
+    $mail->SMTPSecure = $smtpEncryption === 'ssl' ? PHPMailer::ENCRYPTION_SMTPS : PHPMailer::ENCRYPTION_STARTTLS;
+    $mail->Port = $smtpPort;
+    $mail->CharSet = 'UTF-8';
+
+    // Recipients
+    $mail->setFrom($fromEmail, $fromName);
+    $mail->addAddress($testEmail);
+    $mail->addReplyTo($fromEmail, $fromName);
+
+    // Content
+    $mail->isHTML(true);
+    $mail->Subject = 'Test Email from ' . SITE_NAME;
+    
+    $mail->Body = '
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: #3b54c7; color: white; padding: 20px; text-align: center; border-radius: 5px 5px 0 0; }
+            .content { background: #f9f9f9; padding: 30px; border: 1px solid #ddd; }
+            .success { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 15px; border-radius: 4px; margin: 20px 0; }
+            .footer { text-align: center; margin-top: 20px; color: #666; font-size: 12px; }
+            .info-box { background: white; padding: 15px; border-left: 4px solid #3b54c7; margin: 15px 0; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>✅ Test Email Successful</h1>
+            </div>
+            <div class="content">
+                <div class="success">
+                    <strong>Congratulations!</strong> Your email configuration is working correctly.
+                </div>
+                
+                <p>This is a test email from your <strong>' . SITE_NAME . '</strong> system.</p>
+                
+                <div class="info-box">
+                    <strong>SMTP Configuration Details:</strong><br>
+                    • Host: ' . htmlspecialchars($smtpHost) . '<br>
+                    • Port: ' . $smtpPort . '<br>
+                    • Encryption: ' . strtoupper($smtpEncryption) . '<br>
+                    • From: ' . htmlspecialchars($fromName) . ' &lt;' . htmlspecialchars($fromEmail) . '&gt;
+                </div>
+                
+                <p>If you received this email, your system is ready to send:</p>
+                <ul>
+                    <li>Application notifications</li>
+                    <li>Mentor assignment alerts</li>
+                    <li>Project updates</li>
+                    <li>System notifications</li>
+                </ul>
+                
+                <p style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd;">
+                    <strong>Test Time:</strong> ' . date('F j, Y \a\t g:i A') . '<br>
+                    <strong>Server:</strong> ' . gethostname() . '
+                </p>
+            </div>
+            <div class="footer">
+                <p>&copy; ' . date('Y') . ' ' . SITE_NAME . '. All rights reserved.</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    ';
+
+    $mail->AltBody = 'Test Email - Your email configuration is working correctly! SMTP: ' . $smtpHost . ':' . $smtpPort;
+
+    // Send email
+    if (!$mail->send()) {
+        throw new Exception('Failed to send email: ' . $mail->ErrorInfo);
+    }
+
+    // Log the test
     $adminId = $auth->getUserId();
-
-    // Prepare test email content
-    $subject = 'Test Email - JHUB AFRICA System';
-    $message = "This is a test email from JHUB AFRICA Project Tracker.\n\n";
-    $message .= "If you received this email, your SMTP configuration is working correctly!\n\n";
-    $message .= "Test Details:\n";
-    $message .= "- Sent at: " . date('Y-m-d H:i:s') . "\n";
-    $message .= "- Sent by: Admin ID {$adminId}\n";
-    $message .= "- System: " . SITE_NAME . "\n";
-    $message .= "- Version: " . (defined('SITE_VERSION') ? SITE_VERSION : '1.0.0') . "\n\n";
-    $message .= "This is an automated test message. Please do not reply.\n\n";
-    $message .= "Best regards,\n";
-    $message .= "JHUB AFRICA System";
-
-    // Queue email notification
-    $emailId = sendEmailNotification(
-        $testEmail,
-        $subject,
-        $message,
-        'system_test'
+    logActivity(
+        'admin',
+        $adminId,
+        'test_email_sent',
+        "Sent test email to {$testEmail}",
+        null,
+        ['recipient' => $testEmail, 'smtp_host' => $smtpHost]
     );
 
-    if ($emailId) {
-        // Log activity
-        logActivity(
-            'admin',
-            $adminId,
-            'test_email_sent',
-            "Sent test email to {$testEmail}",
-            null,
-            ['recipient' => $testEmail]
-        );
-
-        echo json_encode([
-            'success' => true,
-            'message' => "Test email has been queued and will be sent to {$testEmail}. Please check the inbox (and spam folder)."
-        ]);
-    } else {
-        throw new Exception('Failed to queue test email');
-    }
+    echo json_encode([
+        'success' => true,
+        'message' => "Test email sent successfully to {$testEmail}",
+        'smtp_info' => [
+            'host' => $smtpHost,
+            'port' => $smtpPort,
+            'encryption' => $smtpEncryption
+        ]
+    ]);
 
 } catch (Exception $e) {
     http_response_code(400);

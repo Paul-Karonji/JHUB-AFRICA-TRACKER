@@ -3,6 +3,9 @@
 header('Content-Type: application/json');
 require_once '../../includes/init.php';
 
+// Get database instance
+$database = Database::getInstance();
+
 // Require admin authentication
 if (!$auth->isLoggedIn() || $auth->getUserType() !== USER_TYPE_ADMIN) {
     http_response_code(403);
@@ -33,7 +36,7 @@ try {
     // Get days parameter (default 90)
     $days = isset($input['days']) ? intval($input['days']) : 90;
     
-    // Validate days
+    // Validate days (minimum 30 days to prevent accidental deletion of recent logs)
     if ($days < 30) {
         throw new Exception('Cannot delete logs newer than 30 days');
     }
@@ -51,7 +54,12 @@ try {
     );
 
     if ($countToDelete === 0) {
-        throw new Exception('No logs found older than ' . $days . ' days');
+        echo json_encode([
+            'success' => true,
+            'message' => 'No logs found older than ' . $days . ' days',
+            'logs_deleted' => 0
+        ]);
+        exit;
     }
 
     // Delete old logs
@@ -72,13 +80,14 @@ try {
         'logs_cleared',
         "Cleared {$countToDelete} activity logs older than {$days} days",
         null,
-        ['logs_deleted' => $countToDelete, 'cutoff_date' => $cutoffDate]
+        ['logs_deleted' => $countToDelete, 'cutoff_date' => $cutoffDate, 'days' => $days]
     );
 
     echo json_encode([
         'success' => true,
-        'message' => "Successfully deleted {$countToDelete} activity logs older than {$days} days.",
-        'logs_deleted' => $countToDelete
+        'message' => "Successfully deleted {$countToDelete} activity log(s) older than {$days} days.",
+        'logs_deleted' => $countToDelete,
+        'cutoff_date' => $cutoffDate
     ]);
 
 } catch (Exception $e) {
