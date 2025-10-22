@@ -2,117 +2,144 @@
     <!-- End Main Content -->
 
     <!-- Public Footer -->
-    <footer class="public-footer">
+    <footer class="footer public-footer">
         <div class="container">
-            <div class="row">
-                <!-- About Section -->
-                <div class="col-md-4 mb-4">
-                    <h5 class="mb-3" style="color: white; font-weight: 600;">
-                        <img src="<?php echo defined('SITE_URL') ? SITE_URL : ''; ?>/assets/images/logo/JHUB Africa Logo.png" 
-                             alt="JHUB AFRICA" 
-                             style="max-height: 40px; filter: brightness(0) invert(1);"
-                             onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
-                        <span style="display: none;">JHUB AFRICA</span>
-                    </h5>
-                    <p style="color: rgba(255, 255, 255, 0.8);">
-                        Empowering African innovations through structured mentorship, 
-                        resources, and community support. Join us in transforming ideas 
-                        into impactful solutions.
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <div class="footer-brand">
+                        <a class="footer-logo-link" href="<?php echo defined('SITE_URL') ? SITE_URL : ''; ?>/index.php" rel="home">
+                            <img src="<?php echo defined('SITE_URL') ? SITE_URL : ''; ?>/assets/images/logo/JHUB Africa Logo.png"
+                                 alt="JHUB AFRICA"
+                                 class="footer-logo"
+                                 onerror="this.style.display='none'; this.insertAdjacentHTML('afterend','<span class=&quot;footer-logo-text&quot;>JHUB AFRICA</span>');">
+                        </a>
+                    </div>
+                    <p class="footer-description">
+                        Africa's premier innovation acceleration platform. We nurture African innovations from conception to market success with mentorship, resources, and community support.
                     </p>
-                    <div class="social-links mt-3">
-                        <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
-                        <a href="#" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-                        <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+                    <div class="social-links">
+                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
                     </div>
                 </div>
-                
-                <!-- Quick Links -->
-                <div class="col-md-2 mb-4">
-                    <h5 class="mb-3" style="color: white; font-weight: 600;">Quick Links</h5>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><a href="<?php echo defined('SITE_URL') ? SITE_URL : ''; ?>/public/index.php">Home</a></li>
-                        <li class="mb-2"><a href="<?php echo defined('SITE_URL') ? SITE_URL : ''; ?>/public/projects.php">Projects</a></li>
-                        <li class="mb-2"><a href="<?php echo defined('SITE_URL') ? SITE_URL : ''; ?>/public/about.php">About Us</a></li>
-                        <li class="mb-2"><a href="<?php echo defined('SITE_URL') ? SITE_URL : ''; ?>/public/contact.php">Contact</a></li>
+
+                <div class="col-lg-2 col-md-4">
+                    <h6 class="footer-heading">Quick Links</h6>
+                    <ul class="footer-links">
+                        <li><a href="<?php echo defined('SITE_URL') ? SITE_URL : ''; ?>/index.php"><i class="fas fa-angle-right"></i>Home</a></li>
+                        <li><a href="<?php echo defined('SITE_URL') ? SITE_URL : ''; ?>/public/projects.php"><i class="fas fa-angle-right"></i>Projects</a></li>
+                        <li><a href="<?php echo defined('SITE_URL') ? SITE_URL : ''; ?>/public/about.php"><i class="fas fa-angle-right"></i>About Us</a></li>
+                        <li><a href="<?php echo defined('SITE_URL') ? SITE_URL : ''; ?>/public/contact.php"><i class="fas fa-angle-right"></i>Contact</a></li>
+                        <li><a href="<?php echo defined('SITE_URL') ? SITE_URL : ''; ?>/applications/submit.php"><i class="fas fa-angle-right"></i>Apply</a></li>
                     </ul>
                 </div>
-                
-                <!-- For Innovators -->
-                <div class="col-md-3 mb-4">
-                    <h5 class="mb-3" style="color: white; font-weight: 600;">For Innovators</h5>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><a href="<?php echo defined('SITE_URL') ? SITE_URL : ''; ?>/applications/submit.php">Apply Now</a></li>
-                        <li class="mb-2"><a href="<?php echo defined('SITE_URL') ? SITE_URL : ''; ?>/auth/login.php?type=project">Project Login</a></li>
-                        <li class="mb-2"><a href="<?php echo defined('SITE_URL') ? SITE_URL : ''; ?>/public/faq.php">FAQs</a></li>
-                        <li class="mb-2"><a href="<?php echo defined('SITE_URL') ? SITE_URL : ''; ?>/public/guidelines.php">Guidelines</a></li>
+
+                <div class="col-lg-3 col-md-4">
+                    <h6 class="footer-heading">For Innovators</h6>
+                    <ul class="footer-links">
+                        <li><a href="<?php echo defined('SITE_URL') ? SITE_URL : ''; ?>/applications/submit.php"><i class="fas fa-rocket"></i>Start Application</a></li>
+                        <li><a href="<?php echo defined('SITE_URL') ? SITE_URL : ''; ?>/auth/login.php?type=project"><i class="fas fa-user"></i>Project Login</a></li>
+                        <li><a href="<?php echo defined('SITE_URL') ? SITE_URL : ''; ?>/public/faq.php"><i class="fas fa-question-circle"></i>FAQs</a></li>
+                        <li><a href="<?php echo defined('SITE_URL') ? SITE_URL : ''; ?>/public/guidelines.php"><i class="fas fa-lightbulb"></i>Guidelines</a></li>
                     </ul>
                 </div>
-                
-                <!-- Contact Info -->
-                <div class="col-md-3 mb-4">
-                    <h5 class="mb-3" style="color: white; font-weight: 600;">Contact Us</h5>
-                    <ul class="list-unstyled">
-                        <li class="mb-2">
-                            <i class="fas fa-envelope me-2"></i>
-                            <a href="mailto:info@jhubafrica.org">info@jhubafrica.org</a>
-                        </li>
-                        <li class="mb-2">
-                            <i class="fas fa-phone me-2"></i>
-                            <a href="tel:+254700000000">+254 700 000 000</a>
-                        </li>
-                        <li class="mb-2">
-                            <i class="fas fa-map-marker-alt me-2"></i>
-                            <span style="color: rgba(255, 255, 255, 0.8);">Nairobi, Kenya</span>
-                        </li>
+
+                <div class="col-lg-3 col-md-4">
+                    <h6 class="footer-heading">Contact Us</h6>
+                    <ul class="footer-links">
+                        <li><a href="mailto:info@jhubafrica.com"><i class="fas fa-envelope"></i>info@jhubafrica.com</a></li>
+                        <li><a href="tel:+254700000000"><i class="fas fa-phone"></i>+254 700 000 000</a></li>
+                        <li><a href="#"><i class="fas fa-map-marker-alt"></i>JKUAT, Nairobi, Kenya</a></li>
                     </ul>
                 </div>
             </div>
-            
-            <hr style="border-color: rgba(255,255,255,0.2); margin: 30px 0;">
-            
-            <!-- Copyright -->
-            <div class="row">
-                <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
-                    <p class="mb-0" style="color: rgba(255, 255, 255, 0.8);">
-                        &copy; <?php echo date('Y'); ?> JHUB AFRICA. All rights reserved.
-                    </p>
-                </div>
-                <div class="col-md-6 text-center text-md-end">
-                    <a href="<?php echo defined('SITE_URL') ? SITE_URL : ''; ?>/public/privacy.php" class="me-3">Privacy Policy</a>
-                    <a href="<?php echo defined('SITE_URL') ? SITE_URL : ''; ?>/public/terms.php">Terms of Service</a>
-                </div>
+            <div class="footer-bottom">
+                <p>&copy; <?php echo date('Y'); ?> JHUB AFRICA. All Rights Reserved. Built with passion for African innovation.</p>
             </div>
         </div>
     </footer>
 
     <!-- Bootstrap 5 JS Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
-    
+
     <!-- Custom page-specific scripts -->
     <?php if (isset($customScripts)): ?>
         <?php echo $customScripts; ?>
     <?php endif; ?>
-    
+
+    <!-- Footer Logo Styling -->
+    <style>
+        .footer-logo {
+            max-width: 150px;
+            height: auto;
+            display: block;
+            margin-bottom: 1rem;
+        }
+
+        .footer-logo-text {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: inherit;
+            display: block;
+            margin-bottom: 1rem;
+        }
+
+        /* Responsive sizing for mobile devices */
+        @media (max-width: 768px) {
+            .footer-logo {
+                max-width: 120px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .footer-logo {
+                max-width: 100px;
+            }
+        }
+    </style>
+
     <script>
-        // Active nav link highlighting
         document.addEventListener('DOMContentLoaded', function() {
-            const currentPath = window.location.pathname;
             const navLinks = document.querySelectorAll('.public-navbar .nav-link');
-            
+            const currentPath = window.location.pathname.replace(/\/+$/, '');
+
             navLinks.forEach(link => {
-                const linkHref = link.getAttribute('href');
-                if (linkHref && currentPath.includes(linkHref.split('/').pop())) {
+                const href = link.getAttribute('href');
+                if (!href) {
+                    return;
+                }
+
+                const linkPath = new URL(href, window.location.origin).pathname.replace(/\/+$/, '');
+                const isHomeLink = /\/index\.php$/.test(linkPath) || linkPath === '/';
+                const onHome = currentPath === '' || currentPath === '/' || /\/index\.php$/.test(currentPath);
+
+                if (linkPath === currentPath || (isHomeLink && onHome)) {
                     link.classList.add('active');
                 }
             });
-            
-            // Auto-hide flash messages after 5 seconds
+
+            const navbar = document.querySelector('.public-navbar');
+            const toggleScrolled = () => {
+                if (!navbar) {
+                    return;
+                }
+                if (window.pageYOffset > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            };
+
+            toggleScrolled();
+            window.addEventListener('scroll', toggleScrolled);
+
             const flashAlerts = document.querySelectorAll('.alert');
             flashAlerts.forEach(alert => {
                 setTimeout(() => {
-                    const bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
-                    bsAlert.close();
+                    const instance = bootstrap.Alert.getOrCreateInstance(alert);
+                    instance.close();
                 }, 5000);
             });
         });

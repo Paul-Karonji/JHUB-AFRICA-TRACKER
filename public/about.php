@@ -1,48 +1,39 @@
 <?php
-// public/about.php
-// About JHUB AFRICA Page
 require_once '../includes/init.php';
 
 $pageTitle = "About Us";
-?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $pageTitle; ?> - JHUB AFRICA</title>
-    <meta name="description" content="Learn about JHUB AFRICA's mission to nurture African innovations from conception to market success through mentorship, resources, and community support.">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+$customStyles = <<<CSS
     <style>
         .hero-about {
-            background: linear-gradient(135deg, #3b54c7 0%, #0e015b 100%);
-            color: white;
-            padding: 100px 0;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: #ffffff;
+            padding: 120px 0;
         }
         .feature-card {
             border: none;
             border-radius: 15px;
             padding: 30px;
             height: 100%;
-            transition: all 0.3s;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+            background: #ffffff;
         }
         .feature-card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            box-shadow: 0 25px 45px rgba(44, 64, 154, 0.18);
         }
         .feature-icon {
             width: 80px;
             height: 80px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #3b54c7 0%, #0e015b 100%);
-            color: white;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+            color: #ffffff;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 2rem;
             margin: 0 auto 20px;
+            box-shadow: 0 15px 30px rgba(44, 64, 154, 0.35);
         }
         .stage-timeline {
             position: relative;
@@ -55,7 +46,8 @@ $pageTitle = "About Us";
             top: 0;
             bottom: 0;
             width: 3px;
-            background: linear-gradient(180deg, #3b54c7 0%, #0e015b 100%);
+            background: linear-gradient(180deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border-radius: 3px;
         }
         .stage-item {
             position: relative;
@@ -69,13 +61,13 @@ $pageTitle = "About Us";
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: white;
-            border: 3px solid #2c409a;
+            background: #ffffff;
+            border: 3px solid var(--primary-color);
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            color: #2c409a;
+            color: var(--primary-color);
         }
         .stat-box {
             text-align: center;
@@ -84,44 +76,14 @@ $pageTitle = "About Us";
         .stat-number {
             font-size: 3rem;
             font-weight: bold;
-            color: #2c409a;
+            color: var(--primary-color);
         }
     </style>
-</head>
-<body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="../index.php">
-                <i class="fas fa-lightbulb me-2"></i>JHUB AFRICA
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="../index.php">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="projects.php">Projects</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="about.php">About</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="contact.php">Contact</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="../applications/submit.php">Apply</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="../auth/login.php">Login</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+CSS;
+
+require_once '../templates/public-header.php';
+
+?>
 
     <!-- Hero Section -->
     <div class="hero-about text-center">
@@ -358,40 +320,4 @@ $pageTitle = "About Us";
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="bg-dark text-white py-4">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6">
-                    <h5>JHUB AFRICA</h5>
-                    <p class="mb-0">Nurturing African Innovations from Conception to Market Success</p>
-                </div>
-                <div class="col-md-3">
-                    <h6>Quick Links</h6>
-                    <ul class="list-unstyled">
-                        <li><a href="projects.php" class="text-white-50">Projects</a></li>
-                        <li><a href="about.php" class="text-white-50">About</a></li>
-                        <li><a href="contact.php" class="text-white-50">Contact</a></li>
-                        <li><a href="../applications/submit.php" class="text-white-50">Apply</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-3">
-                    <h6>Connect</h6>
-                    <div class="social-links">
-                        <a href="#" class="text-white-50 me-3"><i class="fab fa-twitter fa-lg"></i></a>
-                        <a href="#" class="text-white-50 me-3"><i class="fab fa-linkedin fa-lg"></i></a>
-                        <a href="#" class="text-white-50 me-3"><i class="fab fa-facebook fa-lg"></i></a>
-                        <a href="#" class="text-white-50"><i class="fab fa-instagram fa-lg"></i></a>
-                    </div>
-                </div>
-            </div>
-            <hr class="bg-secondary my-4">
-            <div class="text-center">
-                <p class="mb-0">&copy; <?php echo date('Y'); ?> JHUB AFRICA. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+<?php require_once '../templates/public-footer.php'; ?>

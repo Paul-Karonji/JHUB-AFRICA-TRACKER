@@ -52,24 +52,31 @@ $logoAlt = 'JHUB AFRICA - Innovations for Transformation';
             box-sizing: border-box;
         }
         
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        body.public-page {
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
             background-color: var(--light-bg);
             color: var(--dark-text);
             line-height: 1.6;
-            padding-top: 80px; /* Height of fixed navbar */
+            padding-top: 110px;
         }
         
         /* Public Navbar */
         .public-navbar {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             z-index: 1030;
-            padding: 0;
+            padding: 1.2rem 0;
+            transition: all 0.3s ease;
+        }
+        
+        .public-navbar.scrolled {
+            padding: 0.8rem 0;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.15);
         }
         
         .public-navbar .container {
@@ -85,13 +92,13 @@ $logoAlt = 'JHUB AFRICA - Innovations for Transformation';
         }
         
         .public-navbar .navbar-brand img {
-            max-height: 50px;
+            max-height: 55px;
             width: auto;
             transition: all 0.3s ease;
         }
         
-        .public-navbar .navbar-brand:hover img {
-            transform: scale(1.05);
+        .public-navbar.scrolled .navbar-brand img {
+            max-height: 45px;
         }
         
         .public-navbar .navbar-nav {
@@ -99,75 +106,86 @@ $logoAlt = 'JHUB AFRICA - Innovations for Transformation';
         }
         
         .public-navbar .nav-link {
-            color: rgba(255, 255, 255, 0.9) !important;
-            font-weight: 500;
-            padding: 8px 16px !important;
-            transition: all 0.3s;
-            border-radius: 5px;
-            margin: 0 2px;
+            color: var(--primary-color) !important;
+            font-weight: 600;
+            font-size: 0.95rem;
+            padding: 0.5rem 1.2rem !important;
+            transition: all 0.3s ease;
+            border-radius: 999px;
+            margin: 0 4px;
+            position: relative;
+        }
+        
+        .public-navbar .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 6px;
+            left: 50%;
+            width: 0;
+            height: 3px;
+            background: var(--accent-color);
+            border-radius: 3px;
+            transform: translateX(-50%);
+            transition: all 0.3s ease;
         }
         
         .public-navbar .nav-link:hover {
+            color: var(--secondary-color) !important;
+        }
+        
+        .public-navbar .nav-link:hover::after,
+        .public-navbar .nav-link.active::after {
+            width: 60%;
+        }
+        
+        .public-navbar .btn-nav-cta {
+            background: linear-gradient(135deg, var(--accent-color), #359a3b);
             color: white !important;
-            background: rgba(255, 255, 255, 0.1);
+            font-weight: 700;
+            padding: 0.6rem 1.6rem !important;
+            margin-left: 1rem;
+            border-radius: 999px;
+            box-shadow: 0 5px 20px rgba(63, 168, 69, 0.3);
         }
         
-        .public-navbar .nav-link.active {
+        .public-navbar .btn-nav-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(63, 168, 69, 0.4);
+        }
+        
+        .public-navbar .btn-login-link {
+            border: 2px solid rgba(14, 1, 91, 0.15);
+            color: var(--secondary-color) !important;
+            font-weight: 600;
+            padding: 0.55rem 1.4rem !important;
+            border-radius: 999px;
+            margin-left: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .public-navbar .btn-login-link:hover {
+            background: var(--secondary-color);
             color: white !important;
-            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--secondary-color);
         }
         
-        .public-navbar .btn-login {
-            background: white;
-            color: var(--primary-color);
-            border: 2px solid white;
-            font-weight: 600;
-            padding: 8px 24px;
-            border-radius: 25px;
-            transition: all 0.3s;
-            text-decoration: none;
-            display: inline-block;
-        }
-        
-        .public-navbar .btn-login:hover {
-            background: transparent;
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(255,255,255,0.3);
-        }
-        
-        .public-navbar .btn-apply {
-            background: var(--accent-color);
-            color: white;
-            border: 2px solid var(--accent-color);
-            font-weight: 600;
-            padding: 8px 24px;
-            border-radius: 25px;
-            transition: all 0.3s;
-            text-decoration: none;
-            display: inline-block;
-        }
-        
-        .public-navbar .btn-apply:hover {
-            background: transparent;
-            border-color: white;
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(255,255,255,0.3);
+        .public-navbar .btn-nav-cta::after,
+        .public-navbar .btn-login-link::after {
+            display: none;
         }
         
         /* Mobile Menu */
         .navbar-toggler {
-            border-color: rgba(255, 255, 255, 0.5);
-            padding: 0.5rem;
+            border: none;
+            padding: 0.35rem 0.6rem;
         }
         
         .navbar-toggler:focus {
-            box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25);
+            box-shadow: none;
         }
         
         .navbar-toggler-icon {
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 0.9)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+            filter: invert(20%);
             width: 1.5em;
             height: 1.5em;
         }
@@ -228,63 +246,37 @@ $logoAlt = 'JHUB AFRICA - Innovations for Transformation';
             margin-bottom: 20px;
         }
         
-        /* Footer */
-        .public-footer {
-            background: var(--secondary-color);
-            color: white;
-            padding: 40px 0 20px;
-            margin-top: 60px;
-        }
-        
-        .public-footer a {
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-        
-        .public-footer a:hover {
-            color: white;
-        }
-        
-        .public-footer .social-links a {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            margin: 0 5px;
-            transition: all 0.3s;
-        }
-        
-        .public-footer .social-links a:hover {
-            background: var(--accent-color);
-            transform: translateY(-3px);
-        }
-        
         /* Responsive */
         @media (max-width: 768px) {
-            body {
-                padding-top: 70px;
+            body.public-page {
+                padding-top: 80px;
+            }
+            
+            .public-navbar {
+                padding: 0.8rem 0;
             }
             
             .public-navbar .navbar-brand img {
-                max-height: 40px;
-            }
-            
-            .public-navbar .btn-login,
-            .public-navbar .btn-apply {
-                width: 100%;
-                margin: 5px 0;
-                text-align: center;
+                max-height: 42px;
             }
             
             .public-navbar .navbar-collapse {
-                background: rgba(0, 0, 0, 0.1);
-                padding: 15px;
-                border-radius: 8px;
-                margin-top: 10px;
+                background: rgba(255, 255, 255, 0.98);
+                padding: 1rem;
+                border-radius: 12px;
+                margin-top: 0.75rem;
+                box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+            }
+            
+            .public-navbar .btn-login-link,
+            .public-navbar .btn-nav-cta {
+                width: 100%;
+                margin: 0.35rem 0 0;
+                text-align: center;
+            }
+            
+            .public-navbar .nav-link::after {
+                display: none;
             }
         }
     </style>
@@ -294,12 +286,12 @@ $logoAlt = 'JHUB AFRICA - Innovations for Transformation';
         <?php echo $customStyles; ?>
     <?php endif; ?>
 </head>
-<body>
+<body class="public-page">
     <!-- Public Navigation Bar -->
-    <nav class="navbar navbar-expand-lg public-navbar">
+    <nav class="navbar navbar-expand-lg navbar-light public-navbar">
         <div class="container">
             <!-- Logo -->
-            <a class="navbar-brand" href="<?php echo $baseUrl; ?>/public/index.php">
+            <a class="navbar-brand" href="<?php echo $baseUrl; ?>/index.php">
                 <img src="<?php echo $logoPath; ?>" 
                      alt="<?php echo $logoAlt; ?>"
                      onerror="this.style.display='none'; this.parentElement.innerHTML+='<span style=\'color:white;font-weight:bold;font-size:1.2rem;\'>JHUB AFRICA</span>';">
@@ -314,7 +306,7 @@ $logoAlt = 'JHUB AFRICA - Innovations for Transformation';
             <div class="collapse navbar-collapse" id="publicNavbar">
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link" href="<?php echo $baseUrl; ?>/public/index.php">
+                        <a class="nav-link" href="<?php echo $baseUrl; ?>/index.php">
                             <i class="fas fa-home me-1"></i> Home
                         </a>
                     </li>
@@ -340,15 +332,15 @@ $logoAlt = 'JHUB AFRICA - Innovations for Transformation';
                     </li>
                     
                     <!-- Apply Button -->
-                    <li class="nav-item ms-lg-2">
-                        <a class="btn btn-apply" href="<?php echo $baseUrl; ?>/applications/submit.php">
+                    <li class="nav-item ms-lg-3">
+                        <a class="nav-link btn-nav-cta" href="<?php echo $baseUrl; ?>/applications/submit.php">
                             <i class="fas fa-paper-plane me-1"></i> Apply Now
                         </a>
                     </li>
                     
                     <!-- Login Button -->
                     <li class="nav-item ms-lg-2">
-                        <a class="btn btn-login" href="<?php echo $baseUrl; ?>/auth/login.php">
+                        <a class="nav-link btn-login-link" href="<?php echo $baseUrl; ?>/auth/login.php">
                             <i class="fas fa-sign-in-alt me-1"></i> Login
                         </a>
                     </li>

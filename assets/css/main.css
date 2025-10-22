@@ -522,64 +522,121 @@ strong, b {
    NAVIGATION - PUBLIC NAVBAR
    ======================================== */
 .public-navbar {
-    background: linear-gradient(135deg, var(--jhub-primary) 0%, var(--jhub-purple) 100%);
-    box-shadow: var(--shadow-lg);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     z-index: 1030;
-    padding: 0.5rem 0;
+    padding: 1.2rem 0;
+    transition: var(--transition-base);
+}
+
+.public-navbar.scrolled {
+    padding: 0.8rem 0;
+    box-shadow: 0 5px 30px rgba(0, 0, 0, 0.15);
 }
 
 .public-navbar .navbar-brand {
-    color: var(--jhub-white);
-    font-weight: var(--font-weight-bold);
-    font-size: 1.5rem;
     display: flex;
     align-items: center;
     gap: 0.75rem;
-}
-
-.public-navbar .navbar-brand:hover {
-    color: var(--jhub-white);
-    opacity: 0.9;
+    padding: 0;
+    margin: 0;
 }
 
 .public-navbar .navbar-brand img {
-    height: 50px;
+    height: 55px;
     width: auto;
+    transition: var(--transition-base);
+}
+
+.public-navbar.scrolled .navbar-brand img {
+    height: 45px;
 }
 
 .public-navbar .nav-link {
-    color: rgba(255, 255, 255, 0.9);
-    font-weight: var(--font-weight-medium);
-    padding: 0.5rem 1rem;
+    color: var(--jhub-black);
+    font-weight: var(--font-weight-semibold);
+    font-size: 0.95rem;
+    padding: 0.5rem 1.2rem;
     margin: 0 0.25rem;
-    border-radius: var(--border-radius);
-    transition: var(--transition-fast);
+    border-radius: 999px;
+    position: relative;
+    transition: var(--transition-base);
 }
 
-.public-navbar .nav-link:hover,
-.public-navbar .nav-link.active {
-    color: var(--jhub-white);
-    background: rgba(255, 255, 255, 0.15);
+.public-navbar .nav-link::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 6px;
+    width: 0;
+    height: 3px;
+    background: var(--jhub-success);
+    border-radius: 3px;
+    transform: translateX(-50%);
+    transition: var(--transition-base);
+}
+
+.public-navbar .nav-link:hover {
+    color: var(--jhub-purple);
+}
+
+.public-navbar .nav-link:hover::after,
+.public-navbar .nav-link.active::after {
+    width: 60%;
 }
 
 .public-navbar .btn-nav-cta {
-    background: var(--jhub-success);
-    color: var(--jhub-white);
-    padding: 0.625rem 1.5rem;
-    border-radius: 2rem;
+    background: linear-gradient(135deg, var(--jhub-success), var(--jhub-success-dark));
+    color: var(--jhub-white) !important;
+    padding: 0.6rem 1.5rem;
+    border-radius: 999px;
     font-weight: var(--font-weight-bold);
     margin-left: 1rem;
-    box-shadow: 0 4px 15px rgba(63, 168, 69, 0.3);
+    box-shadow: 0 5px 20px rgba(63, 168, 69, 0.3);
 }
 
 .public-navbar .btn-nav-cta:hover {
-    background: var(--jhub-success-dark);
     transform: translateY(-2px);
-    box-shadow: 0 6px 25px rgba(63, 168, 69, 0.4);
+    box-shadow: 0 8px 25px rgba(63, 168, 69, 0.4);
+}
+
+.public-navbar .btn-login-link {
+    color: var(--jhub-purple) !important;
+    border: 2px solid rgba(14, 1, 91, 0.15);
+    border-radius: 999px;
+    font-weight: var(--font-weight-semibold);
+    padding: 0.55rem 1.4rem;
+    margin-left: 0.5rem;
+    transition: var(--transition-base);
+}
+
+.public-navbar .btn-login-link:hover {
+    border-color: var(--jhub-purple);
+    color: var(--jhub-white) !important;
+    background: var(--jhub-purple);
+}
+
+.public-navbar .btn-nav-cta::after,
+.public-navbar .btn-login-link::after {
+    display: none;
+}
+
+.public-navbar .navbar-toggler {
+    border: none;
+    padding: 0.25rem 0.5rem;
+}
+
+.public-navbar .navbar-toggler:focus {
+    box-shadow: none;
+}
+
+.public-navbar .navbar-toggler-icon {
+    filter: invert(20%);
 }
 
 /* Dropdown Menu */
@@ -849,8 +906,9 @@ strong, b {
     border-radius: var(--border-radius-xl);
     box-shadow: var(--shadow-xl);
     padding: 3rem;
-    max-width: 500px;
+    max-width: 960px;
     width: 100%;
+    margin: 0 auto;
 }
 
 .auth-header {
@@ -936,17 +994,67 @@ strong, b {
    FOOTER
    ======================================== */
 .public-footer {
-    background: var(--jhub-purple);
-    color: var(--jhub-white);
-    padding: 3rem 0 1.5rem;
+    background: var(--jhub-white);
+    color: var(--jhub-dark-gray);
+    padding: 4rem 0 2rem;
     margin-top: 4rem;
+    box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1);
 }
 
 .footer-brand {
-    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.footer-logo-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.footer-logo-link img {
+    height: 38px;
+    width: auto;
+    display: block;
+    transition: var(--transition-base);
+}
+
+.footer-logo-link .footer-logo-text {
+    display: inline-flex;
+    align-items: center;
+    font-weight: var(--font-weight-semibold);
+    font-size: 1rem;
+    letter-spacing: 0.04em;
+    color: var(--jhub-purple);
+    text-transform: uppercase;
+}
+
+.footer-description {
+    color: var(--jhub-gray);
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+}
+
+.footer-heading {
+    font-size: 1.2rem;
     font-weight: var(--font-weight-bold);
-    color: var(--jhub-white);
-    margin-bottom: 1rem;
+    color: var(--jhub-black);
+    margin-bottom: 1.5rem;
+    position: relative;
+    padding-left: 15px;
+}
+
+.footer-heading::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 60%;
+    background: var(--jhub-success);
+    border-radius: 2px;
 }
 
 .footer-links {
@@ -955,25 +1063,58 @@ strong, b {
 }
 
 .footer-links li {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.8rem;
 }
 
 .footer-links a {
-    color: rgba(255, 255, 255, 0.8);
-    transition: var(--transition-fast);
+    color: var(--jhub-gray);
+    text-decoration: none;
+    transition: var(--transition-base);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.footer-links a i {
+    font-size: 0.85rem;
+    color: var(--jhub-success);
 }
 
 .footer-links a:hover {
+    color: var(--jhub-success);
+    transform: translateX(6px);
+}
+
+.public-footer .social-links a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 45px;
+    height: 45px;
+    background: var(--jhub-light);
+    color: var(--jhub-black);
+    border-radius: 12px;
+    margin-right: 0.75rem;
+    transition: var(--transition-base);
+    font-size: 1.1rem;
+}
+
+.public-footer .social-links a:hover {
+    background: var(--jhub-success);
     color: var(--jhub-white);
-    padding-left: 5px;
+    transform: translateY(-3px);
 }
 
 .footer-bottom {
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    margin-top: 2rem;
-    padding-top: 1.5rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    margin-top: 3rem;
+    padding-top: 2rem;
     text-align: center;
-    color: rgba(255, 255, 255, 0.7);
+}
+
+.footer-bottom p {
+    color: var(--jhub-gray);
+    margin: 0;
 }
 
 /* ========================================
@@ -1397,12 +1538,39 @@ strong, b {
 }
 
 @media (max-width: 768px) {
-    body {
-        padding-top: 70px;
+    .public-page {
+        padding-top: 80px;
+    }
+    
+    .public-navbar {
+        padding: 0.8rem 0;
     }
     
     .public-navbar .navbar-brand img {
-        height: 40px;
+        height: 42px;
+    }
+    
+    .public-navbar .navbar-collapse {
+        background: rgba(255, 255, 255, 0.98);
+        padding: 1rem;
+        border-radius: var(--border-radius-lg);
+        margin-top: 0.75rem;
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .public-navbar .btn-login-link,
+    .public-navbar .btn-nav-cta {
+        width: 100%;
+        margin: 0.35rem 0 0;
+        text-align: center;
+    }
+    
+    .public-navbar .nav-link::after {
+        display: none;
+    }
+
+    .footer-logo-link img {
+        height: 34px;
     }
     
     .hero-section {
@@ -1618,3 +1786,6 @@ textarea:focus {
 /* ========================================
    END OF UNIFIED STYLESHEET
    ======================================== */
+.public-page {
+    padding-top: 110px;
+}
