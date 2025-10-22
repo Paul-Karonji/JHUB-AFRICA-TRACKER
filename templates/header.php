@@ -1,5 +1,5 @@
 <?php
-// templates/header.php - Main Header Template
+// templates/header.php - Main Header Template with Enhanced Styling
 // This file should be included at the top of every page
 
 // Ensure session is started
@@ -74,21 +74,51 @@ $logoAlt = 'JHUB AFRICA - Innovations for Transformation';
     <?php endif; ?>
     
     <style>
-        /* Global Styles */
+        /* ===== JHUB AFRICA COLOR SCHEME ===== */
         :root {
+            /* Primary Colors */
+            --primary-blue: #2c409a;
+            --alert-red: #fd1616;
+            --success-green: #3fa845;
+            --pure-black: #000000;
+            --deep-purple: #0e015b;
+            --pure-white: #ffffff;
+            
+            /* Role-specific colors */
             --admin-color: #2c409a;
             --mentor-color: #3fa845;
             --project-color: #0e015b;
+            
+            /* Bootstrap Override */
             --bs-primary: #2c409a;
             --bs-primary-rgb: 44, 64, 154;
+            --bs-success: #3fa845;
+            --bs-success-rgb: 63, 168, 69;
+            --bs-danger: #fd1616;
+            --bs-danger-rgb: 253, 22, 22;
+            
+            /* Neutral Colors */
+            --bg-light: #f8f9fa;
+            --bg-white: #ffffff;
+            --text-dark: #212529;
+            --text-muted: #6c757d;
+            --border-color: #dee2e6;
+        }
+        
+        /* ===== GLOBAL STYLES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8f9fa;
+            background-color: var(--bg-light);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            color: var(--text-dark);
         }
         
         .main-wrapper {
@@ -96,29 +126,48 @@ $logoAlt = 'JHUB AFRICA - Innovations for Transformation';
             min-height: 100vh;
         }
         
-        /* Sidebar Styles */
+        /* ===== SIDEBAR STYLES ===== */
         .sidebar {
             width: 250px;
-            background: linear-gradient(180deg, #2c409a 0%, #0e015b 100%);
-            color: white;
+            background: linear-gradient(180deg, var(--primary-blue) 0%, var(--deep-purple) 100%);
+            color: var(--pure-white);
             position: fixed;
             height: 100vh;
             overflow-y: auto;
-            transition: all 0.3s;
+            overflow-x: hidden;
+            transition: all 0.3s ease-in-out;
             z-index: 1000;
+            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .sidebar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+        
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
         }
         
         .sidebar.collapsed {
             width: 80px;
         }
         
-        /* UPDATED: Logo Styles */
+        /* Logo Styles */
         .sidebar-brand {
-            padding: 15px 20px;
+            padding: 20px 15px;
             text-align: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             background: rgba(255, 255, 255, 0.05);
-            min-height: 80px;
+            min-height: 85px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -129,6 +178,7 @@ $logoAlt = 'JHUB AFRICA - Innovations for Transformation';
             display: flex;
             align-items: center;
             justify-content: center;
+            text-decoration: none;
         }
         
         .sidebar-brand img {
@@ -138,6 +188,7 @@ $logoAlt = 'JHUB AFRICA - Innovations for Transformation';
             object-fit: contain;
             transition: all 0.3s ease;
             display: block;
+            filter: brightness(0) invert(1); /* Make logo white */
         }
         
         .sidebar.collapsed .sidebar-brand img {
@@ -151,93 +202,147 @@ $logoAlt = 'JHUB AFRICA - Innovations for Transformation';
         
         /* Logo fallback */
         .sidebar-brand .logo-fallback {
-            color: white;
+            color: var(--pure-white);
             font-size: 1.1rem;
             font-weight: bold;
             text-align: center;
             line-height: 1.3;
         }
         
+        /* Sidebar Toggle Button */
+        .sidebar-toggle {
+            position: absolute;
+            right: -15px;
+            top: 30px;
+            width: 30px;
+            height: 30px;
+            background: var(--primary-blue);
+            border: 2px solid var(--pure-white);
+            border-radius: 50%;
+            color: var(--pure-white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            z-index: 1001;
+        }
+        
+        .sidebar-toggle:hover {
+            background: var(--success-green);
+            transform: scale(1.1);
+        }
+        
+        /* Navigation Styles */
         .sidebar-nav {
             padding: 20px 0;
         }
         
         .sidebar-nav .nav-link {
-            color: rgba(255,255,255,0.8);
-            padding: 12px 20px;
+            color: rgba(255, 255, 255, 0.85);
+            padding: 14px 20px;
             display: flex;
             align-items: center;
             transition: all 0.3s;
-            border-left: 3px solid transparent;
+            border-left: 4px solid transparent;
             text-decoration: none;
             position: relative;
+            font-size: 0.95rem;
+            font-weight: 500;
         }
         
         .sidebar-nav .nav-link:hover {
-            background: rgba(255,255,255,0.1);
-            color: white;
-            border-left-color: var(--bs-primary);
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--pure-white);
+            border-left-color: var(--success-green);
+            padding-left: 25px;
         }
         
         .sidebar-nav .nav-link.active {
-            background: rgba(255,255,255,0.15);
-            color: white;
-            border-left-color: var(--bs-primary);
+            background: rgba(255, 255, 255, 0.15);
+            color: var(--pure-white);
+            border-left-color: var(--success-green);
+            font-weight: 600;
         }
         
         .sidebar-nav .nav-link i {
-            width: 20px;
-            margin-right: 10px;
+            width: 24px;
+            margin-right: 12px;
             text-align: center;
+            font-size: 1.1rem;
         }
         
         .sidebar.collapsed .nav-link span:not(.badge) {
             display: none;
         }
         
+        .sidebar.collapsed .nav-link {
+            justify-content: center;
+            padding: 14px 10px;
+        }
+        
+        .sidebar.collapsed .nav-link i {
+            margin-right: 0;
+        }
+        
         /* Badge Styles */
         .nav-link .badge {
             font-size: 0.7rem;
-            padding: 0.25em 0.6em;
-            border-radius: 10px;
+            padding: 0.3em 0.65em;
+            border-radius: 12px;
             margin-left: auto;
+            font-weight: 600;
         }
         
         .sidebar.collapsed .nav-link .badge {
             position: absolute;
-            right: 5px;
-            top: 5px;
-            transform: scale(0.8);
+            right: 8px;
+            top: 8px;
+            transform: scale(0.85);
         }
         
-        /* Badge Animation */
-        @keyframes pulse-warning {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.8; transform: scale(1.1); }
+        /* Badge Animations */
+        @keyframes pulse-badge {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.85;
+                transform: scale(1.08);
+            }
         }
         
+        .nav-link .badge.bg-danger,
         .nav-link .badge.bg-warning {
-            animation: pulse-warning 2s infinite;
+            animation: pulse-badge 2s infinite;
         }
         
-        /* Main Content */
+        /* Divider */
+        .sidebar-nav hr {
+            border-color: rgba(255, 255, 255, 0.15);
+            margin: 20px 15px;
+        }
+        
+        /* ===== MAIN CONTENT AREA ===== */
         .main-content {
             flex: 1;
             margin-left: 250px;
-            transition: margin-left 0.3s;
+            transition: margin-left 0.3s ease-in-out;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            background-color: var(--bg-light);
         }
         
         .sidebar.collapsed ~ .main-content {
             margin-left: 80px;
         }
         
-        /* Top Navbar */
+        /* ===== TOP NAVBAR ===== */
         .top-navbar {
-            background: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background: var(--pure-white);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
             padding: 15px 30px;
             display: flex;
             justify-content: space-between;
@@ -245,48 +350,328 @@ $logoAlt = 'JHUB AFRICA - Innovations for Transformation';
             position: sticky;
             top: 0;
             z-index: 999;
+            border-bottom: 3px solid var(--primary-blue);
         }
         
+        .top-navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .top-navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        /* Content Wrapper */
         .content-wrapper {
             padding: 30px;
             flex: 1;
         }
         
-        /* User Badge */
+        /* ===== USER BADGE ===== */
         .user-badge {
-            display: inline-block;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .user-badge i {
+            font-size: 1rem;
         }
         
         .admin-theme .user-badge {
-            background: rgba(44, 64, 154, 0.1);
+            background: linear-gradient(135deg, rgba(44, 64, 154, 0.1), rgba(44, 64, 154, 0.15));
             color: var(--admin-color);
+            border: 2px solid rgba(44, 64, 154, 0.2);
         }
         
         .mentor-theme .user-badge {
-            background: rgba(63, 168, 69, 0.1);
+            background: linear-gradient(135deg, rgba(63, 168, 69, 0.1), rgba(63, 168, 69, 0.15));
             color: var(--mentor-color);
+            border: 2px solid rgba(63, 168, 69, 0.2);
         }
         
         .project-theme .user-badge {
-            background: rgba(14, 1, 91, 0.1);
+            background: linear-gradient(135deg, rgba(14, 1, 91, 0.1), rgba(14, 1, 91, 0.15));
             color: var(--project-color);
+            border: 2px solid rgba(14, 1, 91, 0.2);
         }
         
-        /* Mobile Menu Toggle */
+        /* ===== BUTTONS ===== */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-blue), var(--deep-purple));
+            border: none;
+            color: var(--pure-white);
+            font-weight: 600;
+            padding: 10px 24px;
+            border-radius: 8px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(44, 64, 154, 0.3);
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--deep-purple), var(--primary-blue));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(44, 64, 154, 0.4);
+        }
+        
+        .btn-success {
+            background: var(--success-green);
+            border: none;
+            color: var(--pure-white);
+            font-weight: 600;
+            padding: 10px 24px;
+            border-radius: 8px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(63, 168, 69, 0.3);
+        }
+        
+        .btn-success:hover {
+            background: #359c3b;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(63, 168, 69, 0.4);
+        }
+        
+        .btn-danger {
+            background: var(--alert-red);
+            border: none;
+            color: var(--pure-white);
+            font-weight: 600;
+            padding: 10px 24px;
+            border-radius: 8px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(253, 22, 22, 0.3);
+        }
+        
+        .btn-danger:hover {
+            background: #e01414;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(253, 22, 22, 0.4);
+        }
+        
+        .btn-warning {
+            background: #ffc107;
+            border: none;
+            color: var(--pure-black);
+            font-weight: 600;
+            padding: 10px 24px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .btn-warning:hover {
+            background: #ffb300;
+            transform: translateY(-2px);
+        }
+        
+        .btn-info {
+            background: #17a2b8;
+            border: none;
+            color: var(--pure-white);
+            font-weight: 600;
+            padding: 10px 24px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .btn-info:hover {
+            background: #138496;
+            transform: translateY(-2px);
+        }
+        
+        /* ===== CARDS ===== */
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 24px;
+            transition: all 0.3s;
+            overflow: hidden;
+        }
+        
+        .card:hover {
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+            transform: translateY(-2px);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-blue), var(--deep-purple));
+            color: var(--pure-white);
+            border-radius: 12px 12px 0 0 !important;
+            padding: 16px 20px;
+            font-weight: 600;
+            border-bottom: none;
+        }
+        
+        .card-header.bg-success {
+            background: linear-gradient(135deg, var(--success-green), #2d8736) !important;
+        }
+        
+        .card-header.bg-danger {
+            background: linear-gradient(135deg, var(--alert-red), #d11212) !important;
+        }
+        
+        .card-header.bg-info {
+            background: linear-gradient(135deg, #17a2b8, #117a8b) !important;
+        }
+        
+        .card-body {
+            padding: 24px;
+        }
+        
+        /* Bordered Cards */
+        .card.border-left-primary {
+            border-left: 4px solid var(--primary-blue) !important;
+        }
+        
+        .card.border-left-success {
+            border-left: 4px solid var(--success-green) !important;
+        }
+        
+        .card.border-left-danger {
+            border-left: 4px solid var(--alert-red) !important;
+        }
+        
+        .card.border-left-warning {
+            border-left: 4px solid #ffc107 !important;
+        }
+        
+        .card.border-left-info {
+            border-left: 4px solid #17a2b8 !important;
+        }
+        
+        /* ===== ALERTS ===== */
+        .alert {
+            border-radius: 10px;
+            border: none;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        
+        .alert-success {
+            background: linear-gradient(135deg, rgba(63, 168, 69, 0.1), rgba(63, 168, 69, 0.15));
+            color: var(--success-green);
+            border-left: 4px solid var(--success-green);
+        }
+        
+        .alert-danger {
+            background: linear-gradient(135deg, rgba(253, 22, 22, 0.1), rgba(253, 22, 22, 0.15));
+            color: var(--alert-red);
+            border-left: 4px solid var(--alert-red);
+        }
+        
+        .alert-warning {
+            background: linear-gradient(135deg, rgba(255, 193, 7, 0.1), rgba(255, 193, 7, 0.15));
+            color: #856404;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .alert-info {
+            background: linear-gradient(135deg, rgba(23, 162, 184, 0.1), rgba(23, 162, 184, 0.15));
+            color: #0c5460;
+            border-left: 4px solid #17a2b8;
+        }
+        
+        /* ===== TABLES ===== */
+        .table {
+            background: var(--pure-white);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .table thead th {
+            background: linear-gradient(135deg, var(--primary-blue), var(--deep-purple));
+            color: var(--pure-white);
+            font-weight: 600;
+            border: none;
+            padding: 14px 16px;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .table tbody tr {
+            transition: all 0.2s;
+        }
+        
+        .table tbody tr:hover {
+            background-color: rgba(44, 64, 154, 0.05);
+        }
+        
+        .table tbody td {
+            padding: 14px 16px;
+            vertical-align: middle;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        /* ===== BADGES ===== */
+        .badge {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .badge.bg-primary {
+            background: var(--primary-blue) !important;
+        }
+        
+        .badge.bg-success {
+            background: var(--success-green) !important;
+        }
+        
+        .badge.bg-danger {
+            background: var(--alert-red) !important;
+        }
+        
+        /* ===== FORMS ===== */
+        .form-control {
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 14px;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 0.2rem rgba(44, 64, 154, 0.15);
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+        
+        /* ===== MOBILE MENU TOGGLE ===== */
         .mobile-menu-toggle {
             display: none;
             background: none;
             border: none;
             font-size: 1.5rem;
-            color: #333;
+            color: var(--text-dark);
             cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: all 0.3s;
         }
         
-        /* Responsive Design */
+        .mobile-menu-toggle:hover {
+            background: var(--bg-light);
+        }
+        
+        /* ===== RESPONSIVE DESIGN ===== */
         @media (max-width: 992px) {
             .sidebar {
                 margin-left: -250px;
@@ -304,10 +689,28 @@ $logoAlt = 'JHUB AFRICA - Innovations for Transformation';
                 display: block;
             }
             
-            /* Adjust logo for tablet */
             .sidebar-brand img {
                 max-width: 160px;
                 max-height: 55px;
+            }
+            
+            .content-wrapper {
+                padding: 20px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .top-navbar {
+                padding: 12px 20px;
+            }
+            
+            .top-navbar-right {
+                gap: 10px;
+            }
+            
+            .user-badge {
+                font-size: 0.8rem;
+                padding: 6px 12px;
             }
         }
         
@@ -320,7 +723,6 @@ $logoAlt = 'JHUB AFRICA - Innovations for Transformation';
                 padding: 10px 15px;
             }
             
-            /* Adjust logo for mobile */
             .sidebar-brand img {
                 max-width: 140px;
                 max-height: 45px;
@@ -330,6 +732,56 @@ $logoAlt = 'JHUB AFRICA - Innovations for Transformation';
                 padding: 12px 15px;
                 min-height: 70px;
             }
+            
+            .card-body {
+                padding: 16px;
+            }
+            
+            .btn {
+                padding: 8px 16px;
+                font-size: 0.9rem;
+            }
+        }
+        
+        /* ===== UTILITY CLASSES ===== */
+        .text-primary {
+            color: var(--primary-blue) !important;
+        }
+        
+        .text-success {
+            color: var(--success-green) !important;
+        }
+        
+        .text-danger {
+            color: var(--alert-red) !important;
+        }
+        
+        .bg-primary {
+            background-color: var(--primary-blue) !important;
+        }
+        
+        .bg-success {
+            background-color: var(--success-green) !important;
+        }
+        
+        .bg-danger {
+            background-color: var(--alert-red) !important;
+        }
+        
+        /* ===== LOADING SPINNER ===== */
+        .spinner-border {
+            border-color: var(--primary-blue);
+            border-right-color: transparent;
+        }
+        
+        /* ===== HOVER EFFECTS ===== */
+        .hover-lift {
+            transition: all 0.3s;
+        }
+        
+        .hover-lift:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
         }
     </style>
 </head>
@@ -349,6 +801,12 @@ $logoAlt = 'JHUB AFRICA - Innovations for Transformation';
                 </a>
             </div>
             
+            <!-- Sidebar Toggle Button -->
+            <div class="sidebar-toggle" onclick="toggleSidebar()" title="Toggle Sidebar">
+                <i class="fas fa-chevron-left"></i>
+            </div>
+            
+            <!-- Navigation -->
             <nav class="sidebar-nav">
                 <?php if ($currentUserType === USER_TYPE_ADMIN): ?>
                     <!-- Admin Navigation -->
@@ -359,21 +817,14 @@ $logoAlt = 'JHUB AFRICA - Innovations for Transformation';
                     <a href="<?php echo $baseUrl; ?>/dashboards/admin/applications.php" class="nav-link">
                         <i class="fas fa-clipboard-list"></i>
                         <span>Applications</span>
+                        <?php if ($stats['pending_applications'] ?? 0 > 0): ?>
+                            <span class="badge bg-danger"><?php echo $stats['pending_applications']; ?></span>
+                        <?php endif; ?>
                     </a>
                     <a href="<?php echo $baseUrl; ?>/dashboards/admin/projects.php" class="nav-link">
                         <i class="fas fa-project-diagram"></i>
                         <span>Projects</span>
                     </a>
-                    
-                    <!-- MODERATION LINK - NEW -->
-                    <a href="<?php echo $baseUrl; ?>/dashboards/admin/moderate-comments.php" class="nav-link">
-                        <i class="fas fa-gavel"></i>
-                        <span>Moderate Comments</span>
-                        <?php if ($pendingCommentsCount > 0): ?>
-                            <span class="badge bg-warning text-dark"><?php echo $pendingCommentsCount; ?></span>
-                        <?php endif; ?>
-                    </a>
-                    
                     <a href="<?php echo $baseUrl; ?>/dashboards/admin/mentors.php" class="nav-link">
                         <i class="fas fa-user-tie"></i>
                         <span>Mentors</span>
@@ -386,6 +837,13 @@ $logoAlt = 'JHUB AFRICA - Innovations for Transformation';
                         <i class="fas fa-users-cog"></i>
                         <span>Admins</span>
                     </a>
+                    <?php if ($pendingCommentsCount > 0): ?>
+                    <a href="<?php echo $baseUrl; ?>/dashboards/admin/moderate-comments.php" class="nav-link">
+                        <i class="fas fa-comments"></i>
+                        <span>Comments</span>
+                        <span class="badge bg-warning"><?php echo $pendingCommentsCount; ?></span>
+                    </a>
+                    <?php endif; ?>
                     <a href="<?php echo $baseUrl; ?>/dashboards/admin/reports.php" class="nav-link">
                         <i class="fas fa-chart-bar"></i>
                         <span>Reports</span>
@@ -394,42 +852,38 @@ $logoAlt = 'JHUB AFRICA - Innovations for Transformation';
                         <i class="fas fa-cog"></i>
                         <span>Settings</span>
                     </a>
-                
+                    
                 <?php elseif ($currentUserType === USER_TYPE_MENTOR): ?>
                     <!-- Mentor Navigation -->
-                       <a href="<?php echo $baseUrl; ?>/dashboards/mentor/index.php" class="nav-link">
-                            <i class="fas fa-tachometer-alt"></i>
-                            <span>Dashboard</span>
-                        </a>
-                        <a href="<?php echo $baseUrl; ?>/dashboards/mentor/available-projects.php" class="nav-link">
-                            <i class="fas fa-search"></i>
-                            <span>Browse Projects</span>
-                        </a>
-                        <a href="<?php echo $baseUrl; ?>/dashboards/mentor/my-projects.php" class="nav-link">
-                            <i class="fas fa-project-diagram"></i>
-                            <span>My Projects</span>
-                        </a>
-                        <a href="<?php echo $baseUrl; ?>/dashboards/mentor/resources.php" class="nav-link">
-                            <i class="fas fa-book"></i>
-                            <span>Resources</span>
-                        </a>
-                        <a href="<?php echo $baseUrl; ?>/dashboards/mentor/assessments.php" class="nav-link">
-                            <i class="fas fa-clipboard-check"></i>
-                            <span>Assessments</span>
-                        </a>
-                        <a href="<?php echo $baseUrl; ?>/dashboards/mentor/learning.php" class="nav-link">
-                            <i class="fas fa-graduation-cap"></i>
-                            <span>Learning</span>
-                        </a>
-                        
-                        <!-- Divider -->
-                        <div style="border-top: 1px solid rgba(255,255,255,0.1); margin: 10px 0;"></div>
-                        
-                        <a href="<?php echo $baseUrl; ?>/dashboards/mentor/profile.php" class="nav-link">
-                            <i class="fas fa-user"></i>
-                            <span>My Profile</span>
-                        </a>
-                
+                    <a href="<?php echo $baseUrl; ?>/dashboards/mentor/index.php" class="nav-link">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="<?php echo $baseUrl; ?>/dashboards/mentor/available-projects.php" class="nav-link">
+                        <i class="fas fa-search"></i>
+                        <span>Browse Projects</span>
+                    </a>
+                    <a href="<?php echo $baseUrl; ?>/dashboards/mentor/index.php#my-projects" class="nav-link">
+                        <i class="fas fa-project-diagram"></i>
+                        <span>My Projects</span>
+                    </a>
+                    <a href="<?php echo $baseUrl; ?>/dashboards/mentor/resources.php" class="nav-link">
+                        <i class="fas fa-folder"></i>
+                        <span>Resources</span>
+                    </a>
+                    <a href="<?php echo $baseUrl; ?>/dashboards/mentor/assessments.php" class="nav-link">
+                        <i class="fas fa-clipboard-check"></i>
+                        <span>Assessments</span>
+                    </a>
+                    <a href="<?php echo $baseUrl; ?>/dashboards/mentor/learning.php" class="nav-link">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>Learning</span>
+                    </a>
+                    <a href="<?php echo $baseUrl; ?>/dashboards/mentor/profile.php" class="nav-link">
+                        <i class="fas fa-user"></i>
+                        <span>My Profile</span>
+                    </a>
+                    
                 <?php elseif ($currentUserType === USER_TYPE_PROJECT): ?>
                     <!-- Project Navigation -->
                     <a href="<?php echo $baseUrl; ?>/dashboards/project/index.php" class="nav-link">
@@ -440,12 +894,8 @@ $logoAlt = 'JHUB AFRICA - Innovations for Transformation';
                         <i class="fas fa-users"></i>
                         <span>Team</span>
                     </a>
-                    <a href="<?php echo $baseUrl; ?>/dashboards/project/mentors.php" class="nav-link">
-                        <i class="fas fa-user-tie"></i>
-                        <span>Mentors</span>
-                    </a>
                     <a href="<?php echo $baseUrl; ?>/dashboards/project/resources.php" class="nav-link">
-                        <i class="fas fa-book"></i>
+                        <i class="fas fa-folder"></i>
                         <span>Resources</span>
                     </a>
                     <a href="<?php echo $baseUrl; ?>/dashboards/project/assessments.php" class="nav-link">
@@ -467,7 +917,7 @@ $logoAlt = 'JHUB AFRICA - Innovations for Transformation';
                 <?php endif; ?>
                 
                 <!-- Common Links -->
-                <hr style="border-color: rgba(255,255,255,0.1); margin: 20px;">
+                <hr>
                 <a href="<?php echo $baseUrl; ?>/public/projects.php" class="nav-link" target="_blank">
                     <i class="fas fa-globe"></i>
                     <span>Public Projects</span>
@@ -478,75 +928,43 @@ $logoAlt = 'JHUB AFRICA - Innovations for Transformation';
                 </a>
             </nav>
         </aside>
-
+        
         <!-- Main Content -->
-        <div class="main-content">
+        <div class="main-content" id="main-content">
             <!-- Top Navbar -->
             <nav class="top-navbar">
-                <div class="d-flex align-items-center">
-                    <button class="mobile-menu-toggle me-3" onclick="toggleSidebar()">
+                <div class="top-navbar-left">
+                    <button class="mobile-menu-toggle" onclick="toggleMobileSidebar()">
                         <i class="fas fa-bars"></i>
                     </button>
-                    <button class="btn btn-link text-dark d-none d-lg-block" onclick="toggleSidebar()" title="Toggle Sidebar">
-                        <i class="fas fa-bars"></i>
-                    </button>
+                    <h5 class="mb-0 fw-bold text-dark d-none d-md-block">
+                        <?php echo isset($pageTitle) ? str_replace(' - ' . SITE_NAME, '', $pageTitle) : 'Dashboard'; ?>
+                    </h5>
                 </div>
                 
-                <div class="d-flex align-items-center gap-3">
-                    <!-- Notifications -->
-                    <div class="dropdown">
-                        <button class="btn btn-link text-dark position-relative" type="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-bell"></i>
-                            <?php if ($pendingCommentsCount > 0): ?>
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                <?php echo $pendingCommentsCount; ?>
-                            </span>
-                            <?php endif; ?>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><h6 class="dropdown-header">Notifications</h6></li>
-                            <?php if ($pendingCommentsCount > 0): ?>
-                            <li><a class="dropdown-item" href="<?php echo $baseUrl; ?>/dashboards/admin/moderate-comments.php">
-                                <i class="fas fa-gavel text-warning"></i> <?php echo $pendingCommentsCount; ?> comment(s) pending approval
-                            </a></li>
-                            <?php endif; ?>
-                            <li><a class="dropdown-item" href="#">New application submitted</a></li>
-                            <li><a class="dropdown-item" href="#">Project update available</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-center" href="#">View All</a></li>
-                        </ul>
-                    </div>
-                    
-                    <!-- User Profile -->
-                    <div class="dropdown">
-                        <button class="btn btn-link text-dark d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
-                            <span class="user-badge"><?php echo e($userRole); ?></span>
-                            <span class="d-none d-md-inline"><?php echo e($currentUserName); ?></span>
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><h6 class="dropdown-header">Account</h6></li>
-                            <li><a class="dropdown-item" href="<?php echo $baseUrl . $dashboardLink; ?>">Dashboard</a></li>
-                            <li><a class="dropdown-item" href="<?php echo $baseUrl; ?>/dashboards/<?php echo strtolower($userRole); ?>/profile.php">Profile</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-danger" href="<?php echo $baseUrl; ?>/auth/logout.php">
-                                <i class="fas fa-sign-out-alt me-2"></i>Logout
-                            </a></li>
-                        </ul>
+                <div class="top-navbar-right">
+                    <div class="user-badge">
+                        <i class="fas fa-user-circle"></i>
+                        <span><?php echo htmlspecialchars($currentUserName); ?></span>
+                        <span class="badge bg-light text-primary ms-1"><?php echo $userRole; ?></span>
                     </div>
                 </div>
             </nav>
-
-            <!-- Page Content -->
+            
+            <!-- Content Wrapper -->
             <div class="content-wrapper">
-                <!-- Flash Messages -->
-                <?php if (isset($_SESSION['flash_message'])): ?>
-                <div class="alert alert-<?php echo $_SESSION['flash_type'] ?? 'info'; ?> alert-dismissible fade show">
-                    <?php echo $_SESSION['flash_message']; ?>
+                <?php
+                // Display flash messages if any
+                if (isset($_SESSION['flash_message'])):
+                    $flashType = $_SESSION['flash_type'] ?? 'info';
+                ?>
+                <div class="alert alert-<?php echo $flashType; ?> alert-dismissible fade show">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <?php echo htmlspecialchars($_SESSION['flash_message']); ?>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
-                <?php 
+                <?php
                     unset($_SESSION['flash_message']);
                     unset($_SESSION['flash_type']);
-                endif; 
+                endif;
                 ?>
