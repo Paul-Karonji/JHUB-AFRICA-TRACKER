@@ -252,3 +252,69 @@ SQL:
 
 Params: ["2025-10-10 00:00:00","2025-10-23 23:59:59","2025-10-10 00:00:00","2025-10-23 23:59:59","2025-10-10 00:00:00","2025-10-23 23:59:59"]
 ---
+2025-10-23 13:04:26 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'created_at' in 'where clause'
+SQL: SELECT COUNT(*) FROM project_applications WHERE status = ? AND created_at BETWEEN ? AND ?
+Params: ["pending","2025-10-10 00:00:00","2025-10-23 23:59:59"]
+---
+2025-10-23 13:04:26 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'created_at' in 'where clause'
+SQL: SELECT COUNT(*) FROM project_applications WHERE status = ? AND created_at BETWEEN ? AND ?
+Params: ["approved","2025-10-10 00:00:00","2025-10-23 23:59:59"]
+---
+2025-10-23 13:04:26 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'created_at' in 'where clause'
+SQL: SELECT COUNT(*) FROM project_applications WHERE status = ? AND created_at BETWEEN ? AND ?
+Params: ["rejected","2025-10-10 00:00:00","2025-10-23 23:59:59"]
+---
+2025-10-23 13:04:26 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'created_at' in 'where clause'
+SQL: SELECT COUNT(*) FROM project_innovators WHERE is_active = 1 AND created_at BETWEEN ? AND ?
+Params: ["2025-10-10 00:00:00","2025-10-23 23:59:59"]
+---
+2025-10-23 13:04:26 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'pm.created_at' in 'on clause'
+SQL: 
+    SELECT m.name, m.email,
+           COUNT(DISTINCT pm.project_id) as projects,
+           COUNT(DISTINCT mr.resource_id) as resources,
+           COUNT(DISTINCT pa.assessment_id) as assessments
+    FROM mentors m
+    LEFT JOIN project_mentors pm ON m.mentor_id = pm.mentor_id AND pm.is_active = 1 AND pm.created_at BETWEEN ? AND ?
+    LEFT JOIN mentor_resources mr ON m.mentor_id = mr.mentor_id AND mr.is_deleted = 0 AND mr.created_at BETWEEN ? AND ?
+    LEFT JOIN project_assessments pa ON m.mentor_id = pa.mentor_id AND pa.is_deleted = 0 AND pa.created_at BETWEEN ? AND ?
+    WHERE m.is_active = 1
+    GROUP BY m.mentor_id
+    ORDER BY projects DESC, resources DESC
+    LIMIT 10
+
+Params: ["2025-10-10 00:00:00","2025-10-23 23:59:59","2025-10-10 00:00:00","2025-10-23 23:59:59","2025-10-10 00:00:00","2025-10-23 23:59:59"]
+---
+2025-10-23 13:13:42 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'created_at' in 'where clause'
+SQL: SELECT COUNT(*) FROM project_applications WHERE status = ? AND created_at BETWEEN ? AND ?
+Params: ["pending","2025-10-10 00:00:00","2025-10-23 23:59:59"]
+---
+2025-10-23 13:13:42 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'created_at' in 'where clause'
+SQL: SELECT COUNT(*) FROM project_applications WHERE status = ? AND created_at BETWEEN ? AND ?
+Params: ["approved","2025-10-10 00:00:00","2025-10-23 23:59:59"]
+---
+2025-10-23 13:13:42 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'created_at' in 'where clause'
+SQL: SELECT COUNT(*) FROM project_applications WHERE status = ? AND created_at BETWEEN ? AND ?
+Params: ["rejected","2025-10-10 00:00:00","2025-10-23 23:59:59"]
+---
+2025-10-23 13:13:42 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'created_at' in 'where clause'
+SQL: SELECT COUNT(*) FROM project_innovators WHERE is_active = 1 AND created_at BETWEEN ? AND ?
+Params: ["2025-10-10 00:00:00","2025-10-23 23:59:59"]
+---
+2025-10-23 13:13:42 - Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'pm.created_at' in 'on clause'
+SQL: 
+    SELECT m.name, m.email,
+           COUNT(DISTINCT pm.project_id) as projects,
+           COUNT(DISTINCT mr.resource_id) as resources,
+           COUNT(DISTINCT pa.assessment_id) as assessments
+    FROM mentors m
+    LEFT JOIN project_mentors pm ON m.mentor_id = pm.mentor_id AND pm.is_active = 1 AND pm.created_at BETWEEN ? AND ?
+    LEFT JOIN mentor_resources mr ON m.mentor_id = mr.mentor_id AND mr.is_deleted = 0 AND mr.created_at BETWEEN ? AND ?
+    LEFT JOIN project_assessments pa ON m.mentor_id = pa.mentor_id AND pa.is_deleted = 0 AND pa.created_at BETWEEN ? AND ?
+    WHERE m.is_active = 1
+    GROUP BY m.mentor_id
+    ORDER BY projects DESC, resources DESC
+    LIMIT 10
+
+Params: ["2025-10-10 00:00:00","2025-10-23 23:59:59","2025-10-10 00:00:00","2025-10-23 23:59:59","2025-10-10 00:00:00","2025-10-23 23:59:59"]
+---

@@ -26,8 +26,12 @@ $logoAlt = 'JHUB AFRICA - Innovations for Transformation';
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title><?php echo htmlspecialchars($pageTitle); ?></title>
     
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="<?php echo $baseUrl; ?>/favicon.ico">
+    <!-- Favicon - JHUB Logo -->
+    <link rel="icon" type="image/x-icon" href="<?php echo $baseUrl; ?>/assets/favicon_io/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="<?php echo $baseUrl; ?>/assets/favicon_io/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="<?php echo $baseUrl; ?>/assets/favicon_io/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="<?php echo $baseUrl; ?>/assets/favicon_io/apple-touch-icon.png">
+    <link rel="manifest" href="<?php echo $baseUrl; ?>/assets/favicon_io/site.webmanifest">
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
