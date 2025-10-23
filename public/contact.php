@@ -168,7 +168,7 @@ require_once '../templates/public-header.php';
                     <?php endif; ?>
 
                     <form method="POST" action="">
-                        <?php echo Validator::csrfToken(); ?>
+                        <?php echo Validator::csrfInput(); ?>
 
                         <div class="row g-3">
                             <div class="col-md-6">
