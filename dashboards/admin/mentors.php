@@ -214,7 +214,7 @@ include '../../templates/header.php';
                                     <?php foreach ($assignedProjects as $project): ?>
                                     <tr>
                                         <td><?php echo e($project['project_name']); ?></td>
-                                        <td><span class="badge bg-primary">Stage <?php echo $project['current_stage']; ?></span></td>
+                                        <td><span class="badge bg-primary"><?php echo getStageName($project['current_stage']); ?></span></td>
                                         <td>
                                             <span class="badge bg-<?php echo $project['status'] === 'active' ? 'success' : ($project['status'] === 'completed' ? 'info' : 'danger'); ?>">
                                                 <?php echo ucfirst($project['status']); ?>

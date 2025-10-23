@@ -71,7 +71,7 @@ include '../../templates/header.php';
             <p class="text-muted mb-0">Project Lead: <?php echo e($project['project_lead_name']); ?></p>
         </div>
         <div class="d-flex gap-2">
-            <span class="badge bg-primary fs-6">Stage <?php echo $project['current_stage']; ?></span>
+            <span class="badge bg-primary fs-6"><?php echo getStageName($project['current_stage']); ?></span>
             <span class="badge bg-<?php echo $project['status'] === 'active' ? 'success' : ($project['status'] === 'completed' ? 'info' : 'danger'); ?> fs-6">
                 <?php echo ucfirst($project['status']); ?>
             </span>

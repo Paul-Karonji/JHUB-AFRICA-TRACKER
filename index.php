@@ -1416,7 +1416,7 @@ $pageTitle = "Home";
                 <div class="project-card">
                     <div class="project-header">
                         <h3 class="project-title"><?php echo e($project['project_name']); ?></h3>
-                        <span class="project-stage-badge">Stage <?php echo $project['current_stage']; ?> of 6</span>
+                        <span class="project-stage-badge"><?php echo getStageName($project['current_stage']); ?></span>
                     </div>
                     <div class="project-body">
                         <p class="project-description">

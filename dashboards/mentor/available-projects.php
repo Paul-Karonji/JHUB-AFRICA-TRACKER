@@ -61,7 +61,7 @@ include '../../templates/header.php';
                     </div>
                     <div class="card-body">
                         <div class="mb-3">
-                            <span class="badge bg-primary me-2">Stage <?php echo $project['current_stage']; ?></span>
+                            <span class="badge bg-primary me-2"><?php echo getStageName($project['current_stage']); ?></span>
                             <span class="badge bg-success"><?php echo ucfirst($project['status']); ?></span>
                         </div>
                         

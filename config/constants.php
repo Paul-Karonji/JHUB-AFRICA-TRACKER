@@ -20,29 +20,29 @@ define('APPLICATION_STATUS_APPROVED', 'approved');
 define('APPLICATION_STATUS_REJECTED', 'rejected');
 
 // Project Stages
-define('STAGE_1', 1); // Project Creation
-define('STAGE_2', 2); // Mentorship
-define('STAGE_3', 3); // Assessment
-define('STAGE_4', 4); // Learning and Development
-define('STAGE_5', 5); // Progress Tracking and Feedback
-define('STAGE_6', 6); // Showcase and Integration
+define('STAGE_1', 1); // Project Activation & Setup
+define('STAGE_2', 2); // Mentorship & Strategic Planning
+define('STAGE_3', 3); // Capacity Building & Skill Development
+define('STAGE_4', 4); // Product Development & Incubation
+define('STAGE_5', 5); // Progress Evaluation & Showcase
+define('STAGE_6', 6); // Integration, Scale-Up & Alumni Transition
 
 $STAGE_NAMES = [
-    STAGE_1 => 'Project Creation',
-    STAGE_2 => 'Mentorship',
-    STAGE_3 => 'Assessment',
-    STAGE_4 => 'Learning and Development',
-    STAGE_5 => 'Progress Tracking and Feedback',
-    STAGE_6 => 'Showcase and Integration'
+    STAGE_1 => 'Project Activation & Setup',
+    STAGE_2 => 'Mentorship & Strategic Planning',
+    STAGE_3 => 'Capacity Building & Skill Development',
+    STAGE_4 => 'Product Development & Incubation',
+    STAGE_5 => 'Progress Evaluation & Showcase',
+    STAGE_6 => 'Integration, Scale-Up & Alumni Transition'
 ];
 
 $STAGE_DESCRIPTIONS = [
-    STAGE_1 => 'Initial project setup and team building',
-    STAGE_2 => 'Mentor assignment and initial guidance',
-    STAGE_3 => 'Project assessment and evaluation',
-    STAGE_4 => 'Skills development and learning objectives',
-    STAGE_5 => 'Progress monitoring and feedback collection',
-    STAGE_6 => 'Final showcase and ecosystem integration'
+    STAGE_1 => 'Initial project setup, team formation, and activation of resources',
+    STAGE_2 => 'Mentor assignment, strategic guidance, and planning for project execution',
+    STAGE_3 => 'Building team capabilities through targeted skill development and training',
+    STAGE_4 => 'Product/service development, testing, iteration, and incubation support',
+    STAGE_5 => 'Progress monitoring, evaluation, feedback collection, and showcase preparation',
+    STAGE_6 => 'Final showcase, ecosystem integration, scaling strategies, and alumni network transition'
 ];
 
 // Comment Types

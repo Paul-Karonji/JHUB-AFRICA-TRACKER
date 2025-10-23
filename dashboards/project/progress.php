@@ -21,12 +21,12 @@ $stats = [
 
 // Stage information
 $stages = [
-    1 => ['name' => 'Project Creation', 'description' => 'Initial setup and team building', 'icon' => 'fa-rocket'],
-    2 => ['name' => 'Mentorship', 'description' => 'Mentor assignment and guidance', 'icon' => 'fa-user-tie'],
-    3 => ['name' => 'Assessment', 'description' => 'Project evaluation and feedback', 'icon' => 'fa-clipboard-check'],
-    4 => ['name' => 'Learning & Development', 'description' => 'Skills and knowledge building', 'icon' => 'fa-graduation-cap'],
-    5 => ['name' => 'Progress Tracking', 'description' => 'Monitoring and refinement', 'icon' => 'fa-chart-line'],
-    6 => ['name' => 'Showcase & Integration', 'description' => 'Final presentation and ecosystem entry', 'icon' => 'fa-trophy']
+    1 => ['name' => 'Project Activation & Setup', 'description' => 'Initial project setup, team formation, and activation of resources', 'icon' => 'fa-rocket'],
+    2 => ['name' => 'Mentorship & Strategic Planning', 'description' => 'Mentor assignment, strategic guidance, and planning for project execution', 'icon' => 'fa-user-tie'],
+    3 => ['name' => 'Capacity Building & Skill Development', 'description' => 'Building team capabilities through targeted skill development and training', 'icon' => 'fa-clipboard-check'],
+    4 => ['name' => 'Product Development & Incubation', 'description' => 'Product/service development, testing, iteration, and incubation support', 'icon' => 'fa-graduation-cap'],
+    5 => ['name' => 'Progress Evaluation & Showcase', 'description' => 'Progress monitoring, evaluation, feedback collection, and showcase preparation', 'icon' => 'fa-chart-line'],
+    6 => ['name' => 'Integration, Scale-Up & Alumni Transition', 'description' => 'Final showcase, ecosystem integration, scaling strategies, and alumni network transition', 'icon' => 'fa-trophy']
 ];
 
 // Calculate days in current stage
@@ -60,7 +60,7 @@ include '../../templates/header.php';
                     </div>
                 </div>
                 <div class="col-md-10">
-                    <h3>Stage <?php echo $project['current_stage']; ?>: <?php echo $stages[$project['current_stage']]['name']; ?></h3>
+                    <h3><?php echo $stages[$project['current_stage']]['name']; ?></h3>
                     <p class="lead text-muted mb-3"><?php echo $stages[$project['current_stage']]['description']; ?></p>
                     
                     <div class="row">
@@ -97,7 +97,7 @@ include '../../templates/header.php';
                         <i class="fas <?php echo $stageNum < $project['current_stage'] ? 'fa-check' : ($stageNum == $project['current_stage'] ? 'fa-circle' : $stageInfo['icon']); ?>"></i>
                     </div>
                     <div class="timeline-content">
-                        <h5>Stage <?php echo $stageNum; ?>: <?php echo $stageInfo['name']; ?></h5>
+                        <h5><?php echo $stageInfo['name']; ?></h5>
                         <p class="text-muted mb-2"><?php echo $stageInfo['description']; ?></p>
                         <?php if ($stageNum < $project['current_stage']): ?>
                             <span class="badge bg-success"><i class="fas fa-check me-1"></i> Completed</span>

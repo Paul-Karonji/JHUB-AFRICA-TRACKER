@@ -138,7 +138,7 @@ require_once '../templates/public-header.php';
                     <p class="lead text-muted mb-3"><?php echo nl2br(htmlspecialchars($project['description'])); ?></p>
                     
                     <div class="mb-3">
-                        <span class="badge bg-primary me-2">Stage <?php echo $project['current_stage']; ?></span>
+                        <span class="badge bg-primary me-2"><?php echo getStageName($project['current_stage']); ?></span>
                         <span class="badge bg-success"><?php echo ucfirst($project['status']); ?></span>
                     </div>
                     

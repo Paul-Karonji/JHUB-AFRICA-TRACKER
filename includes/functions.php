@@ -35,12 +35,12 @@ function getStageProgress($stage) {
  */
 function getStageName($stage) {
     $stageNames = [
-        1 => 'Project Creation / Ideation',
-        2 => 'Mentorship / Validation',
-        3 => 'Assessment / Development',
-        4 => 'Learning & Development / Testing',
-        5 => 'Progress Tracking / Launch Prep',
-        6 => 'Showcase & Integration / Scaling'
+        1 => 'Project Activation & Setup',
+        2 => 'Mentorship & Strategic Planning',
+        3 => 'Capacity Building & Skill Development',
+        4 => 'Product Development & Incubation',
+        5 => 'Progress Evaluation & Showcase',
+        6 => 'Integration, Scale-Up & Alumni Transition'
     ];
     return $stageNames[$stage] ?? 'Unknown Stage';
 }
@@ -50,12 +50,12 @@ function getStageName($stage) {
  */
 function getStageDescription($stage) {
     $descriptions = [
-        1 => 'Initial project setup, team building, and idea development',
-        2 => 'Working with mentors for guidance, support, and market validation',
-        3 => 'Project assessment, evaluation, and product/service development',
-        4 => 'Focused on skills development, learning, testing and iteration',
-        5 => 'Progress monitoring, feedback collection, and launch preparation',
-        6 => 'Final showcase, ecosystem integration, scaling and growth'
+        1 => 'Initial project setup, team formation, and activation of resources',
+        2 => 'Mentor assignment, strategic guidance, and planning for project execution',
+        3 => 'Building team capabilities through targeted skill development and training',
+        4 => 'Product/service development, testing, iteration, and incubation support',
+        5 => 'Progress monitoring, evaluation, feedback collection, and showcase preparation',
+        6 => 'Final showcase, ecosystem integration, scaling strategies, and alumni network transition'
     ];
     return $descriptions[$stage] ?? '';
 }

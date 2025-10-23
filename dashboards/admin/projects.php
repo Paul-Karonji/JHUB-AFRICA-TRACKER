@@ -153,7 +153,7 @@ include '../../templates/header.php';
                 <p class="text-muted">Project Details & Management</p>
             </div>
             <div>
-                <span class="badge bg-primary fs-6 me-2">Stage <?php echo $viewProject['current_stage']; ?></span>
+                <span class="badge bg-primary fs-6 me-2"><?php echo getStageName($viewProject['current_stage']); ?></span>
                 <span class="badge bg-<?php echo $viewProject['status'] === 'active' ? 'success' : ($viewProject['status'] === 'completed' ? 'info' : 'danger'); ?> fs-6">
                     <?php echo ucfirst($viewProject['status']); ?>
                 </span>
@@ -245,7 +245,7 @@ include '../../templates/header.php';
                                 <select name="new_stage" class="form-select" required>
                                     <?php for ($i = 1; $i <= 6; $i++): ?>
                                         <option value="<?php echo $i; ?>" <?php echo $viewProject['current_stage'] == $i ? 'selected' : ''; ?>>
-                                            Stage <?php echo $i; ?>
+                                            <?php echo getStageName($i); ?>
                                         </option>
                                     <?php endfor; ?>
                                 </select>
@@ -352,7 +352,7 @@ include '../../templates/header.php';
                                 <?php foreach ($projects as $project): ?>
                                 <tr>
                                     <td><strong><?php echo e($project['project_name']); ?></strong></td>
-                                    <td><span class="badge bg-primary">Stage <?php echo $project['current_stage']; ?></span></td>
+                                    <td><span class="badge bg-primary"><?php echo getStageName($project['current_stage']); ?></span></td>
                                     <td>
                                         <span class="badge bg-<?php echo $project['status'] === 'active' ? 'success' : ($project['status'] === 'completed' ? 'info' : 'danger'); ?>">
                                             <?php echo ucfirst($project['status']); ?>

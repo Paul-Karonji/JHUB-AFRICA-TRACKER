@@ -8,44 +8,44 @@ $auth->requireUserType(USER_TYPE_ADMIN);
 $startDate = $_GET['start_date'] ?? date('Y-m-d', strtotime('-30 days'));
 $endDate = $_GET['end_date'] ?? date('Y-m-d');
 
-// Overall Statistics
+// Overall Statistics (filtered by date range)
 $stats = [
-    'total_projects' => $database->count('projects'),
-    'active_projects' => $database->count('projects', 'status = ?', ['active']),
-    'completed_projects' => $database->count('projects', 'status = ?', ['completed']),
-    'terminated_projects' => $database->count('projects', 'status = ?', ['terminated']),
-    'pending_applications' => $database->count('project_applications', 'status = ?', ['pending']),
-    'approved_applications' => $database->count('project_applications', 'status = ?', ['approved']),
-    'rejected_applications' => $database->count('project_applications', 'status = ?', ['rejected']),
-    'total_mentors' => $database->count('mentors'),
-    'active_mentors' => $database->count('mentors', 'is_active = 1'),
-    'total_innovators' => $database->count('project_innovators', 'is_active = 1'),
-    'total_resources' => $database->count('mentor_resources', 'is_deleted = 0'),
-    'total_assessments' => $database->count('project_assessments', 'is_deleted = 0'),
-    'total_learning' => $database->count('learning_objectives', 'is_deleted = 0')
+    'total_projects' => $database->count('projects', 'created_at BETWEEN ? AND ?', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']),
+    'active_projects' => $database->count('projects', 'status = ? AND created_at BETWEEN ? AND ?', ['active', $startDate . ' 00:00:00', $endDate . ' 23:59:59']),
+    'completed_projects' => $database->count('projects', 'status = ? AND created_at BETWEEN ? AND ?', ['completed', $startDate . ' 00:00:00', $endDate . ' 23:59:59']),
+    'terminated_projects' => $database->count('projects', 'status = ? AND created_at BETWEEN ? AND ?', ['terminated', $startDate . ' 00:00:00', $endDate . ' 23:59:59']),
+    'pending_applications' => $database->count('project_applications', 'status = ? AND created_at BETWEEN ? AND ?', ['pending', $startDate . ' 00:00:00', $endDate . ' 23:59:59']),
+    'approved_applications' => $database->count('project_applications', 'status = ? AND created_at BETWEEN ? AND ?', ['approved', $startDate . ' 00:00:00', $endDate . ' 23:59:59']),
+    'rejected_applications' => $database->count('project_applications', 'status = ? AND created_at BETWEEN ? AND ?', ['rejected', $startDate . ' 00:00:00', $endDate . ' 23:59:59']),
+    'total_mentors' => $database->count('mentors', 'created_at BETWEEN ? AND ?', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']),
+    'active_mentors' => $database->count('mentors', 'is_active = 1 AND created_at BETWEEN ? AND ?', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']),
+    'total_innovators' => $database->count('project_innovators', 'is_active = 1 AND created_at BETWEEN ? AND ?', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']),
+    'total_resources' => $database->count('mentor_resources', 'is_deleted = 0 AND created_at BETWEEN ? AND ?', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']),
+    'total_assessments' => $database->count('project_assessments', 'is_deleted = 0 AND created_at BETWEEN ? AND ?', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']),
+    'total_learning' => $database->count('learning_objectives', 'is_deleted = 0 AND created_at BETWEEN ? AND ?', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
 ];
 
-// Projects by Stage
+// Projects by Stage (filtered by date range)
 $projectsByStage = [];
 for ($i = 1; $i <= 6; $i++) {
-    $projectsByStage[$i] = $database->count('projects', 'current_stage = ? AND status = ?', [$i, 'active']);
+    $projectsByStage[$i] = $database->count('projects', 'current_stage = ? AND status = ? AND created_at BETWEEN ? AND ?', [$i, 'active', $startDate . ' 00:00:00', $endDate . ' 23:59:59']);
 }
 
-// Top Mentors
+// Top Mentors (filtered by date range)
 $topMentors = $database->getRows("
     SELECT m.name, m.email,
            COUNT(DISTINCT pm.project_id) as projects,
            COUNT(DISTINCT mr.resource_id) as resources,
            COUNT(DISTINCT pa.assessment_id) as assessments
     FROM mentors m
-    LEFT JOIN project_mentors pm ON m.mentor_id = pm.mentor_id AND pm.is_active = 1
-    LEFT JOIN mentor_resources mr ON m.mentor_id = mr.mentor_id AND mr.is_deleted = 0
-    LEFT JOIN project_assessments pa ON m.mentor_id = pa.mentor_id AND pa.is_deleted = 0
+    LEFT JOIN project_mentors pm ON m.mentor_id = pm.mentor_id AND pm.is_active = 1 AND pm.created_at BETWEEN ? AND ?
+    LEFT JOIN mentor_resources mr ON m.mentor_id = mr.mentor_id AND mr.is_deleted = 0 AND mr.created_at BETWEEN ? AND ?
+    LEFT JOIN project_assessments pa ON m.mentor_id = pa.mentor_id AND pa.is_deleted = 0 AND pa.created_at BETWEEN ? AND ?
     WHERE m.is_active = 1
     GROUP BY m.mentor_id
     ORDER BY projects DESC, resources DESC
     LIMIT 10
-");
+", [$startDate . ' 00:00:00', $endDate . ' 23:59:59', $startDate . ' 00:00:00', $endDate . ' 23:59:59', $startDate . ' 00:00:00', $endDate . ' 23:59:59']);
 
 // Recent Activity Summary
 $activitySummary = $database->getRows("
@@ -58,15 +58,15 @@ $activitySummary = $database->getRows("
     ORDER BY date DESC
 ", [$startDate, $endDate]);
 
-// Growth Data (last 6 months)
+// Growth Data (filtered by date range)
 $growthData = $database->getRows("
     SELECT DATE_FORMAT(created_at, '%Y-%m') as month,
            COUNT(*) as projects
     FROM projects
-    WHERE created_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
+    WHERE created_at BETWEEN ? AND ?
     GROUP BY DATE_FORMAT(created_at, '%Y-%m')
     ORDER BY month ASC
-");
+", [$startDate . ' 00:00:00', $endDate . ' 23:59:59']);
 
 $pageTitle = "System Reports & Analytics";
 include '../../templates/header.php';

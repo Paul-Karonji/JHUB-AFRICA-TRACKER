@@ -207,9 +207,9 @@ require_once '../templates/public-header.php';
                 All Stages
             </a>
             <?php for ($i = 1; $i <= 6; $i++): ?>
-                <a href="?<?php echo http_build_query(array_merge($_GET, ['stage' => $i])); ?>" 
+                <a href="?<?php echo http_build_query(array_merge($_GET, ['stage' => $i])); ?>"
                    class="filter-chip <?php echo $stage === $i ? 'active' : ''; ?>">
-                    Stage <?php echo $i; ?>
+                    <?php echo getStageName($i); ?>
                 </a>
             <?php endfor; ?>
         </div>
@@ -221,7 +221,7 @@ require_once '../templates/public-header.php';
                     <?php if ($search): ?>
                         Search results for "<?php echo e($search); ?>"
                     <?php elseif ($stage > 0): ?>
-                        Projects in Stage <?php echo $stage; ?>
+                        Projects in <?php echo getStageName($stage); ?>
                     <?php else: ?>
                         All Projects
                     <?php endif; ?>
@@ -253,7 +253,7 @@ require_once '../templates/public-header.php';
                         <div class="card-header position-relative">
                             <h5 class="mb-1 text-truncate"><?php echo e($project['project_name']); ?></h5>
                             <small>Led by <?php echo e($project['project_lead_name']); ?></small>
-                            <div class="project-stage">Stage <?php echo $project['current_stage']; ?></div>
+                            <div class="project-stage"><?php echo getStageName($project['current_stage']); ?></div>
                         </div>
                         <div class="card-body">
                             <p class="card-text text-muted" style="min-height: 100px;">

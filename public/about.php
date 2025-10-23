@@ -181,45 +181,45 @@ require_once '../templates/public-header.php';
             <div class="col-lg-8 mx-auto">
                 <div class="stage-timeline">
                     <div class="stage-item" data-stage="1">
-                        <h5>Stage 1: Project Creation</h5>
+                        <h5>Stage 1: Project Activation & Setup</h5>
                         <p class="text-muted">
-                            Initial project setup and team building. Projects enter our ecosystem 
-                            and begin assembling their core team.
+                            Initial project setup, team formation, and activation of resources.
+                            Projects enter our ecosystem and establish their foundation.
                         </p>
                     </div>
                     <div class="stage-item" data-stage="2">
-                        <h5>Stage 2: Mentorship</h5>
+                        <h5>Stage 2: Mentorship & Strategic Planning</h5>
                         <p class="text-muted">
-                            Mentor assignment and initial guidance. Expert mentors join projects 
-                            to provide strategic direction and support.
+                            Mentor assignment, strategic guidance, and planning for project execution.
+                            Expert mentors provide direction and support for strategic development.
                         </p>
                     </div>
                     <div class="stage-item" data-stage="3">
-                        <h5>Stage 3: Assessment</h5>
+                        <h5>Stage 3: Capacity Building & Skill Development</h5>
                         <p class="text-muted">
-                            Market validation, business model verification, and technical feasibility 
-                            reviews to ensure project viability.
+                            Building team capabilities through targeted skill development and training.
+                            Focus on equipping teams with essential competencies.
                         </p>
                     </div>
                     <div class="stage-item" data-stage="4">
-                        <h5>Stage 4: Learning and Development</h5>
+                        <h5>Stage 4: Product Development & Incubation</h5>
                         <p class="text-muted">
-                            Skill building and knowledge acquisition through targeted learning 
-                            objectives and training programs.
+                            Product/service development, testing, iteration, and incubation support.
+                            Transform ideas into market-ready solutions.
                         </p>
                     </div>
                     <div class="stage-item" data-stage="5">
-                        <h5>Stage 5: Progress Tracking</h5>
+                        <h5>Stage 5: Progress Evaluation & Showcase</h5>
                         <p class="text-muted">
-                            Regular milestone reviews, feedback collection, and performance optimization 
-                            to ensure continuous improvement.
+                            Progress monitoring, evaluation, feedback collection, and showcase preparation.
+                            Refine and prepare for public demonstration.
                         </p>
                     </div>
                     <div class="stage-item" data-stage="6">
-                        <h5>Stage 6: Showcase and Integration</h5>
+                        <h5>Stage 6: Integration, Scale-Up & Alumni Transition</h5>
                         <p class="text-muted">
-                            Final presentation, industry connections, and ecosystem integration 
-                            to prepare for market launch.
+                            Final showcase, ecosystem integration, scaling strategies, and alumni network transition.
+                            Prepare for sustainable growth and continued support.
                         </p>
                     </div>
                 </div>

@@ -222,7 +222,7 @@ include '../../templates/header.php';
                                             </a>
                                         </td>
                                         <td>
-                                            <span class="badge bg-primary">Stage <?php echo $project['current_stage']; ?></span>
+                                            <span class="badge bg-primary"><?php echo getStageName($project['current_stage']); ?></span>
                                         </td>
                                         <td><?php echo $project['team_count']; ?></td>
                                         <td><?php echo $project['mentor_count']; ?></td>

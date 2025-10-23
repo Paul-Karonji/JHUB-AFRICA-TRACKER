@@ -224,7 +224,7 @@ include '../../templates/header.php';
                     <div>
                         <label class="small text-muted">Current Stage:</label>
                         <div>
-                            <span class="badge bg-primary">Stage <?php echo $project['current_stage']; ?></span>
+                            <span class="badge bg-primary"><?php echo getStageName($project['current_stage']); ?></span>
                         </div>
                     </div>
                 </div>

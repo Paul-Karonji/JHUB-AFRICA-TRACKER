@@ -115,7 +115,7 @@ include '../../templates/header.php';
                 <p class="text-muted mb-0">Project Lead: <?php echo htmlspecialchars($viewProject['project_lead_name']); ?></p>
             </div>
             <div>
-                <span class="badge bg-primary fs-6 me-2">Stage <?php echo $viewProject['current_stage']; ?></span>
+                <span class="badge bg-primary fs-6 me-2"><?php echo getStageName($viewProject['current_stage']); ?></span>
                 <span class="badge bg-<?php echo $viewProject['status'] === 'active' ? 'success' : ($viewProject['status'] === 'completed' ? 'info' : 'danger'); ?> fs-6">
                     <?php echo ucfirst($viewProject['status']); ?>
                 </span>
@@ -147,7 +147,7 @@ include '../../templates/header.php';
                         <strong>Status:</strong> <?php echo ucfirst($viewProject['status']); ?>
                     </div>
                     <div class="col-md-4">
-                        <strong>Current Stage:</strong> <?php echo $viewProject['current_stage']; ?> of 6
+                        <strong>Current Stage:</strong> <?php echo getStageName($viewProject['current_stage']); ?>
                     </div>
                 </div>
             </div>
@@ -292,7 +292,7 @@ include '../../templates/header.php';
                                         <small class="text-muted"><?php echo htmlspecialchars($project['project_lead_name']); ?></small>
                                     </td>
                                     <td>
-                                        <span class="badge bg-primary">Stage <?php echo $project['current_stage']; ?></span>
+                                        <span class="badge bg-primary"><?php echo getStageName($project['current_stage']); ?></span>
                                     </td>
                                     <td>
                                         <span class="badge bg-<?php echo $project['status'] === 'active' ? 'success' : 'secondary'; ?>">
